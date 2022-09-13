@@ -1,0 +1,16 @@
+.navbar {
+	position: fixed;
+	width: 100%;
+	height: 65px;
+	z-index: 2000;
+	box-sizing: border-box;
+}
+
+.navbar .content {
+	padding-inline: 10%;
+	height: 100%;
+}
+
+.navbar .logo {
+	margin-inline: 20px;
+}

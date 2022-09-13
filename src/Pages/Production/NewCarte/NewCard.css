@@ -1,0 +1,12 @@
+.new-card-container {
+	top: 70px;
+	position: absolute;
+	display: flex;
+	width: 100%;
+}
+
+#map-container {
+	width: 100%;
+	height: calc(100vh - 70px);
+	border: 1px solid black;
+}
