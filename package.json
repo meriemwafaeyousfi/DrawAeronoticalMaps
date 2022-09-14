@@ -7,6 +7,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "ol": "^7.1.0",
+    "ol-contextmenu": "^4.1.0",
     "ol-ext": "^3.2.30",
     "primeicons": "^5.0.0",
     "primereact": "^8.5.0",

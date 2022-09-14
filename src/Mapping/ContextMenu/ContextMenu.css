@@ -1,0 +1,40 @@
+.ajouter-poingee {
+	background: url('C:/Users/y.lalmi/Desktop/Work/AmetView_Production_2.0.0/public/Icons/Clouds/circle-plus-solid.svg');
+	width: 1rem;
+	height: 1rem;
+}
+.supprimer-poingee {
+	background: url('C:/Users/y.lalmi/Desktop/Work/AmetView_Production_2.0.0/public/Icons/Clouds/circle-minus-solid.svg');
+	width: 1rem;
+	height: 1rem;
+}
+.copie-figure {
+	background: url('C:/Users/y.lalmi/Desktop/Work/AmetView_Production_2.0.0/public/Icons/Clouds/copy-solid.svg');
+	width: 1rem;
+	height: 1rem;
+}
+.couper-figure {
+	background: url('C:/Users/y.lalmi/Desktop/Work/AmetView_Production_2.0.0/public/Icons/Clouds/scissors-solid.svg');
+	width: 1rem;
+	height: 1rem;
+}
+.coller-figure {
+	background: url('C:/Users/y.lalmi/Desktop/Work/AmetView_Production_2.0.0/public/Icons/Clouds/paste-solid.svg');
+	width: 1rem;
+	height: 1rem;
+}
+.ajouter-zone-text {
+	background: url('C:/Users/y.lalmi/Desktop/Work/AmetView_Production_2.0.0/public/Icons/Clouds/square-minus-solid.svg');
+	width: 1rem;
+	height: 1rem;
+}
+.supprimer-zone-text {
+	background: url('C:/Users/y.lalmi/Desktop/Work/AmetView_Production_2.0.0/public/Icons/Clouds/square-plus-solid.svg');
+	width: 1rem;
+	height: 1rem;
+}
+.supprimer-figure {
+	background: url('C:/Users/y.lalmi/Desktop/Work/AmetView_Production_2.0.0/public/Icons/Clouds/trash-can-solid.svg');
+	width: 1rem;
+	height: 1rem;
+}

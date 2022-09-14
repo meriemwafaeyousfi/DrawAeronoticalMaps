@@ -1,16 +1,38 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import './Tools.css';
+import { DragPan } from 'ol/interaction';
 
-function Tools({ option, setOption }) {
+function Tools({ map, option, setOption }) {
+	const disableOptions = useCallback(() => {
+		let tmp = document.querySelectorAll('.tools button');
+		tmp.forEach((Element) => {
+			Element.classList.remove('active');
+		});
+	}, []);
+
+	useEffect(() => {
+		if (option !== '') {
+		} else {
+			if (map) {
+				map.getInteractions().forEach((interaction) => {
+					console.log(interaction);
+				});
+			}
+			document.querySelector('body').style.cursor = 'unset';
+		}
+	}, [map, disableOptions, option]);
+
 	const toggle = useCallback(
 		(name) => {
-			if (option === name) {
-				setOption('');
-			} else {
-				setOption(name);
-			}
+			setOption((prev) => {
+				if (prev === name) {
+					return '';
+				} else {
+					return name;
+				}
+			});
 		},
-		[option, setOption]
+		[setOption]
 	);
 	const items = [
 		{
@@ -18,7 +40,7 @@ function Tools({ option, setOption }) {
 			icon: '/Icons/Clouds/floppy-disk-solid.svg',
 			alt: 'Save icon',
 			command: () => {
-				toggle('text');
+				console.log('saved');
 			},
 		},
 		{
@@ -26,31 +48,51 @@ function Tools({ option, setOption }) {
 			icon: '/Icons/Clouds/arrow-pointer-solid.svg',
 			alt: 'Select icon',
 			command: () => {
-				toggle('text');
+				toggle('select');
+				disableOptions();
+				document.getElementById('select').classList.add('active');
+				document.querySelector('body').style.cursor = 'unset';
 			},
 		},
 		{
-			id: 'zoomin',
+			id: 'zoom_in',
 			icon: '/Icons/Clouds/magnifying-glass-plus-solid.svg',
 			alt: 'Zoom In icon',
 			command: () => {
-				toggle('text');
+				toggle('zoom_in');
+				document.querySelector('body').style.cursor = 'zoom-in';
 			},
 		},
 		{
-			id: 'zoomout',
+			id: 'zoom_out',
 			icon: '/Icons/Clouds/magnifying-glass-minus-solid.svg',
 			alt: 'Zoom Out icon',
 			command: () => {
-				toggle('text');
+				toggle('zoom_out');
+				document.querySelector('body').style.cursor = 'zoom-out';
 			},
 		},
 		{
 			id: 'drag',
 			icon: '/Icons/Clouds/hand-solid.svg',
 			alt: 'Drag icon',
-			command: () => {
-				toggle('text');
+			command: (event) => {
+				setOption((prev) => {
+					if (prev === 'drag') {
+						document.getElementById('drag').classList.remove('active');
+						map.getInteractions().forEach((interaction) => {
+							if (interaction instanceof DragPan) {
+								map.removeInteraction(interaction);
+							}
+						});
+						return '';
+					} else {
+						document.getElementById('drag').classList.add('active');
+						document.querySelector('body').style.cursor = 'grab';
+						map.addInteraction(new DragPan());
+						return 'drag';
+					}
+				});
 			},
 		},
 		{
@@ -58,7 +100,7 @@ function Tools({ option, setOption }) {
 			icon: '/Icons/Clouds/rotate-left-solid.svg',
 			alt: 'Undo icon',
 			command: () => {
-				toggle('text');
+				console.log('undo');
 			},
 		},
 		{
@@ -66,103 +108,95 @@ function Tools({ option, setOption }) {
 			icon: '/Icons/Clouds/rotate-right-solid.svg',
 			alt: 'Redo icon',
 			command: () => {
-				toggle('text');
+				console.log('redo');
 			},
 		},
 		{
-			id: 'clouds',
+			id: 'zone_texte',
+			icon: '/Icons/Clouds/message-regular.svg',
+			alt: 'Zone de texte icon',
+			command: () => {
+				toggle('zone_texte');
+			},
+		},
+		{
+			id: 'zone_nuageuse',
 			icon: '/Icons/Clouds/cloud-solid.svg',
-			alt: 'cloud icon',
+			alt: 'Zone nuageuse icon',
 			command: () => {
-				toggle('clouds');
+				toggle('zone_nuageuse');
 			},
 		},
 		{
-			id: 'jet',
+			id: 'courant_jet',
 			icon: '/Icons/Clouds/wind-solid.svg',
-			alt: 'Jet icon',
+			alt: 'Courant jet icon',
 			command: () => {
-				toggle('jet');
+				toggle('courant_jet');
 			},
 		},
 		{
-			id: 'text',
+			id: 'front',
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
-			alt: 'text Zone icon',
+			alt: 'front icon',
 			command: () => {
-				toggle('text');
+				toggle('front');
 			},
 		},
 		{
-			id: 'text',
+			id: 'cat',
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
-			alt: 'text Zone icon',
+			alt: 'Cat icon',
 			command: () => {
-				toggle('text');
+				toggle('cat');
 			},
 		},
 		{
-			id: 'text',
+			id: 'ligne',
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
-			alt: 'text Zone icon',
+			alt: 'ligne icon',
 			command: () => {
-				toggle('text');
+				toggle('ligne');
 			},
 		},
 		{
-			id: 'text',
+			id: 'fleche',
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
-			alt: 'text Zone icon',
+			alt: 'Flèche icon',
 			command: () => {
-				toggle('text');
+				toggle('fleche');
 			},
 		},
 		{
-			id: 'text',
+			id: 'centres_action',
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
-			alt: 'text Zone icon',
+			alt: "Centres d'action icon",
 			command: () => {
-				toggle('text');
+				toggle('centres_action');
 			},
 		},
 		{
-			id: 'text',
-			icon: '/Icons/Clouds/i-cursor-solid.svg',
-			alt: 'text Zone icon',
+			id: 'volcan',
+			icon: '/Icons/Clouds/volcano-solid.svg',
+			alt: 'Volcan icon',
 			command: () => {
-				toggle('text');
+				toggle('volcan');
 			},
 		},
 		{
-			id: 'text',
+			id: 'tropopause',
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
-			alt: 'text Zone icon',
+			alt: 'tropopause icon',
 			command: () => {
-				toggle('text');
+				toggle('tropopause');
 			},
 		},
 		{
-			id: 'text',
+			id: 'condition_en_surface',
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'text Zone icon',
 			command: () => {
-				toggle('text');
-			},
-		},
-		{
-			id: 'text',
-			icon: '/Icons/Clouds/i-cursor-solid.svg',
-			alt: 'text Zone icon',
-			command: () => {
-				toggle('text');
-			},
-		},
-		{
-			id: 'text',
-			icon: '/Icons/Clouds/i-cursor-solid.svg',
-			alt: 'text Zone icon',
-			command: () => {
-				toggle('text');
+				toggle('condition_en_surface');
 			},
 		},
 	];
