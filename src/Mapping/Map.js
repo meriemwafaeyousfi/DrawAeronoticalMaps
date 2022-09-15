@@ -22,3 +22,27 @@ export const createBlankMap = (target) => {
 		}
 	});
 };
+
+export const zoomingInAndCenter = (event) => {
+	event.map.getView().animate({
+		center: event.coordinate,
+		zoom: event.map.getView().getZoom() + 1,
+		duration: 300,
+	});
+};
+
+export const zoomingOutAndCenter = (event) => {
+	event.map.getView().animate({
+		center: event.coordinate,
+		zoom: event.map.getView().getZoom() - 1,
+		duration: 300,
+	});
+};
+
+export const clearAllInteractions = (map) => {
+	map.getInteractions().forEach((inter) => {
+		map.removeInteraction(inter);
+	});
+};
+
+export const endDrawing = new CustomEvent('drawing:end');

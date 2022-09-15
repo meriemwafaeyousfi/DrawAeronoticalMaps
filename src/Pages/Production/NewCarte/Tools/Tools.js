@@ -1,8 +1,18 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
 import './Tools.css';
 import { DragPan } from 'ol/interaction';
+import {
+	clearAllInteractions,
+	endDrawing,
+	zoomingInAndCenter,
+	zoomingOutAndCenter,
+} from '../../../../Mapping/Map';
+import { cloudDrawingStartEvent } from '../../../../Mapping/Features/Clouds/Clouds';
+import { jetFlowDrawingStartEvent } from '../../../../Mapping/Features/JetFlow/JetFlow';
 
-function Tools({ map, option, setOption }) {
+function Tools({ map }) {
+	const [option, setOption] = useState('');
+
 	const disableOptions = useCallback(() => {
 		let tmp = document.querySelectorAll('.tools button');
 		tmp.forEach((Element) => {
@@ -10,29 +20,55 @@ function Tools({ map, option, setOption }) {
 		});
 	}, []);
 
-	useEffect(() => {
-		if (option !== '') {
-		} else {
-			if (map) {
-				map.getInteractions().forEach((interaction) => {
-					console.log(interaction);
-				});
-			}
-			document.querySelector('body').style.cursor = 'unset';
-		}
-	}, [map, disableOptions, option]);
-
-	const toggle = useCallback(
-		(name) => {
+	/* 	const toggleOption = useCallback(
+		(option, cursor = 'unset') => {
+			disableOptions();
+			document.querySelector('#map-container').style.cursor = 'unset';
+			clearAllInteractions(map);
+			map.un('singleclick', zoomingInAndCenter);
+			map.un('singleclick', zoomingOutAndCenter);
 			setOption((prev) => {
-				if (prev === name) {
+				if (prev === option) {
 					return '';
 				} else {
-					return name;
+					switch (option) {
+						case 'zoom_in':
+							map.on('singleclick', zoomingInAndCenter);
+							break;
+						case 'zoom_out':
+							map.on('singleclick', zoomingOutAndCenter);
+							break;
+						case 'drag':
+							map.addInteraction(new DragPan());
+							break;
+						default:
+							break;
+					}
+					document.getElementById(option).classList.add('active');
+					document.querySelector('#map-container').style.cursor = cursor;
+					return option;
 				}
 			});
 		},
-		[setOption]
+		[disableOptions, map, setOption]
+	); */
+
+	const toggleDrawingOptions = useCallback(
+		(option, startEvent, endEvent) => {
+			disableOptions();
+			map.getViewport().dispatchEvent(endEvent);
+			setOption((prev) => {
+				if (prev === option) {
+					document.getElementById(option).classList.remove('active');
+					return '';
+				} else {
+					document.getElementById(option).classList.add('active');
+					map.getViewport().dispatchEvent(startEvent);
+					return option;
+				}
+			});
+		},
+		[disableOptions, map]
 	);
 	const items = [
 		{
@@ -48,10 +84,7 @@ function Tools({ map, option, setOption }) {
 			icon: '/Icons/Clouds/arrow-pointer-solid.svg',
 			alt: 'Select icon',
 			command: () => {
-				toggle('select');
-				disableOptions();
-				document.getElementById('select').classList.add('active');
-				document.querySelector('body').style.cursor = 'unset';
+				console.log('saved');
 			},
 		},
 		{
@@ -59,8 +92,7 @@ function Tools({ map, option, setOption }) {
 			icon: '/Icons/Clouds/magnifying-glass-plus-solid.svg',
 			alt: 'Zoom In icon',
 			command: () => {
-				toggle('zoom_in');
-				document.querySelector('body').style.cursor = 'zoom-in';
+				console.log('saved');
 			},
 		},
 		{
@@ -68,8 +100,7 @@ function Tools({ map, option, setOption }) {
 			icon: '/Icons/Clouds/magnifying-glass-minus-solid.svg',
 			alt: 'Zoom Out icon',
 			command: () => {
-				toggle('zoom_out');
-				document.querySelector('body').style.cursor = 'zoom-out';
+				console.log('saved');
 			},
 		},
 		{
@@ -77,22 +108,7 @@ function Tools({ map, option, setOption }) {
 			icon: '/Icons/Clouds/hand-solid.svg',
 			alt: 'Drag icon',
 			command: (event) => {
-				setOption((prev) => {
-					if (prev === 'drag') {
-						document.getElementById('drag').classList.remove('active');
-						map.getInteractions().forEach((interaction) => {
-							if (interaction instanceof DragPan) {
-								map.removeInteraction(interaction);
-							}
-						});
-						return '';
-					} else {
-						document.getElementById('drag').classList.add('active');
-						document.querySelector('body').style.cursor = 'grab';
-						map.addInteraction(new DragPan());
-						return 'drag';
-					}
-				});
+				console.log('saved');
 			},
 		},
 		{
@@ -116,7 +132,7 @@ function Tools({ map, option, setOption }) {
 			icon: '/Icons/Clouds/message-regular.svg',
 			alt: 'Zone de texte icon',
 			command: () => {
-				toggle('zone_texte');
+				toggleDrawingOptions('zone_texte', cloudDrawingStartEvent, endDrawing);
 			},
 		},
 		{
@@ -124,7 +140,11 @@ function Tools({ map, option, setOption }) {
 			icon: '/Icons/Clouds/cloud-solid.svg',
 			alt: 'Zone nuageuse icon',
 			command: () => {
-				toggle('zone_nuageuse');
+				toggleDrawingOptions(
+					'zone_nuageuse',
+					cloudDrawingStartEvent,
+					endDrawing
+				);
 			},
 		},
 		{
@@ -132,7 +152,11 @@ function Tools({ map, option, setOption }) {
 			icon: '/Icons/Clouds/wind-solid.svg',
 			alt: 'Courant jet icon',
 			command: () => {
-				toggle('courant_jet');
+				toggleDrawingOptions(
+					'courant_jet',
+					jetFlowDrawingStartEvent,
+					endDrawing
+				);
 			},
 		},
 		{
@@ -140,7 +164,7 @@ function Tools({ map, option, setOption }) {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'front icon',
 			command: () => {
-				toggle('front');
+				toggleDrawingOptions('front', jetFlowDrawingStartEvent, endDrawing);
 			},
 		},
 		{
@@ -148,7 +172,7 @@ function Tools({ map, option, setOption }) {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'Cat icon',
 			command: () => {
-				toggle('cat');
+				toggleDrawingOptions('cat', jetFlowDrawingStartEvent, endDrawing);
 			},
 		},
 		{
@@ -156,7 +180,7 @@ function Tools({ map, option, setOption }) {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'ligne icon',
 			command: () => {
-				toggle('ligne');
+				toggleDrawingOptions('ligne', jetFlowDrawingStartEvent, endDrawing);
 			},
 		},
 		{
@@ -164,7 +188,7 @@ function Tools({ map, option, setOption }) {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'Flèche icon',
 			command: () => {
-				toggle('fleche');
+				toggleDrawingOptions('fleche', jetFlowDrawingStartEvent, endDrawing);
 			},
 		},
 		{
@@ -172,7 +196,11 @@ function Tools({ map, option, setOption }) {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: "Centres d'action icon",
 			command: () => {
-				toggle('centres_action');
+				toggleDrawingOptions(
+					'centres_action',
+					jetFlowDrawingStartEvent,
+					endDrawing
+				);
 			},
 		},
 		{
@@ -180,7 +208,7 @@ function Tools({ map, option, setOption }) {
 			icon: '/Icons/Clouds/volcano-solid.svg',
 			alt: 'Volcan icon',
 			command: () => {
-				toggle('volcan');
+				toggleDrawingOptions('volcan', jetFlowDrawingStartEvent, endDrawing);
 			},
 		},
 		{
@@ -188,7 +216,11 @@ function Tools({ map, option, setOption }) {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'tropopause icon',
 			command: () => {
-				toggle('tropopause');
+				toggleDrawingOptions(
+					'tropopause',
+					jetFlowDrawingStartEvent,
+					endDrawing
+				);
 			},
 		},
 		{
@@ -196,7 +228,11 @@ function Tools({ map, option, setOption }) {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'text Zone icon',
 			command: () => {
-				toggle('condition_en_surface');
+				toggleDrawingOptions(
+					'condition_en_surface',
+					jetFlowDrawingStartEvent,
+					endDrawing
+				);
 			},
 		},
 	];
