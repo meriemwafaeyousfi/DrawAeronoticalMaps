@@ -1,4 +1,4 @@
-import { Draw, Modify, Select } from 'ol/interaction';
+import { Draw, Modify, Select, Translate } from 'ol/interaction';
 import { Stroke, Style, Fill } from 'ol/style';
 import { arc } from './ArcGeometry';
 import VectorSource from 'ol/source/Vector';
@@ -7,6 +7,12 @@ import CircleStyle from 'ol/style/Circle';
 import { MultiPoint } from 'ol/geom';
 import { doubleClick, never } from 'ol/events/condition';
 
+export const cloudVectorLayer = () => {
+	return new VectorLayer({
+		title: 'Clouds Layer',
+		source: new VectorSource(),
+	});
+};
 export const drawCloud = (vectorSource) => {
 	return new Draw({
 		source: vectorSource,
@@ -31,13 +37,6 @@ export const drawCloud = (vectorSource) => {
 	});
 };
 
-export const cloudVectorLayer = () => {
-	return new VectorLayer({
-		title: 'Clouds Layer',
-		source: new VectorSource(),
-	});
-};
-
 export const modifyCloud = (select) => {
 	return new Modify({
 		features: select.getFeatures(),
@@ -51,7 +50,6 @@ export const selectCloud = (vectorLayer) => {
 	return new Select({
 		layers: [vectorLayer],
 		hitTolerance: 10,
-		condition: doubleClick,
 		style: (feature) => {
 			if (feature.getGeometry().getType() === 'LineString') {
 				return [
@@ -86,4 +84,10 @@ export const selectCloud = (vectorLayer) => {
 	});
 };
 
+export const translateCloud = (vectorLayer) => {
+	return new Translate({
+		layers: [vectorLayer],
+		hitTolerance: 10,
+	});
+};
 export const cloudDrawingStartEvent = new CustomEvent('cloud_drawing:start');

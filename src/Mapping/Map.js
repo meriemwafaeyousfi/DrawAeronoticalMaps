@@ -41,8 +41,16 @@ export const zoomingOutAndCenter = (event) => {
 
 export const clearAllInteractions = (map) => {
 	map.getInteractions().forEach((inter) => {
-		map.removeInteraction(inter);
+		inter.setActive(false);
 	});
 };
 
 export const endDrawing = new CustomEvent('drawing:end');
+
+export const selectOn = new CustomEvent('select:on');
+
+export const selectOff = new CustomEvent('select:off');
+
+export const translateOn = new CustomEvent('translate:on');
+
+export const translateOff = new CustomEvent('translate:off');

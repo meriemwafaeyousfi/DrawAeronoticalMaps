@@ -1,47 +1,47 @@
 .ajouter-poingee {
-	background: url('C:/Users/y.lalmi/Desktop/Work/AmetView_Production_2.0.0/public/Icons/Clouds/circle-plus-solid.svg');
+	background: url('../../../public/Icons/Clouds/circle-plus-solid.svg');
 	width: 1rem;
 	height: 1rem;
 	background-repeat: no-repeat;
 }
 .supprimer-poingee {
-	background: url('C:/Users/y.lalmi/Desktop/Work/AmetView_Production_2.0.0/public/Icons/Clouds/circle-minus-solid.svg');
+	background: url('../../../public/Icons/Clouds/circle-minus-solid.svg');
 	width: 1rem;
 	height: 1rem;
 	background-repeat: no-repeat;
 }
 .copie-figure {
-	background: url('C:/Users/y.lalmi/Desktop/Work/AmetView_Production_2.0.0/public/Icons/Clouds/copy-solid.svg');
+	background: url('../../../public/Icons/Clouds/copy-solid.svg');
 	width: 1rem;
 	height: 1rem;
 	background-repeat: no-repeat;
 }
 .couper-figure {
-	background: url('C:/Users/y.lalmi/Desktop/Work/AmetView_Production_2.0.0/public/Icons/Clouds/scissors-solid.svg');
+	background: url('../../../public/Icons/Clouds/scissors-solid.svg');
 	width: 1rem;
 	height: 1rem;
 	background-repeat: no-repeat;
 }
 .coller-figure {
-	background: url('C:/Users/y.lalmi/Desktop/Work/AmetView_Production_2.0.0/public/Icons/Clouds/paste-solid.svg');
+	background: url('../../../public/Icons/Clouds/paste-solid.svg');
 	width: 1rem;
 	height: 1rem;
 	background-repeat: no-repeat;
 }
 .ajouter-zone-text {
-	background: url('C:/Users/y.lalmi/Desktop/Work/AmetView_Production_2.0.0/public/Icons/Clouds/square-minus-solid.svg');
+	background: url('../../../public/Icons/Clouds/square-minus-solid.svg');
 	width: 1rem;
 	height: 1rem;
 	background-repeat: no-repeat;
 }
 .supprimer-zone-text {
-	background: url('C:/Users/y.lalmi/Desktop/Work/AmetView_Production_2.0.0/public/Icons/Clouds/square-plus-solid.svg');
+	background: url('../../../public/Icons/Clouds/square-plus-solid.svg');
 	width: 1rem;
 	height: 1rem;
 	background-repeat: no-repeat;
 }
 .supprimer-figure {
-	background: url('C:/Users/y.lalmi/Desktop/Work/AmetView_Production_2.0.0/public/Icons/Clouds/trash-can-solid.svg');
+	background: url('../../../public/Icons/Clouds/trash-can-solid.svg');
 	width: 1rem;
 	height: 1rem;
 	background-repeat: no-repeat;
