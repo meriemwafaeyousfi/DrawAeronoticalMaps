@@ -38,6 +38,9 @@ function CloudyArea({ map, option }) {
 		const dc = drawCloud(cvl.getSource());
 		dc.set('title', 'cloud_drawing');
 		dc.setActive(false);
+		dc.on('drawend', ({ feature }) => {
+			feature.set('featureType', 'cloud');
+		});
 		map.addInteraction(dc);
 
 		const sc = selectCloud(cvl);

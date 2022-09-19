@@ -29,13 +29,13 @@
 	background-repeat: no-repeat;
 }
 .ajouter-zone-text {
-	background: url('../../../public/Icons/Clouds/square-minus-solid.svg');
+	background: url('../../../public/Icons/Clouds/square-plus-solid.svg');
 	width: 1rem;
 	height: 1rem;
 	background-repeat: no-repeat;
 }
 .supprimer-zone-text {
-	background: url('../../../public/Icons/Clouds/square-plus-solid.svg');
+	background: url('../../../public/Icons/Clouds/square-minus-solid.svg');
 	width: 1rem;
 	height: 1rem;
 	background-repeat: no-repeat;

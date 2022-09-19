@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import ContextMenu from '../../../Mapping/ContextMenu/ContextMenu';
+import MapContextMenu from '../../../Mapping/ContextMenu/MapContextMenu';
 import { createBlankMap } from '../../../Mapping/Map';
 import { DragPan, Draw, Select, Translate } from 'ol/interaction';
 import CloudyArea from '../Features/CloudyArea/CloudyArea';
@@ -36,10 +36,9 @@ function NewCard() {
 					}
 				});
 			});
-			res.on('contextmenu', (event) => {
+			res.getViewport().addEventListener('contextmenu', (event) => {
 				event.preventDefault();
-				setContextMenu(true);
-				console.log(event);
+				setContextMenu(event);
 			});
 			res.addInteraction(new DragPan());
 			setMap(res);
@@ -49,7 +48,7 @@ function NewCard() {
 		<div className="new-card-container">
 			<Tools map={map} setOption={setOption} />
 			<div id="map-container"></div>
-			{contextMenu && <ContextMenu map={map} />}
+			<MapContextMenu map={map} event={contextMenu} />
 			{map && <CloudyArea map={map} option={option} />}
 			{map && <JetFlow map={map} />}
 		</div>

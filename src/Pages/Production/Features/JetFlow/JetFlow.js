@@ -39,6 +39,9 @@ function JetFlow({ map }) {
 		const djf = drawJetFlow(jfvl.getSource());
 		djf.set('title', 'draw_jet_flow');
 		djf.setActive(false);
+		djf.on('drawend', ({ feature }) => {
+			feature.set('featureType', 'jetFlow');
+		});
 		map.addInteraction(djf);
 
 		const sjf = selectJetFlow(jfvl);
