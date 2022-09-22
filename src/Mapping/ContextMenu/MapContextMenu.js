@@ -1,97 +1,73 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ContextMenu as PrimeContextMenu } from 'primereact/contextmenu';
 import './MapContextMenu.css';
+import { addAHandle } from '../Features/Clouds/Clouds';
+import { copyFeature, pastFeature } from '../Map';
 
 function MapContextMenu({ map }) {
 	const CMRef = useRef(null);
-	const [featureType, setFeatureType] = useState('');
+	const [feature, setFeature] = useState(null);
+	const [eventCoordiantes, setEventCoordinates] = useState(null);
+	const [layer, setLayer] = useState();
 	const [vertex, setVertex] = useState(false);
 
-	const generateItem = useCallback(() => {
-		let items = [];
-		if (featureType !== '') {
-			items = [
-				{
-					label: 'Copier',
-					icon: 'copie-figure',
-					command: (event) => {},
-				},
-				{
-					label: 'Coller',
-					icon: 'coller-figure',
-					command: (event) => {},
-				},
-				{
-					label: 'Couper',
-					icon: 'couper-figure',
-					command: (event) => {},
-				},
-				{ separator: true },
-				{
-					label: 'Supprimer la figure',
-					icon: 'supprimer-figure',
-					command: (event) => {},
-				},
-			];
-
-			if (featureType === 'cloud') {
-				items.push(
-					{
-						label: 'Ajouter une zone de texte',
-						icon: 'ajouter-zone-text',
-						command: () => {},
-					},
-					{
-						label: 'Supprimer la zone de texte',
-						icon: 'supprimer-zone-text',
-						command: () => {},
-					}
-				);
-			}
-
-			if (vertex) {
-				items.push({
-					label: 'Supprimer le poignée',
-					icon: 'supprimer-poingee',
-					command: (event) => {
-						setVertex(false);
-					},
-				});
-			} else {
-				items.push({
-					label: 'Ajouter un poignée',
-					icon: 'ajouter-poingee',
-					command: (event) => {
-						setVertex(true);
-					},
-				});
-			}
-		} else {
-			items = [
-				{
-					label: 'Random Action',
-					command: () => {},
-				},
-				{
-					label: 'Random Action',
-					command: () => {},
-				},
-				{
-					label: 'Random Action',
-					command: () => {},
-				},
-				{
-					label: 'Random Action',
-					command: () => {},
-				},
-				{
-					label: 'Random Action',
-					command: () => {},
-				},
-			];
-		}
-		return items;
-	}, [featureType, vertex]);
+	const items = [
+		{
+			label: 'Ajouter un poignée',
+			icon: 'ajouter-poingee',
+			visible: !!feature,
+			command: (event) => {
+				addAHandle(eventCoordiantes, feature);
+			},
+		},
+		{
+			label: 'Supprimer le poignée',
+			icon: 'supprimer-poingee',
+			visible:
+				!!feature && feature.get('feature_type') === 'zone_nuageuse' && vertex,
+			command: (event) => {},
+		},
+		{
+			label: 'Ajouter une zone de texte',
+			icon: 'ajouter-zone-text',
+			visible: !!feature && feature.get('feature_type') === 'zone_nuageuse',
+			command: () => {},
+		},
+		{
+			label: 'Supprimer la zone de texte',
+			icon: 'supprimer-zone-text',
+			visible: !!feature && feature.get('feature_type') === 'zone_nuageuse',
+			command: () => {},
+		},
+		{
+			label: 'Copier',
+			icon: 'copie-figure',
+			disabled: !feature,
+			command: () => {
+				copyFeature(map, feature);
+			},
+		},
+		{
+			label: 'Couper',
+			icon: 'couper-figure',
+			disabled: !feature,
+			command: (event) => {},
+		},
+		{
+			label: 'Coller',
+			icon: 'coller-figure',
+			disabled: !!map && !map.get('feature_copiee'),
+			command: () => {
+				pastFeature(map, layer, eventCoordiantes);
+			},
+		},
+		{
+			label: 'Supprimer la figure',
+			icon: 'supprimer-figure',
+			disabled: !feature,
+			command: (event) => {},
+		},
+	];
 
 	const distance = useCallback((p1, p2) => {
 		return Math.sqrt(
@@ -118,25 +94,28 @@ function MapContextMenu({ map }) {
 	);
 	useEffect(() => {
 		if (map) {
-			/* map.getViewport().addEventListener('contextmenu', (event) => {
-				generateItem();
+			map.getViewport().addEventListener('contextmenu', (event) => {
+				setEventCoordinates(null);
+				setFeature(null);
+				setEventCoordinates(
+					map.getCoordinateFromPixel(map.getEventPixel(event))
+				);
 				map.forEachFeatureAtPixel(
 					map.getEventPixel(event),
-					(feature) => {
-						setFeatureType(feature.get('featureType'));
+					(feature, layer) => {
+						if (feature.getGeometry().getType() !== 'Point') {
+							setLayer(layer);
+							setFeature(feature);
+						}
 					},
-					{ hitTolerance: 10 }
+					{ hitTolerance: 5 }
 				);
 				CMRef.current.show(event);
-			}); */
+			});
 		}
-	}, [generateItem, map]);
+	}, [map]);
 	return (
-		<PrimeContextMenu
-			model={generateItem()}
-			style={{ width: '250px' }}
-			ref={CMRef}
-		/>
+		<PrimeContextMenu model={items} style={{ width: '260px' }} ref={CMRef} />
 	);
 }
 

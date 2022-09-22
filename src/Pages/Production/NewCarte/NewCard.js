@@ -36,10 +36,6 @@ function NewCard() {
 					}
 				});
 			});
-			res.getViewport().addEventListener('contextmenu', (event) => {
-				event.preventDefault();
-				setContextMenu(event);
-			});
 			res.addInteraction(new DragPan());
 			setMap(res);
 		});

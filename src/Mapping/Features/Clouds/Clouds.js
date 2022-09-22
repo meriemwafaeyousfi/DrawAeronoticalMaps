@@ -4,8 +4,9 @@ import { arc } from './ArcGeometry';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import CircleStyle from 'ol/style/Circle';
-import { MultiPoint } from 'ol/geom';
-import { doubleClick, never } from 'ol/events/condition';
+import { MultiPoint, LineString } from 'ol/geom';
+import { never } from 'ol/events/condition';
+import Point from 'ol/geom/Point';
 
 export const cloudVectorLayer = () => {
 	return new VectorLayer({
@@ -37,12 +38,11 @@ export const drawCloud = (vectorSource) => {
 	});
 };
 
-export const modifyCloud = (select) => {
+export const modifyCloud = (select, cvl) => {
 	return new Modify({
 		features: select.getFeatures(),
 		insertVertexCondition: never,
 		removePoint: never,
-		pixelTolerance: 10,
 	});
 };
 
@@ -90,4 +90,10 @@ export const translateCloud = (vectorLayer) => {
 		hitTolerance: 10,
 	});
 };
+
+export const addAHandle = (point, feature) => {
+	const ls = new LineString(feature.getGeometry().getCoordinates());
+	const pt = ls.getClosestPoint(point);
+};
+
 export const cloudDrawingStartEvent = new CustomEvent('cloud_drawing:start');

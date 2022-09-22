@@ -4,8 +4,9 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import { Fill, Stroke, Style } from 'ol/style';
 import { getCoords, bezierSpline, lineString } from '@turf/turf';
-import { doubleClick, never } from 'ol/events/condition';
+import { never, altKeyOnly } from 'ol/events/condition';
 import CircleStyle from 'ol/style/Circle';
+import Point from 'ol/geom/Point';
 
 export const jetFlowDrawingStartEvent = new CustomEvent('courant_jet:start');
 
@@ -25,7 +26,20 @@ export const drawJetFlow = (vectorSource) => {
 				new Style({
 					stroke: new Stroke({
 						color: 'black',
-						width: 2,
+						width: 7,
+					}),
+					geometry: () => {
+						return new LineString(
+							getCoords(
+								bezierSpline(lineString(feature.getGeometry().getCoordinates()))
+							)
+						);
+					},
+				}),
+				new Style({
+					stroke: new Stroke({
+						color: 'white',
+						width: 4,
 					}),
 					geometry: () => {
 						return new LineString(
@@ -44,7 +58,7 @@ export const modifyJetFlow = (select) => {
 	return new Modify({
 		features: select.getFeatures(),
 		insertVertexCondition: never,
-		removePoint: never,
+		removePoint: altKeyOnly,
 		pixelTolerance: 10,
 	});
 };

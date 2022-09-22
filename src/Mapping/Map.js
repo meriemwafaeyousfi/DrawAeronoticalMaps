@@ -1,6 +1,7 @@
 import { View, Map } from 'ol';
 import { fromLonLat } from 'ol/proj';
 import BlankMap from './Layers/BlankMap';
+import * as extent from 'ol/extent';
 
 export const createBlankMap = (target) => {
 	return new Promise((resolve, rejecte) => {
@@ -43,6 +44,20 @@ export const clearAllInteractions = (map) => {
 	map.getInteractions().forEach((inter) => {
 		inter.setActive(false);
 	});
+};
+
+export const copyFeature = (map, feature) => {
+	map.set('feature_copiee', feature.clone());
+};
+export const pastFeature = (map, layer, destination) => {
+	console.log(
+		extent.getCenter(map.get('feature_copiee').getGeometry().getExtent())
+	);
+	const source = extent.getCenter(
+		map.get('feature_copiee').getGeometry().getExtent()
+	);
+	map.get('feature_copiee').getGeometry().transform(source, destination);
+	layer.getSource().addFeature(map.get('feature_copiee'));
 };
 
 export const endDrawing = new CustomEvent('drawing:end');

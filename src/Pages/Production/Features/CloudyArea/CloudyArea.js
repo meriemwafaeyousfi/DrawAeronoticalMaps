@@ -24,6 +24,7 @@ function CloudyArea({ map, option }) {
 				}
 			});
 		});
+
 		map.getViewport().addEventListener('translate:on', (e) => {
 			map.getInteractions().forEach((interaction) => {
 				if (interaction.get('title') === 'translate_cloud') {
@@ -39,7 +40,7 @@ function CloudyArea({ map, option }) {
 		dc.set('title', 'cloud_drawing');
 		dc.setActive(false);
 		dc.on('drawend', ({ feature }) => {
-			feature.set('featureType', 'cloud');
+			feature.set('feature_type', 'zone_nuageuse');
 		});
 		map.addInteraction(dc);
 
@@ -48,7 +49,7 @@ function CloudyArea({ map, option }) {
 		sc.setActive(false);
 		map.addInteraction(sc);
 
-		const mc = modifyCloud(sc);
+		const mc = modifyCloud(sc, cvl);
 		mc.set('title', 'modify_cloud');
 		map.addInteraction(mc);
 
