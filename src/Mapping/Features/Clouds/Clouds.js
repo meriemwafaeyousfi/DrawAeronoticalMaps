@@ -130,4 +130,10 @@ export const deleteAHandle = (point, feature) => {
 	feature.getGeometry().setCoordinates(newCoordinates);
 };
 
-export const cloudDrawingStartEvent = new CustomEvent('cloud_drawing:start');
+export const cloudDrawingON = (map) => {
+	map.getInteractions().forEach((interaction) => {
+		if (interaction.get('title') === 'zone_nuageuse:draw') {
+			interaction.setActive(true);
+		}
+	});
+};

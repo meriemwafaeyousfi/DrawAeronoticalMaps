@@ -4,6 +4,10 @@ import { Loc, Qte, Type, Images } from '../../../../../Helpers/data';
 
 import './Window.css';
 import { useSelector } from 'react-redux';
+import {
+	alignOverlayContent,
+	updateOverlayContent,
+} from '../../../../../Mapping/Features/Clouds/TextOverLay';
 
 function Window({ map }) {
 	const [selectedFeature, setSelectedFeature] = useState(null);
@@ -14,8 +18,8 @@ function Window({ map }) {
 
 	const [alignement, setAlignement] = useState('Gauche');
 	const [fraction, setFraction] = useState({
-		numenator: 0,
-		denominator: 0,
+		numenator: '0',
+		denominator: '0',
 	});
 	const [text, setText] = useState('');
 
@@ -52,14 +56,34 @@ function Window({ map }) {
 	const insertFraction = useCallback(() => {
 		setText((prev) => {
 			if (prev === '') {
-				return fraction;
+				return (
+					(fraction.numenator === '0' ? 'XXX' : fraction.numenator) +
+					'/' +
+					(fraction.denominator === '0' ? 'XXX' : fraction.denominator)
+				);
 			} else {
-				return prev + ' ' + fraction;
+				return (
+					prev +
+					' ' +
+					(fraction.numenator === '0' ? 'XXX' : fraction.numenator) +
+					'/' +
+					(fraction.denominator === '0' ? 'XXX' : fraction.denominator)
+				);
 			}
 		});
 	}, [fraction]);
 
-	const handleAlignement = useCallback((event) => {}, []);
+	const handleAlignement = useCallback(
+		(event) => {
+			if (selectedFeature) {
+				const { value } = event.target;
+				setAlignement(value);
+				selectedFeature.set('alignement', value);
+				alignOverlayContent(map.getOverlayById(selectedFeature.ol_uid), value);
+			}
+		},
+		[map, selectedFeature]
+	);
 
 	const handleFeatureStyleChange = useCallback(
 		(event) => {
@@ -80,12 +104,14 @@ function Window({ map }) {
 				width: selectedFeature.get('width'),
 			});
 			setText(selectedFeature.get('text'));
+			setAlignement(selectedFeature.get('alignement'));
 		} else {
 			setSelectedFeatureStyle({
 				color: '#000000',
 				width: 2,
 			});
 			setText('');
+			setAlignement('Gauche');
 		}
 	}, [selectedFeature]);
 
@@ -105,6 +131,13 @@ function Window({ map }) {
 	const handleCancel = () => {};
 
 	useEffect(() => {
+		if (map && selectedFeature) {
+			selectedFeature.set('text', text);
+			updateOverlayContent(map, selectedFeature);
+		}
+	}, [text, selectedFeature, map]);
+
+	useEffect(() => {
 		const onSelect = ({ selected }) => {
 			if (selected[0]) {
 				setSelectedFeature(selected[0]);
@@ -115,7 +148,7 @@ function Window({ map }) {
 		map &&
 			map.getViewport().addEventListener('select:on', () => {
 				map.getInteractions().forEach((interaction) => {
-					if (interaction.get('title') === 'select_cloud') {
+					if (interaction.get('title') === 'zone_nuageuse:select') {
 						interaction.on('select', onSelect);
 					}
 				});
@@ -202,8 +235,7 @@ function Window({ map }) {
 							<label htmlFor="numenator">Haut</label>
 							<input
 								id="numenator"
-								type="number"
-								placeholder="XXX"
+								type="text"
 								value={fraction.numenator}
 								onChange={fractionChange}
 							/>
@@ -212,8 +244,7 @@ function Window({ map }) {
 							<label htmlFor="denominator">bas</label>
 							<input
 								id="denominator"
-								type="number"
-								placeholder="XXX"
+								type="text"
 								value={fraction.denominator}
 								onChange={fractionChange}
 							/>
@@ -234,7 +265,7 @@ function Window({ map }) {
 							<label htmlFor="alignement">Alignement</label>
 							<select onChange={handleAlignement} value={alignement}>
 								<option value={'Gauche'}>Gauche</option>
-								<option value={'Center'}>Center</option>
+								<option value={'Centre'}>Centre</option>
 								<option value={'Droite'}>Droite</option>
 							</select>
 						</div>

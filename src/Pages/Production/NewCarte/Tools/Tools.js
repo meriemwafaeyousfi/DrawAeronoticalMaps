@@ -11,7 +11,7 @@ import {
 	zoomingInAndCenter,
 	zoomingOutAndCenter,
 } from '../../../../Mapping/Map';
-import { cloudDrawingStartEvent } from '../../../../Mapping/Features/Clouds/Clouds';
+import { cloudDrawingON } from '../../../../Mapping/Features/Clouds/Clouds';
 import { jetFlowDrawingStartEvent } from '../../../../Mapping/Features/JetFlow/JetFlow';
 
 function Tools({ map }) {
@@ -84,7 +84,7 @@ function Tools({ map }) {
 				toggleDrawingOptions(jetFlowDrawingStartEvent);
 				break;
 			case 'zone_nuageuse':
-				toggleDrawingOptions(cloudDrawingStartEvent);
+				cloudDrawingON(map);
 				break;
 			case 'courant_jet':
 				toggleDrawingOptions(jetFlowDrawingStartEvent);
@@ -117,7 +117,7 @@ function Tools({ map }) {
 				nothing();
 				break;
 		}
-	}, [dragAndTranslate, nothing, option, toggleDrawingOptions, zoom]);
+	}, [dragAndTranslate, map, nothing, option, toggleDrawingOptions, zoom]);
 
 	const toggleOption = useCallback((event) => {
 		const { id } = event.target;

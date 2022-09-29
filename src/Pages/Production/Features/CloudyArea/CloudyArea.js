@@ -21,8 +21,9 @@ function CloudyArea({ map }) {
 		});
 
 		map.getViewport().addEventListener('select:on', (e) => {
+			console.log('activated');
 			map.getInteractions().forEach((interaction) => {
-				if (interaction.get('title') === 'select_cloud') {
+				if (interaction.get('title') === 'zone_nuageuse:select') {
 					interaction.setActive(true);
 				}
 			});
@@ -30,7 +31,7 @@ function CloudyArea({ map }) {
 
 		map.getViewport().addEventListener('translate:on', (e) => {
 			map.getInteractions().forEach((interaction) => {
-				if (interaction.get('title') === 'translate_cloud') {
+				if (interaction.get('title') === 'zone_nuageuse:translate') {
 					interaction.setActive(true);
 				}
 			});
@@ -40,28 +41,30 @@ function CloudyArea({ map }) {
 		map.addLayer(cvl);
 
 		const sc = selectCloud(cvl);
-		sc.set('title', 'select_cloud');
+		sc.set('title', 'zone_nuageuse:select');
 		sc.setActive(false);
 		map.addInteraction(sc);
 
 		const dc = drawCloud(cvl.getSource());
-		dc.set('title', 'cloud_drawing');
+		dc.set('title', 'zone_nuageuse:draw');
 		dc.setActive(false);
 		dc.on('drawend', ({ feature }) => {
 			feature.set('feature_type', 'zone_nuageuse');
 			feature.set('color', '#000000');
 			feature.set('width', 2);
 			feature.set('text', '');
+			feature.set('alignement', 'Gauche');
+			sc.getFeatures().push(feature);
 			createTextOverlay(map, feature);
 		});
 		map.addInteraction(dc);
 
 		const mc = modifyCloud(sc, cvl);
-		mc.set('title', 'modify_cloud');
+		mc.set('title', 'zone_nuageuse:modify');
 		map.addInteraction(mc);
 
 		const tc = translateCloud(cvl);
-		tc.set('title', 'translate_cloud');
+		tc.set('title', 'zone_nuageuse:translate');
 		tc.setActive(false);
 		tc.on('translating', ({ features }) => {
 			const link = cvl.getSource().getFeatureById(features.array_[0].ol_uid);

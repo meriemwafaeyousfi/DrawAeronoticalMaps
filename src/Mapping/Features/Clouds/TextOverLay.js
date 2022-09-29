@@ -58,59 +58,10 @@ export const createTextOverlay = (map, feature) => {
 		if (layer.get('title') === 'Zones_Nuageuses') {
 			layer.getSource().addFeature(link);
 		}
-		console.log();
 	});
 
 	map.addOverlay(textOverlay);
 	return textOverlay;
-};
-
-export const updateOverlayContent = (overlay, text, fraction) => {
-	let textContainer = overlay.getElement().querySelector('.overlay_text');
-	textContainer.innerHTML = '';
-	let words = text.split(' ');
-	words.forEach((word) => {
-		if (Object.keys(imagesLink).includes(word)) {
-			let img = document.createElement('img');
-			img.setAttribute('src', imagesLink[word]);
-			img.setAttribute('alt', word);
-			img.style.width = '15px';
-			img.style.margin = '2px';
-			textContainer.appendChild(img);
-		} else {
-			let span = document.createElement('span');
-			span.innerHTML = word;
-			textContainer.appendChild(span);
-		}
-	});
-	if (fraction.show) {
-		let numenator = document.createElement('div');
-		numenator.className = 'overlay_fraction_numenator';
-		numenator.innerHTML = fraction.numenator ? fraction.numenator : 'XXX';
-
-		let denominator = document.createElement('div');
-		denominator.className = 'overlay_fraction_denominator';
-		denominator.innerHTML = fraction.denominator ? fraction.denominator : 'XXX';
-
-		let frac = document.createElement('div');
-		frac.className = 'overlay_fraction';
-		frac.appendChild(numenator);
-		frac.appendChild(denominator);
-
-		textContainer.appendChild(frac);
-	} else {
-		if (textContainer.querySelector('.overlay_fraction'))
-			textContainer.querySelector('.overlay_fraction').innerHTML = '';
-	}
-};
-
-export const getOverlayContent = (overlay) => {
-	const overlay_container = overlay.getElement();
-	return overlay_container.querySelector('.overlay_content');
-};
-
-export const getOverlay = (map, feature) => {
-	return map.getOverlayById(feature.ol_uid);
 };
 
 export const unHighlightOverlay = (overlay) => {
@@ -127,6 +78,49 @@ export const highlightOverlay = (overlay) => {
 		.classList.add('selected_overlay');
 };
 
+export const getOverlay = (map, feature) => {
+	return map.getOverlayById(feature.ol_uid);
+};
+
+export const updateOverlayContent = (map, feature) => {
+	let textContainer = map
+		.getOverlayById(feature.ol_uid)
+		.getElement()
+		.querySelector('.overlay_text');
+	textContainer.innerHTML = '';
+	let words = feature.get('text').split(' ');
+	console.log(words);
+	words.forEach((word) => {
+		if (Object.keys(imagesLink).includes(word)) {
+			let img = document.createElement('img');
+			img.setAttribute('src', imagesLink[word]);
+			img.setAttribute('alt', word);
+			img.style.width = '15px';
+			img.style.margin = '2px';
+			textContainer.appendChild(img);
+		} else if (new RegExp('/').test(word)) {
+			let numenator = document.createElement('div');
+			numenator.className = 'overlay_fraction_numenator';
+			numenator.innerHTML = word.split('/')[0];
+
+			let denominator = document.createElement('div');
+			denominator.className = 'overlay_fraction_denominator';
+			denominator.innerHTML = word.split('/')[1];
+
+			let fraction = document.createElement('div');
+			fraction.className = 'overlay_fraction';
+			fraction.appendChild(numenator);
+			fraction.appendChild(denominator);
+
+			textContainer.appendChild(fraction);
+		} else {
+			let span = document.createElement('span');
+			span.innerHTML = word;
+			textContainer.appendChild(span);
+		}
+	});
+};
+
 export const unHighlightAllOverlays = () => {
 	document.querySelectorAll('.selected_overlay').forEach((overlay) => {
 		overlay.classList.remove('selected_overlay');
@@ -139,12 +133,11 @@ export const removeOverlay = (map, overlay) => {
 
 export const alignOverlayContent = (overlay, alignement) => {
 	const overlay_content = overlay.getElement().querySelector('.overlay_text');
-
 	switch (alignement) {
 		case 'Gauche':
 			overlay_content.style.justifyContent = 'start';
 			break;
-		case 'Center':
+		case 'Centre':
 			overlay_content.style.justifyContent = 'center';
 			break;
 		case 'Droite':
