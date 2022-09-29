@@ -67,7 +67,6 @@ function Tools({ map }) {
 	);
 
 	useEffect(() => {
-		console.log(option);
 		switch (option) {
 			case 'select':
 				toggleDrawingOptions(selectOn);

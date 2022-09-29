@@ -2,6 +2,7 @@ import { View, Map } from 'ol';
 import { fromLonLat } from 'ol/proj';
 import BlankMap from './Layers/BlankMap';
 import * as extent from 'ol/extent';
+import { distance } from 'ol/coordinate';
 
 export const createBlankMap = (target) => {
 	return new Promise((resolve, rejecte) => {
@@ -47,17 +48,41 @@ export const clearAllInteractions = (map) => {
 };
 
 export const copyFeature = (map, feature) => {
-	map.set('feature_copiee', feature.clone());
+	map.set('feature_copiee', feature);
+	map.set('feature_coupee', null);
 };
+
+export const cutFeature = (map, feature) => {
+	map.set('feature_coupee', feature);
+	map.set('feature_copiee', null);
+};
+
 export const pastFeature = (map, layer, destination) => {
-	console.log(
-		extent.getCenter(map.get('feature_copiee').getGeometry().getExtent())
-	);
-	const source = extent.getCenter(
-		map.get('feature_copiee').getGeometry().getExtent()
-	);
-	map.get('feature_copiee').getGeometry().transform(source, destination);
-	layer.getSource().addFeature(map.get('feature_copiee'));
+	let feature = null;
+	if (map.get('feature_copiee')) {
+		feature = map.get('feature_copiee').clone();
+	}
+	if (map.get('feature_coupee')) {
+		feature = map.get('feature_coupee');
+	}
+	const source = extent.getCenter(feature.getGeometry().getExtent());
+	const translationVector = [
+		destination[0] - source[0],
+		destination[1] - source[1],
+	];
+	let newCoords = [];
+	feature
+		.getGeometry()
+		.getCoordinates()
+		.forEach((Coord) => {
+			newCoords = [
+				...newCoords,
+				[Coord[0] + translationVector[0], Coord[1] + translationVector[1]],
+			];
+		});
+	feature.getGeometry().setCoordinates(newCoords);
+	layer.getSource().removeFeature(feature);
+	layer.getSource().addFeature(feature);
 };
 
 export const endDrawing = new CustomEvent('drawing:end');
@@ -69,3 +94,16 @@ export const selectOff = new CustomEvent('select:off');
 export const translateOn = new CustomEvent('translate:on');
 
 export const translateOff = new CustomEvent('translate:off');
+
+export const verticesCheck = (point, feature) => {
+	let vertex = false;
+	feature
+		.getGeometry()
+		.getCoordinates()
+		.forEach((coord) => {
+			if (distance(coord, point) <= 350000) {
+				vertex = true;
+			}
+		});
+	return vertex;
+};

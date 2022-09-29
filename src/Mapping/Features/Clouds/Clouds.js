@@ -6,11 +6,11 @@ import VectorLayer from 'ol/layer/Vector';
 import CircleStyle from 'ol/style/Circle';
 import { MultiPoint, LineString } from 'ol/geom';
 import { never } from 'ol/events/condition';
-import Point from 'ol/geom/Point';
+import { distance } from 'ol/coordinate';
 
 export const cloudVectorLayer = () => {
 	return new VectorLayer({
-		title: 'Clouds Layer',
+		title: 'Zones_Nuageuses',
 		source: new VectorSource(),
 	});
 };
@@ -88,12 +88,46 @@ export const translateCloud = (vectorLayer) => {
 	return new Translate({
 		layers: [vectorLayer],
 		hitTolerance: 10,
+		filter: (feature) => {
+			if (feature.get('title') === 'feature_overlay_link') {
+				return false;
+			}
+			return true;
+		},
 	});
 };
 
 export const addAHandle = (point, feature) => {
-	const ls = new LineString(feature.getGeometry().getCoordinates());
-	const pt = ls.getClosestPoint(point);
+	const pointOnFeature = feature.getGeometry().getClosestPoint(point);
+	let newCoordinates = [feature.getGeometry().getCoordinates()[0]];
+	feature.getGeometry().forEachSegment((start, end) => {
+		const segement = new LineString([start, end]);
+		const pointOnSegement = segement.getClosestPoint(point);
+		const distanceBetweenTheTwoPoint = distance(
+			pointOnFeature,
+			pointOnSegement
+		);
+		if (distanceBetweenTheTwoPoint === 0) {
+			newCoordinates.push(pointOnFeature);
+			newCoordinates.push(end);
+		} else {
+			newCoordinates.push(end);
+		}
+	});
+	feature.getGeometry().setCoordinates(newCoordinates);
+};
+
+export const deleteAHandle = (point, feature) => {
+	let newCoordinates = [];
+	feature
+		.getGeometry()
+		.getCoordinates()
+		.forEach((coord) => {
+			if (distance(point, coord) >= 350000) {
+				newCoordinates.push(coord);
+			}
+		});
+	feature.getGeometry().setCoordinates(newCoordinates);
 };
 
 export const cloudDrawingStartEvent = new CustomEvent('cloud_drawing:start');

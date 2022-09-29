@@ -10,7 +10,6 @@ import Tools from './Tools/Tools';
 function NewCard() {
 	const [map, setMap] = useState(null);
 	const [option, setOption] = useState('');
-	const [contextMenu, setContextMenu] = useState(null);
 
 	useEffect(() => {
 		createBlankMap('map-container').then((res) => {
@@ -44,7 +43,7 @@ function NewCard() {
 		<div className="new-card-container">
 			<Tools map={map} setOption={setOption} />
 			<div id="map-container"></div>
-			<MapContextMenu map={map} event={contextMenu} />
+			<MapContextMenu map={map} />
 			{map && <CloudyArea map={map} option={option} />}
 			{map && <JetFlow map={map} />}
 		</div>

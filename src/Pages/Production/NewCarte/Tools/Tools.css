@@ -15,6 +15,7 @@
 	border: 1px solid black;
 	margin: 1px;
 	width: 80%;
+	height: 5%;
 }
 .tools button:hover {
 	background-color: #f59e0b;

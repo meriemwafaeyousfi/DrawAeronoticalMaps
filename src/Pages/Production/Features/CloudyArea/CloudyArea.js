@@ -6,8 +6,11 @@ import {
 	selectCloud,
 	translateCloud,
 } from '../../../../Mapping/Features/Clouds/Clouds';
+import { createTextOverlay } from '../../../../Mapping/Features/Clouds/TextOverLay';
+import * as extent from 'ol/extent';
+import Window from './Window/Window';
 
-function CloudyArea({ map, option }) {
+function CloudyArea({ map }) {
 	const init = useCallback(() => {
 		map.getViewport().addEventListener('cloud_drawing:start', (e) => {
 			map.getInteractions().forEach((interaction) => {
@@ -36,18 +39,22 @@ function CloudyArea({ map, option }) {
 		const cvl = cloudVectorLayer();
 		map.addLayer(cvl);
 
+		const sc = selectCloud(cvl);
+		sc.set('title', 'select_cloud');
+		sc.setActive(false);
+		map.addInteraction(sc);
+
 		const dc = drawCloud(cvl.getSource());
 		dc.set('title', 'cloud_drawing');
 		dc.setActive(false);
 		dc.on('drawend', ({ feature }) => {
 			feature.set('feature_type', 'zone_nuageuse');
+			feature.set('color', '#000000');
+			feature.set('width', 2);
+			feature.set('text', '');
+			createTextOverlay(map, feature);
 		});
 		map.addInteraction(dc);
-
-		const sc = selectCloud(cvl);
-		sc.set('title', 'select_cloud');
-		sc.setActive(false);
-		map.addInteraction(sc);
 
 		const mc = modifyCloud(sc, cvl);
 		mc.set('title', 'modify_cloud');
@@ -56,13 +63,22 @@ function CloudyArea({ map, option }) {
 		const tc = translateCloud(cvl);
 		tc.set('title', 'translate_cloud');
 		tc.setActive(false);
+		tc.on('translating', ({ features }) => {
+			const link = cvl.getSource().getFeatureById(features.array_[0].ol_uid);
+			const center = extent.getCenter(
+				features.array_[0].getGeometry().getExtent()
+			);
+			link
+				.getGeometry()
+				.setCoordinates([center, link.getGeometry().getCoordinates()[1]]);
+		});
 		map.addInteraction(tc);
 	}, [map]);
 
 	useEffect(() => {
 		init();
 	}, [init]);
-	return <></>;
+	return <Window map={map} />;
 }
 
 export default CloudyArea;

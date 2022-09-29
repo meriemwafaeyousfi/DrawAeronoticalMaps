@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ContextMenu as PrimeContextMenu } from 'primereact/contextmenu';
 import './MapContextMenu.css';
-import { addAHandle } from '../Features/Clouds/Clouds';
-import { copyFeature, pastFeature } from '../Map';
+import { addAHandle, deleteAHandle } from '../Features/Clouds/Clouds';
+import { copyFeature, cutFeature, pastFeature, verticesCheck } from '../Map';
 
 function MapContextMenu({ map }) {
 	const CMRef = useRef(null);
@@ -15,8 +15,9 @@ function MapContextMenu({ map }) {
 		{
 			label: 'Ajouter un poignée',
 			icon: 'ajouter-poingee',
-			visible: !!feature,
-			command: (event) => {
+			visible:
+				!!feature && feature.get('feature_type') === 'zone_nuageuse' && !vertex,
+			command: () => {
 				addAHandle(eventCoordiantes, feature);
 			},
 		},
@@ -25,7 +26,9 @@ function MapContextMenu({ map }) {
 			icon: 'supprimer-poingee',
 			visible:
 				!!feature && feature.get('feature_type') === 'zone_nuageuse' && vertex,
-			command: (event) => {},
+			command: () => {
+				deleteAHandle(eventCoordiantes, feature);
+			},
 		},
 		{
 			label: 'Ajouter une zone de texte',
@@ -51,12 +54,15 @@ function MapContextMenu({ map }) {
 			label: 'Couper',
 			icon: 'couper-figure',
 			disabled: !feature,
-			command: (event) => {},
+			command: () => {
+				cutFeature(map, feature);
+			},
 		},
 		{
 			label: 'Coller',
 			icon: 'coller-figure',
-			disabled: !!map && !map.get('feature_copiee'),
+			disabled:
+				!!map && !(map.get('feature_copiee') || map.get('feature_coupee')),
 			command: () => {
 				pastFeature(map, layer, eventCoordiantes);
 			},
@@ -65,50 +71,35 @@ function MapContextMenu({ map }) {
 			label: 'Supprimer la figure',
 			icon: 'supprimer-figure',
 			disabled: !feature,
-			command: (event) => {},
+			command: () => {
+				layer.getSource().removeFeature(feature);
+				map.getInteractions().forEach((interaction) => {
+					if (interaction.get('title') === 'select_cloud') {
+						interaction.changed();
+					}
+				});
+			},
 		},
 	];
 
-	const distance = useCallback((p1, p2) => {
-		return Math.sqrt(
-			(p2[0] - p1[0]) * (p2[0] - p1[0]) + (p2[1] - p1[1]) * (p2[1] - p1[1])
-		);
-	}, []);
-
-	const getClosestPoint = useCallback(
-		(point, feature) => {
-			let vertex = null;
-			feature
-				.getGeometry()
-				.getCoordinates()
-				.forEach((coord) => {
-					if (distance(map.getPixelFromCoordinate(coord), point) <= 7) {
-						vertex = coord;
-					}
-				});
-			return vertex
-				? { coords: vertex, vertex: true }
-				: { coords: map.getCoordinateFromPixel(point), vertex: false };
-		},
-		[distance, map]
-	);
 	useEffect(() => {
 		if (map) {
 			map.getViewport().addEventListener('contextmenu', (event) => {
 				setEventCoordinates(null);
 				setFeature(null);
-				setEventCoordinates(
-					map.getCoordinateFromPixel(map.getEventPixel(event))
-				);
+				setVertex(false);
+				const ec = map.getCoordinateFromPixel(map.getEventPixel(event));
+				setEventCoordinates(ec);
 				map.forEachFeatureAtPixel(
 					map.getEventPixel(event),
 					(feature, layer) => {
 						if (feature.getGeometry().getType() !== 'Point') {
 							setLayer(layer);
 							setFeature(feature);
+							setVertex(verticesCheck(ec, feature));
 						}
 					},
-					{ hitTolerance: 5 }
+					{ hitTolerance: 10 }
 				);
 				CMRef.current.show(event);
 			});
