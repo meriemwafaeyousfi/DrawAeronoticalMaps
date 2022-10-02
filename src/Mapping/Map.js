@@ -3,6 +3,7 @@ import { fromLonLat } from 'ol/proj';
 import BlankMap from './Layers/BlankMap';
 import * as extent from 'ol/extent';
 import { distance } from 'ol/coordinate';
+import { DragPan, Draw, Select, Translate } from 'ol/interaction';
 
 export const createBlankMap = (target) => {
 	return new Promise((resolve, rejecte) => {
@@ -85,15 +86,53 @@ export const pastFeature = (map, layer, destination) => {
 	layer.getSource().addFeature(feature);
 };
 
-export const endDrawing = new CustomEvent('drawing:end');
+export const endDrawing = (map) => {
+	map.getInteractions().forEach((interaction) => {
+		if (interaction instanceof Draw) {
+			interaction.setActive(false);
+		}
+	});
+};
 
-export const selectOn = new CustomEvent('select:on');
+export const selectOn = (map) => {
+	map.getInteractions().forEach((interaction) => {
+		if (interaction instanceof Select) {
+			interaction.setActive(true);
+		}
+	});
+};
 
-export const selectOff = new CustomEvent('select:off');
+export const selectOff = (map) => {
+	map.getInteractions().forEach((interaction) => {
+		if (interaction instanceof Select) {
+			interaction.setActive(false);
+		}
+	});
+};
 
-export const translateOn = new CustomEvent('translate:on');
+export const translateOn = (map) => {
+	map.getInteractions().forEach((interaction) => {
+		if (interaction instanceof Translate) {
+			interaction.setActive(true);
+		}
+	});
+};
 
-export const translateOff = new CustomEvent('translate:off');
+export const translateOff = (map) => {
+	map.getInteractions().forEach((interaction) => {
+		if (interaction instanceof Translate) {
+			interaction.setActive(false);
+		}
+	});
+};
+
+export const dragPanOff = (map) => {
+	map.getInteractions().forEach((interaction) => {
+		if (interaction instanceof DragPan) {
+			interaction.setActive(false);
+		}
+	});
+};
 
 export const verticesCheck = (point, feature) => {
 	let vertex = false;

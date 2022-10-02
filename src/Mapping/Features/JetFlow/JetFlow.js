@@ -6,7 +6,6 @@ import { Fill, Stroke, Style } from 'ol/style';
 import { getCoords, bezierSpline, lineString } from '@turf/turf';
 import { never, altKeyOnly } from 'ol/events/condition';
 import CircleStyle from 'ol/style/Circle';
-import Point from 'ol/geom/Point';
 
 export const jetFlowDrawingStartEvent = new CustomEvent('courant_jet:start');
 
@@ -111,5 +110,13 @@ export const translateJetFlow = (vectorLayer) => {
 	return new Translate({
 		layers: [vectorLayer],
 		hitTolerance: 10,
+	});
+};
+
+export const jetFlowDrawingON = (map) => {
+	map.getInteractions().forEach((interaction) => {
+		if (interaction.get('title') === 'courant_jet:draw') {
+			interaction.setActive(true);
+		}
 	});
 };

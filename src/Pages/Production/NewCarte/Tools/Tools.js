@@ -10,51 +10,49 @@ import {
 	selectOn,
 	zoomingInAndCenter,
 	zoomingOutAndCenter,
+	dragPanOff,
 } from '../../../../Mapping/Map';
 import { cloudDrawingON } from '../../../../Mapping/Features/Clouds/Clouds';
-import { jetFlowDrawingStartEvent } from '../../../../Mapping/Features/JetFlow/JetFlow';
+import { jetFlowDrawingON } from '../../../../Mapping/Features/JetFlow/JetFlow';
+import { useDispatch, useSelector } from 'react-redux';
+import { setOption } from './actions';
 
 function Tools({ map }) {
-	const [option, setOption] = useState('');
+	let option = useSelector((state) => state.option);
+	const modals = useSelector((state) => state.cloudyAreaModal);
+	const dispatch = useDispatch();
 	const [undoRedo, setUndoRedo] = useState(null);
 
 	const nothing = useCallback(() => {
 		if (map) {
-			map.getInteractions().forEach((interaction) => {
-				if (interaction instanceof DragPan) {
-					interaction.setActive(false);
-				}
-			});
 			map.un('singleclick', zoomingInAndCenter);
 			map.un('singleclick', zoomingOutAndCenter);
-			map.getViewport().dispatchEvent(endDrawing);
-			map.getViewport().dispatchEvent(selectOff);
-			map.getViewport().dispatchEvent(translateOff);
+			dragPanOff(map);
+			endDrawing(map);
+			selectOff(map);
+			translateOff(map);
 			document.querySelector('#map-container').style.cursor = 'unset';
 		}
 	}, [map]);
 
 	const toggleDrawingOptions = useCallback(
-		(startEvent) => {
+		(drawingFunction) => {
 			nothing();
-			map.getViewport().dispatchEvent(startEvent);
+			drawingFunction(map);
 		},
 		[map, nothing]
 	);
 
-	const dragAndTranslate = useCallback(
-		(opt) => {
-			nothing();
-			map.getInteractions().forEach((interaction) => {
-				if (interaction instanceof DragPan) {
-					interaction.setActive(true);
-				}
-			});
-			map.getViewport().dispatchEvent(translateOn);
-			document.querySelector('#map-container').style.cursor = 'grab';
-		},
-		[map, nothing]
-	);
+	const dragAndTranslate = useCallback(() => {
+		nothing();
+		map.getInteractions().forEach((interaction) => {
+			if (interaction instanceof DragPan) {
+				interaction.setActive(true);
+			}
+		});
+		translateOn(map);
+		document.querySelector('#map-container').style.cursor = 'grab';
+	}, [map, nothing]);
 
 	const zoom = useCallback(
 		(opt, action) => {
@@ -67,70 +65,6 @@ function Tools({ map }) {
 	);
 
 	useEffect(() => {
-		switch (option) {
-			case 'select':
-				toggleDrawingOptions(selectOn);
-				break;
-			case 'zoom_in':
-				zoom(option, zoomingInAndCenter);
-				break;
-			case 'zoom_out':
-				zoom(option, zoomingOutAndCenter);
-				break;
-			case 'drag':
-				dragAndTranslate(option);
-				break;
-			case 'zone_texte':
-				toggleDrawingOptions(jetFlowDrawingStartEvent);
-				break;
-			case 'zone_nuageuse':
-				cloudDrawingON(map);
-				break;
-			case 'courant_jet':
-				toggleDrawingOptions(jetFlowDrawingStartEvent);
-				break;
-			case 'front':
-				toggleDrawingOptions(jetFlowDrawingStartEvent);
-				break;
-			case 'cat':
-				toggleDrawingOptions(jetFlowDrawingStartEvent);
-				break;
-			case 'ligne':
-				toggleDrawingOptions(jetFlowDrawingStartEvent);
-				break;
-			case 'fleche':
-				toggleDrawingOptions(jetFlowDrawingStartEvent);
-				break;
-			case 'centres_action':
-				toggleDrawingOptions(jetFlowDrawingStartEvent);
-				break;
-			case 'volcan':
-				toggleDrawingOptions(jetFlowDrawingStartEvent);
-				break;
-			case 'tropopause':
-				toggleDrawingOptions(jetFlowDrawingStartEvent);
-				break;
-			case 'condition_en_surface':
-				toggleDrawingOptions(jetFlowDrawingStartEvent);
-				break;
-			default:
-				nothing();
-				break;
-		}
-	}, [dragAndTranslate, map, nothing, option, toggleDrawingOptions, zoom]);
-
-	const toggleOption = useCallback((event) => {
-		const { id } = event.target;
-		setOption((prev) => {
-			if (prev === id) {
-				return '';
-			} else {
-				return id;
-			}
-		});
-	}, []);
-
-	useEffect(() => {
 		if (map) {
 			const ur = new UndoRedo({
 				maxLength: 10,
@@ -139,81 +73,142 @@ function Tools({ map }) {
 			map.addInteraction(ur);
 		}
 	}, [map]);
+
 	const items = [
 		{
 			id: 'select',
 			icon: '/Icons/Clouds/arrow-pointer-solid.svg',
 			alt: 'Select icon',
+			command: () => {
+				toggleDrawingOptions(selectOn);
+				dispatch(setOption('select'));
+			},
 		},
 		{
 			id: 'zoom_in',
 			icon: '/Icons/Clouds/magnifying-glass-plus-solid.svg',
 			alt: 'Zoom In icon',
+			command: () => {
+				zoom('zoom_in', zoomingInAndCenter);
+				dispatch(setOption('zoom_in'));
+			},
 		},
 		{
 			id: 'zoom_out',
 			icon: '/Icons/Clouds/magnifying-glass-minus-solid.svg',
 			alt: 'Zoom Out icon',
+			command: () => {
+				zoom('zoom_out', zoomingOutAndCenter);
+				dispatch(setOption('zoom_out'));
+			},
 		},
 		{
 			id: 'drag',
 			icon: '/Icons/Clouds/hand-solid.svg',
 			alt: 'Drag icon',
+			command: () => {
+				dragAndTranslate();
+				dispatch(setOption('drag'));
+			},
 		},
 		{
 			id: 'zone_texte',
 			icon: '/Icons/Clouds/message-regular.svg',
 			alt: 'Zone de texte icon',
+			command: () => {
+				toggleDrawingOptions(jetFlowDrawingON);
+				dispatch(setOption('zone_texte'));
+			},
 		},
 		{
 			id: 'zone_nuageuse',
 			icon: '/Icons/Clouds/cloud-solid.svg',
 			alt: 'Zone nuageuse icon',
+			command: () => {
+				toggleDrawingOptions(cloudDrawingON);
+				dispatch(setOption('zone_nuageuse'));
+			},
 		},
 		{
 			id: 'courant_jet',
 			icon: '/Icons/Clouds/wind-solid.svg',
 			alt: 'Courant jet icon',
+			command: () => {
+				toggleDrawingOptions(jetFlowDrawingON);
+				map.changed();
+			},
 		},
 		{
 			id: 'front',
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'front icon',
+			command: () => {
+				toggleDrawingOptions(jetFlowDrawingON);
+				map.changed();
+			},
 		},
 		{
 			id: 'cat',
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'Cat icon',
+			command: () => {
+				toggleDrawingOptions(jetFlowDrawingON);
+				map.changed();
+			},
 		},
 		{
 			id: 'ligne',
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'ligne icon',
+			command: () => {
+				toggleDrawingOptions(jetFlowDrawingON);
+				map.changed();
+			},
 		},
 		{
 			id: 'fleche',
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'Flèche icon',
+			command: () => {
+				toggleDrawingOptions(jetFlowDrawingON);
+				map.changed();
+			},
 		},
 		{
 			id: 'centres_action',
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: "Centres d'action icon",
+			command: () => {
+				toggleDrawingOptions(jetFlowDrawingON);
+				map.changed();
+			},
 		},
 		{
 			id: 'volcan',
 			icon: '/Icons/Clouds/volcano-solid.svg',
 			alt: 'Volcan icon',
+			command: () => {
+				toggleDrawingOptions(jetFlowDrawingON);
+				map.changed();
+			},
 		},
 		{
 			id: 'tropopause',
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'tropopause icon',
+			command: () => {
+				toggleDrawingOptions(jetFlowDrawingON);
+				map.changed();
+			},
 		},
 		{
 			id: 'condition_en_surface',
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'text Zone icon',
+			command: () => {
+				toggleDrawingOptions(jetFlowDrawingON);
+				map.changed();
+			},
 		},
 	];
 
@@ -257,9 +252,10 @@ function Tools({ map }) {
 			</button>
 			{items.map((item, key) => (
 				<button
-					onClick={toggleOption}
+					onClick={item.command}
 					key={key}
 					id={item.id}
+					disabled={modals}
 					className={option === item.id ? 'active' : ''}>
 					<img src={item.icon} alt={item.alt} height={20} width={20} />
 				</button>

@@ -1,39 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import MapContextMenu from '../../../Mapping/ContextMenu/MapContextMenu';
 import { createBlankMap } from '../../../Mapping/Map';
-import { DragPan, Draw, Select, Translate } from 'ol/interaction';
+import { DragPan } from 'ol/interaction';
 import CloudyArea from '../Features/CloudyArea/CloudyArea';
 import JetFlow from '../Features/JetFlow/JetFlow';
 import './NewCard.css';
 
 import Tools from './Tools/Tools';
+import { useDispatch, useSelector } from 'react-redux';
+import { cloudModal } from '../Features/CloudyArea/actions';
 function NewCard() {
 	const [map, setMap] = useState(null);
 	const [option, setOption] = useState('');
-
+	const dispatch = useDispatch();
 	useEffect(() => {
 		createBlankMap('map-container').then((res) => {
-			res.getViewport().addEventListener('drawing:end', (e) => {
-				res.getInteractions().forEach((interaction) => {
-					if (interaction instanceof Draw) {
-						interaction.setActive(false);
-					}
-				});
-			});
-			res.getViewport().addEventListener('select:off', (e) => {
-				res.getInteractions().forEach((interaction) => {
-					if (interaction instanceof Select) {
-						interaction.getFeatures().clear();
-						interaction.setActive(false);
-					}
-				});
-			});
-			res.getViewport().addEventListener('translate:off', (e) => {
-				res.getInteractions().forEach((interaction) => {
-					if (interaction instanceof Translate) {
-						interaction.setActive(false);
-					}
-				});
+			res.getViewport().addEventListener('dblclick', (event) => {
+				res.forEachFeatureAtPixel(
+					res.getEventPixel(event),
+					(feature) => {
+						if (feature.get('feature_type') === 'zone_nuageuse') {
+							dispatch(cloudModal(true));
+						}
+					},
+					{ hitTolerance: 10 }
+				);
 			});
 			res.addInteraction(new DragPan());
 			setMap(res);

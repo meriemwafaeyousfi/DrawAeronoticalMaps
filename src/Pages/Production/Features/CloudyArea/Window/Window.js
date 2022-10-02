@@ -3,14 +3,16 @@ import { Dialog } from 'primereact/dialog';
 import { Loc, Qte, Type, Images } from '../../../../../Helpers/data';
 
 import './Window.css';
-import { useSelector } from 'react-redux';
 import {
 	alignOverlayContent,
 	updateOverlayContent,
 } from '../../../../../Mapping/Features/Clouds/TextOverLay';
+import { useDispatch, useSelector } from 'react-redux';
+import { cloudModal, selectFeature } from '../actions';
 
 function Window({ map }) {
-	const [selectedFeature, setSelectedFeature] = useState(null);
+	const disptach = useDispatch();
+	const selectedFeature = useSelector((state) => state.selectedFeature);
 	const [selectedFeatureStyle, setSelectedFeatureStyle] = useState({
 		color: '#000000',
 		width: 2,
@@ -124,11 +126,15 @@ function Window({ map }) {
 				);
 	}, [selectedFeature]);
 
-	const handleConfirm = () => {
-		console.log(text, fraction);
-	};
+	const handleConfirm = useCallback(() => {
+		disptach(selectFeature(null));
+		disptach(cloudModal(false));
+	}, [disptach]);
 
-	const handleCancel = () => {};
+	const handleCancel = useCallback(() => {
+		disptach(selectFeature(null));
+		disptach(cloudModal(false));
+	}, [disptach]);
 
 	useEffect(() => {
 		if (map && selectedFeature) {
@@ -137,23 +143,6 @@ function Window({ map }) {
 		}
 	}, [text, selectedFeature, map]);
 
-	useEffect(() => {
-		const onSelect = ({ selected }) => {
-			if (selected[0]) {
-				setSelectedFeature(selected[0]);
-			} else {
-				setSelectedFeature(null);
-			}
-		};
-		map &&
-			map.getViewport().addEventListener('select:on', () => {
-				map.getInteractions().forEach((interaction) => {
-					if (interaction.get('title') === 'zone_nuageuse:select') {
-						interaction.on('select', onSelect);
-					}
-				});
-			});
-	}, [map]);
 	return (
 		<Dialog
 			header="Zone nuaguse"
@@ -161,7 +150,7 @@ function Window({ map }) {
 			contentClassName="cloudWindowContent"
 			position="bottom-left"
 			modal={false}
-			visible={useSelector((state) => state.cloudyAreaModal)}
+			visible={true}
 			className="cloudWindow"
 			keepInViewport={false}
 			dismissableMask={false}
@@ -236,6 +225,7 @@ function Window({ map }) {
 							<input
 								id="numenator"
 								type="text"
+								autoComplete="off"
 								value={fraction.numenator}
 								onChange={fractionChange}
 							/>
@@ -245,6 +235,7 @@ function Window({ map }) {
 							<input
 								id="denominator"
 								type="text"
+								autoComplete="off"
 								value={fraction.denominator}
 								onChange={fractionChange}
 							/>
@@ -288,6 +279,7 @@ function Window({ map }) {
 							<input
 								type="number"
 								id="width"
+								autoComplete="off"
 								value={selectedFeatureStyle.width}
 								onChange={handleFeatureStyleChange}
 							/>

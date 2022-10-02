@@ -9,17 +9,9 @@ import {
 
 function JetFlow({ map }) {
 	const init = useCallback(() => {
-		map.getViewport().addEventListener('courant_jet:start', (e) => {
-			map.getInteractions().forEach((interaction) => {
-				if (interaction.get('title') === 'draw_jet_flow') {
-					interaction.setActive(true);
-				}
-			});
-		});
-
 		map.getViewport().addEventListener('select:on', (e) => {
 			map.getInteractions().forEach((interaction) => {
-				if (interaction.get('title') === 'select_jet_flow') {
+				if (interaction.get('title') === 'courant_jet:select') {
 					interaction.setActive(true);
 				}
 			});
@@ -27,7 +19,7 @@ function JetFlow({ map }) {
 
 		map.getViewport().addEventListener('translate:on', (e) => {
 			map.getInteractions().forEach((interaction) => {
-				if (interaction.get('title') === 'translate_jet_flow') {
+				if (interaction.get('title') === 'courant_jet:translate') {
 					interaction.setActive(true);
 				}
 			});
@@ -37,24 +29,24 @@ function JetFlow({ map }) {
 		map.addLayer(jfvl);
 
 		const djf = drawJetFlow(jfvl.getSource());
-		djf.set('title', 'draw_jet_flow');
+		djf.set('title', 'courant_jet:draw');
 		djf.setActive(false);
 		djf.on('drawend', ({ feature }) => {
-			feature.set('featureType', 'jetFlow');
+			feature.set('featureType', 'courant_jet');
 		});
 		map.addInteraction(djf);
 
 		const sjf = selectJetFlow(jfvl);
-		sjf.set('title', 'select_jet_flow');
+		sjf.set('title', 'courant_jet:select');
 		sjf.setActive(false);
 		map.addInteraction(sjf);
 
 		const mjf = modifyJetFlow(sjf);
-		mjf.set('title', 'modify_jet_flow');
+		mjf.set('title', 'courant_jet:modify');
 		map.addInteraction(mjf);
 
 		const tjf = translateJetFlow(jfvl);
-		tjf.set('title', 'translate_jet_flow');
+		tjf.set('title', 'courant_jet:translate');
 		tjf.setActive(false);
 		map.addInteraction(tjf);
 	}, [map]);
