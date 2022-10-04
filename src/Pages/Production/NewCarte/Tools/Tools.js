@@ -14,6 +14,7 @@ import {
 } from '../../../../Mapping/Map';
 import { cloudDrawingON } from '../../../../Mapping/Features/Clouds/Clouds';
 import { jetFlowDrawingON } from '../../../../Mapping/Features/JetFlow/JetFlow';
+import { frontFlowDrawingON } from '../../../../Mapping/Features/FrontFlow/FrontFlow';
 import { useDispatch, useSelector } from 'react-redux';
 import { setOption } from './actions';
 
@@ -143,7 +144,7 @@ function Tools({ map }) {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'front icon',
 			command: () => {
-				toggleDrawingOptions(jetFlowDrawingON);
+				toggleDrawingOptions(frontFlowDrawingON);
 				map.changed();
 			},
 		},
