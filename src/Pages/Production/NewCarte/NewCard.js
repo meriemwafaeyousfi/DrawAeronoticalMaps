@@ -4,6 +4,7 @@ import { createBlankMap } from '../../../Mapping/Map';
 import { DragPan } from 'ol/interaction';
 import CloudyArea from '../Features/CloudyArea/CloudyArea';
 import JetFlow from '../Features/JetFlow/JetFlow';
+import FrontFlow from '../Features/FrontFlow/FrontFlow';
 import './NewCard.css';
 
 import Tools from './Tools/Tools';
@@ -24,6 +25,7 @@ function NewCard() {
 			<MapContextMenu />
 			<CloudyArea />
 			<JetFlow />
+			{map && <FrontFlow map={map} />}
 		</div>
 	);
 }

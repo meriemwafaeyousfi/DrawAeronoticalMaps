@@ -15,6 +15,7 @@ import {
 } from '../../../../Mapping/Map';
 import { cloudDrawingON } from '../../../../Mapping/Features/Clouds/Clouds';
 import { jetFlowDrawingON } from '../../../../Mapping/Features/JetFlow/JetFlow';
+import { frontFlowDrawingON } from '../../../../Mapping/Features/FrontFlow/FrontFlow';
 import { useDispatch, useSelector } from 'react-redux';
 import { setModal, setOption } from '../redux/actions';
 
@@ -116,7 +117,7 @@ function Tools() {
 					toggleToolsOption(jetFlowDrawingON);
 					break;
 				case 'front':
-					toggleToolsOption(jetFlowDrawingON);
+					toggleDrawingOptions(frontFlowDrawingON);
 					break;
 				case 'cat':
 					toggleToolsOption(jetFlowDrawingON);
@@ -216,7 +217,7 @@ function Tools() {
 			command: () => {
 				option !== 'front'
 					? dispatch(setOption('front'))
-					: dispatch(setOption(''));
+					: dispatch(setOption(''));	
 			},
 		},
 		{
