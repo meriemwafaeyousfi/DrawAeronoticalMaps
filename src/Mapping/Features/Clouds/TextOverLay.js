@@ -89,7 +89,6 @@ export const updateOverlayContent = (map, feature) => {
 		.querySelector('.overlay_text');
 	textContainer.innerHTML = '';
 	let words = feature.get('text').split(' ');
-	console.log(words);
 	words.forEach((word) => {
 		if (Object.keys(imagesLink).includes(word)) {
 			let img = document.createElement('img');

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import {
 	drawJetFlow,
 	jetFlowVectorLayer,
@@ -7,7 +8,8 @@ import {
 	translateJetFlow,
 } from '../../../../Mapping/Features/JetFlow/JetFlow';
 
-function JetFlow({ map }) {
+function JetFlow() {
+	const map = useSelector((state) => state.map);
 	const init = useCallback(() => {
 		map.getViewport().addEventListener('select:on', (e) => {
 			map.getInteractions().forEach((interaction) => {
@@ -51,8 +53,10 @@ function JetFlow({ map }) {
 		map.addInteraction(tjf);
 	}, [map]);
 	useEffect(() => {
-		init();
-	}, [init]);
+		if (map) {
+			init();
+		}
+	}, [init, map]);
 	return <></>;
 }
 

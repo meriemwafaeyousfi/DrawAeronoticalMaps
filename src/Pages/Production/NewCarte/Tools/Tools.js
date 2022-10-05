@@ -11,32 +11,52 @@ import {
 	zoomingInAndCenter,
 	zoomingOutAndCenter,
 	dragPanOff,
+	save,
 } from '../../../../Mapping/Map';
 import { cloudDrawingON } from '../../../../Mapping/Features/Clouds/Clouds';
 import { jetFlowDrawingON } from '../../../../Mapping/Features/JetFlow/JetFlow';
 import { frontFlowDrawingON } from '../../../../Mapping/Features/FrontFlow/FrontFlow';
 import { useDispatch, useSelector } from 'react-redux';
-import { setOption } from './actions';
+import { setModal, setOption } from '../redux/actions';
 
-function Tools({ map }) {
-	let option = useSelector((state) => state.option);
-	const modals = useSelector((state) => state.cloudyAreaModal);
+function Tools() {
+	const map = useSelector((state) => state.map);
+	const modal = useSelector((state) => state.modal);
+	const option = useSelector((state) => state.option);
+
 	const dispatch = useDispatch();
+
 	const [undoRedo, setUndoRedo] = useState(null);
 
+	const doubleClick = useCallback(
+		(event) => {
+			dispatch(setModal(''));
+			map.forEachFeatureAtPixel(
+				map.getEventPixel(event),
+				(feature) => {
+					if (feature.getGeometry().getType() !== 'Point') {
+						dispatch(setModal(feature.get('feature_type')));
+					}
+				},
+				{ hitTolerance: 10 }
+			);
+		},
+		[dispatch, map]
+	);
 	const nothing = useCallback(() => {
 		if (map) {
 			map.un('singleclick', zoomingInAndCenter);
 			map.un('singleclick', zoomingOutAndCenter);
+			map.getViewport().removeEventListener('dblclick', doubleClick);
 			dragPanOff(map);
 			endDrawing(map);
 			selectOff(map);
 			translateOff(map);
 			document.querySelector('#map-container').style.cursor = 'unset';
 		}
-	}, [map]);
+	}, [doubleClick, map]);
 
-	const toggleDrawingOptions = useCallback(
+	const toggleToolsOption = useCallback(
 		(drawingFunction) => {
 			nothing();
 			drawingFunction(map);
@@ -75,23 +95,69 @@ function Tools({ map }) {
 		}
 	}, [map]);
 
+	useEffect(() => {
+		if (map) {
+			switch (option) {
+				case 'zoom_in':
+					zoom('zoom_in', zoomingInAndCenter);
+					break;
+				case 'zoom_out':
+					zoom('zoom_out', zoomingOutAndCenter);
+					break;
+				case 'drag':
+					dragAndTranslate();
+					break;
+				case 'zone_texte':
+					toggleToolsOption(jetFlowDrawingON);
+					break;
+				case 'zone_nuageuse':
+					toggleToolsOption(cloudDrawingON);
+					break;
+				case 'courant_jet':
+					toggleToolsOption(jetFlowDrawingON);
+					break;
+				case 'front':
+					toggleDrawingOptions(frontFlowDrawingON);
+					break;
+				case 'cat':
+					toggleToolsOption(jetFlowDrawingON);
+					break;
+				case 'ligne':
+					toggleToolsOption(jetFlowDrawingON);
+					break;
+				case 'fleche':
+					toggleToolsOption(jetFlowDrawingON);
+					break;
+				case 'centres_action':
+					toggleToolsOption(jetFlowDrawingON);
+					break;
+				case 'volcan':
+					toggleToolsOption(jetFlowDrawingON);
+					break;
+				case 'tropopause':
+					toggleToolsOption(jetFlowDrawingON);
+					break;
+				case 'condition_en_surface':
+					toggleToolsOption(jetFlowDrawingON);
+					break;
+
+				default:
+					toggleToolsOption(selectOn);
+					map.getViewport().addEventListener('dblclick', doubleClick);
+					break;
+			}
+		}
+	}, [doubleClick, dragAndTranslate, map, option, toggleToolsOption, zoom]);
+
 	const items = [
-		{
-			id: 'select',
-			icon: '/Icons/Clouds/arrow-pointer-solid.svg',
-			alt: 'Select icon',
-			command: () => {
-				toggleDrawingOptions(selectOn);
-				dispatch(setOption('select'));
-			},
-		},
 		{
 			id: 'zoom_in',
 			icon: '/Icons/Clouds/magnifying-glass-plus-solid.svg',
 			alt: 'Zoom In icon',
 			command: () => {
-				zoom('zoom_in', zoomingInAndCenter);
-				dispatch(setOption('zoom_in'));
+				option !== 'zoom_in'
+					? dispatch(setOption('zoom_in'))
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -99,8 +165,9 @@ function Tools({ map }) {
 			icon: '/Icons/Clouds/magnifying-glass-minus-solid.svg',
 			alt: 'Zoom Out icon',
 			command: () => {
-				zoom('zoom_out', zoomingOutAndCenter);
-				dispatch(setOption('zoom_out'));
+				option !== 'zoom_out'
+					? dispatch(setOption('zoom_out'))
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -108,8 +175,9 @@ function Tools({ map }) {
 			icon: '/Icons/Clouds/hand-solid.svg',
 			alt: 'Drag icon',
 			command: () => {
-				dragAndTranslate();
-				dispatch(setOption('drag'));
+				option !== 'drag'
+					? dispatch(setOption('drag'))
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -117,8 +185,9 @@ function Tools({ map }) {
 			icon: '/Icons/Clouds/message-regular.svg',
 			alt: 'Zone de texte icon',
 			command: () => {
-				toggleDrawingOptions(jetFlowDrawingON);
-				dispatch(setOption('zone_texte'));
+				option !== 'zone_texte'
+					? dispatch(setOption('zone_texte'))
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -126,8 +195,9 @@ function Tools({ map }) {
 			icon: '/Icons/Clouds/cloud-solid.svg',
 			alt: 'Zone nuageuse icon',
 			command: () => {
-				toggleDrawingOptions(cloudDrawingON);
-				dispatch(setOption('zone_nuageuse'));
+				option !== 'zone_nuageuse'
+					? dispatch(setOption('zone_nuageuse'))
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -135,8 +205,9 @@ function Tools({ map }) {
 			icon: '/Icons/Clouds/wind-solid.svg',
 			alt: 'Courant jet icon',
 			command: () => {
-				toggleDrawingOptions(jetFlowDrawingON);
-				map.changed();
+				option !== 'courant_jet'
+					? dispatch(setOption('courant_jet'))
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -144,8 +215,9 @@ function Tools({ map }) {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'front icon',
 			command: () => {
-				toggleDrawingOptions(frontFlowDrawingON);
-				map.changed();
+				option !== 'front'
+					? dispatch(setOption('front'))
+					: dispatch(setOption(''));	
 			},
 		},
 		{
@@ -153,8 +225,7 @@ function Tools({ map }) {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'Cat icon',
 			command: () => {
-				toggleDrawingOptions(jetFlowDrawingON);
-				map.changed();
+				option !== 'cat' ? dispatch(setOption('cat')) : dispatch(setOption(''));
 			},
 		},
 		{
@@ -162,8 +233,9 @@ function Tools({ map }) {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'ligne icon',
 			command: () => {
-				toggleDrawingOptions(jetFlowDrawingON);
-				map.changed();
+				option !== 'ligne'
+					? dispatch(setOption('ligne'))
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -171,8 +243,9 @@ function Tools({ map }) {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'Flèche icon',
 			command: () => {
-				toggleDrawingOptions(jetFlowDrawingON);
-				map.changed();
+				option !== 'fleche'
+					? dispatch(setOption('fleche'))
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -180,8 +253,9 @@ function Tools({ map }) {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: "Centres d'action icon",
 			command: () => {
-				toggleDrawingOptions(jetFlowDrawingON);
-				map.changed();
+				option !== 'centres_action'
+					? dispatch(setOption('centres_action'))
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -189,8 +263,9 @@ function Tools({ map }) {
 			icon: '/Icons/Clouds/volcano-solid.svg',
 			alt: 'Volcan icon',
 			command: () => {
-				toggleDrawingOptions(jetFlowDrawingON);
-				map.changed();
+				option !== 'volcan'
+					? dispatch(setOption('volcan'))
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -198,8 +273,9 @@ function Tools({ map }) {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'tropopause icon',
 			command: () => {
-				toggleDrawingOptions(jetFlowDrawingON);
-				map.changed();
+				option !== 'tropopause'
+					? dispatch(setOption('tropopause'))
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -207,8 +283,9 @@ function Tools({ map }) {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'text Zone icon',
 			command: () => {
-				toggleDrawingOptions(jetFlowDrawingON);
-				map.changed();
+				option !== 'condition_en_surface'
+					? dispatch(setOption('condition_en_surface'))
+					: dispatch(setOption(''));
 			},
 		},
 	];
@@ -217,7 +294,7 @@ function Tools({ map }) {
 		<div className="tools">
 			<button
 				onClick={() => {
-					console.log('saved');
+					save(map);
 				}}
 				id={'save'}>
 				<img
@@ -256,7 +333,7 @@ function Tools({ map }) {
 					onClick={item.command}
 					key={key}
 					id={item.id}
-					disabled={modals}
+					disabled={modal !== ''}
 					className={option === item.id ? 'active' : ''}>
 					<img src={item.icon} alt={item.alt} height={20} width={20} />
 				</button>

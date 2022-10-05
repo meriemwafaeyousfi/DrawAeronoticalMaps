@@ -146,3 +146,9 @@ export const verticesCheck = (point, feature) => {
 		});
 	return vertex;
 };
+
+export const save = (map) => {
+	map.getLayers().forEach((layer) => {
+		console.log(layer.get('title'));
+	});
+};
