@@ -1,10 +1,7 @@
 import { createStore, combineReducers } from 'redux';
-import {
-	cloudyAreaModal,
-	selectedFeature,
-} from './Pages/Production/Features/CloudyArea/reducers';
-import { option } from './Pages/Production/NewCarte/Tools/reducer';
-const reducers = { cloudyAreaModal, option, selectedFeature };
+import { map, option, modal } from './Pages/Production/NewCarte/redux/reducers';
+import { selectedFeature } from './Pages/Production/Features/CloudyArea/redux/reducers';
+const reducers = { map, option, modal, selectedFeature };
 
 const rootReducer = combineReducers(reducers);
 

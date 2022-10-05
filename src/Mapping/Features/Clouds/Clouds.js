@@ -130,10 +130,24 @@ export const deleteAHandle = (point, feature) => {
 	feature.getGeometry().setCoordinates(newCoordinates);
 };
 
+export const inverseFeature = (feature) => {
+	feature
+		.getGeometry()
+		.setCoordinates(feature.getGeometry().getCoordinates().reverse());
+};
+
 export const cloudDrawingON = (map) => {
 	map.getInteractions().forEach((interaction) => {
 		if (interaction.get('title') === 'zone_nuageuse:draw') {
 			interaction.setActive(true);
 		}
 	});
+};
+
+export const deleteCloudFeature = (map, layer, feature) => {
+	map.removeOverlay(map.getOverlayById(feature.ol_uid));
+	layer
+		.getSource()
+		.removeFeature(layer.getSource().getFeatureById(feature.ol_uid));
+	layer.getSource().removeFeature(feature);
 };

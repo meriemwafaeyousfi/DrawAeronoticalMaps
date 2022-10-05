@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
 	cloudVectorLayer,
 	drawCloud,
@@ -9,15 +9,20 @@ import {
 import { createTextOverlay } from '../../../../Mapping/Features/Clouds/TextOverLay';
 import * as extent from 'ol/extent';
 import Window from './Window/Window';
-import { useDispatch, useSelector } from 'react-redux';
 import { endDrawing } from '../../../../Mapping/Map';
-import { setOption } from '../../NewCarte/Tools/actions';
-import { cloudModal, selectFeature } from './actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { setModal, setOption } from '../../NewCarte/redux/actions';
+import { setSelectedFeature } from './redux/actions';
 
-function CloudyArea({ map }) {
+function CloudyArea() {
+	const map = useSelector((state) => state.map);
+	const modal = useSelector((state) => state.modal);
 	const dispatch = useDispatch();
+
+	const [vectorLayer, setVectorLayer] = useState(null);
 	const init = useCallback(() => {
 		const cvl = cloudVectorLayer();
+		setVectorLayer(cvl);
 		map.addLayer(cvl);
 
 		const sc = selectCloud(cvl);
@@ -25,18 +30,31 @@ function CloudyArea({ map }) {
 		sc.setActive(false);
 		sc.on('select', ({ selected }) => {
 			if (selected[0]) {
-				dispatch(selectFeature(selected[0]));
+				dispatch(setSelectedFeature(selected[0]));
 			} else {
-				dispatch(selectFeature(null));
+				dispatch(setSelectedFeature(null));
 			}
 		});
 		map.addInteraction(sc);
+
+		cvl.getSource().on('addfeature', ({ feature }) => {
+			if (feature.get('feature_type') === 'zone_nuageuse') {
+				console.log('feature added');
+				sc.getFeatures().clear();
+				sc.getFeatures().push(feature);
+				dispatch(setSelectedFeature(feature));
+				dispatch(setModal('zone_nuageuse'));
+				createTextOverlay(map, feature);
+			}
+		});
+		cvl.getSource().on('removefeature', ({ feature }) => {
+			console.log('feature removed');
+		});
 
 		const dc = drawCloud(cvl.getSource());
 		dc.set('title', 'zone_nuageuse:draw');
 		dc.setActive(false);
 		dc.on('drawend', ({ feature }) => {
-			sc.getFeatures().clear();
 			feature.set('feature_type', 'zone_nuageuse');
 			feature.set('color', '#000000');
 			feature.set('width', 2);
@@ -44,10 +62,6 @@ function CloudyArea({ map }) {
 			feature.set('alignement', 'Gauche');
 			endDrawing(map);
 			dispatch(setOption(''));
-			dispatch(selectFeature(feature));
-			dispatch(cloudModal(true));
-			sc.getFeatures().push(feature);
-			createTextOverlay(map, feature);
 		});
 		map.addInteraction(dc);
 
@@ -71,9 +85,11 @@ function CloudyArea({ map }) {
 	}, [dispatch, map]);
 
 	useEffect(() => {
-		init();
-	}, [init]);
-	return useSelector((state) => state.cloudyAreaModal) && <Window map={map} />;
+		if (map) {
+			init();
+		}
+	}, [init, map]);
+	return modal === 'zone_nuageuse' && <Window vectorLayer={vectorLayer} />;
 }
 
 export default CloudyArea;

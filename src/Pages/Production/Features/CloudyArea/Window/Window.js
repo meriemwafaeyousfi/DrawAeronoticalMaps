@@ -7,22 +7,32 @@ import {
 	alignOverlayContent,
 	updateOverlayContent,
 } from '../../../../../Mapping/Features/Clouds/TextOverLay';
+import {
+	deleteCloudFeature,
+	inverseFeature,
+} from '../../../../../Mapping/Features/Clouds/Clouds';
 import { useDispatch, useSelector } from 'react-redux';
-import { cloudModal, selectFeature } from '../actions';
+import { setModal, setOption } from '../../../NewCarte/redux/actions';
+import { setSelectedFeature } from '../redux/actions';
 
-function Window({ map }) {
-	const disptach = useDispatch();
+function Window({ vectorLayer }) {
+	const map = useSelector((state) => state.map);
 	const selectedFeature = useSelector((state) => state.selectedFeature);
+	const disptach = useDispatch();
+
+	const [backupFeature, setBackupFeature] = useState(null);
 	const [selectedFeatureStyle, setSelectedFeatureStyle] = useState({
 		color: '#000000',
 		width: 2,
 	});
 
 	const [alignement, setAlignement] = useState('Gauche');
+
 	const [fraction, setFraction] = useState({
 		numenator: '0',
 		denominator: '0',
 	});
+
 	const [text, setText] = useState('');
 
 	const handleChange = useCallback((event) => {
@@ -101,6 +111,7 @@ function Window({ map }) {
 
 	useEffect(() => {
 		if (selectedFeature) {
+			setBackupFeature(selectedFeature.clone());
 			setSelectedFeatureStyle({
 				color: selectedFeature.get('color'),
 				width: selectedFeature.get('width'),
@@ -118,23 +129,22 @@ function Window({ map }) {
 	}, [selectedFeature]);
 
 	const inverse = useCallback(() => {
-		selectedFeature &&
-			selectedFeature
-				.getGeometry()
-				.setCoordinates(
-					selectedFeature.getGeometry().getCoordinates().reverse()
-				);
+		selectedFeature && inverseFeature(selectedFeature);
 	}, [selectedFeature]);
 
 	const handleConfirm = useCallback(() => {
-		disptach(selectFeature(null));
-		disptach(cloudModal(false));
+		disptach(setOption(''));
+		disptach(setModal(''));
 	}, [disptach]);
 
 	const handleCancel = useCallback(() => {
-		disptach(selectFeature(null));
-		disptach(cloudModal(false));
-	}, [disptach]);
+		console.log(backupFeature);
+		deleteCloudFeature(map, vectorLayer, selectedFeature);
+		vectorLayer.getSource().addFeature(backupFeature);
+		disptach(setSelectedFeature(backupFeature));
+		disptach(setOption(''));
+		disptach(setModal(''));
+	}, [backupFeature, disptach, map, selectedFeature, vectorLayer]);
 
 	useEffect(() => {
 		if (map && selectedFeature) {

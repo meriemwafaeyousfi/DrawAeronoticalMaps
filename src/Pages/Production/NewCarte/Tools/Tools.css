@@ -17,9 +17,17 @@
 	width: 80%;
 	height: 5%;
 }
-.tools button:hover {
+.tools button:disabled {
+	background-color: #999999;
+}
+
+.tools button:hover:enabled {
 	background-color: #f59e0b;
 	color: white;
+}
+
+.tools button:hover:disabled {
+	background-color: none;
 }
 
 .active {
