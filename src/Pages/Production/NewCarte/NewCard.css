@@ -1,0 +1,64 @@
+.new-card-container {
+	top: 70px;
+	position: absolute;
+	display: flex;
+	width: 100%;
+}
+
+#map-container {
+	width: 100%;
+	height: calc(100vh - 70px);
+	border: 1px solid black;
+}
+
+.overlay_container {
+	width: 100px;
+	border: 0.5px solid grey;
+	text-shadow: 2px;
+}
+.overlay_content {
+	position: relative;
+	padding: 0;
+}
+.overlay_text {
+	pointer-events: none;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0px 5px;
+	align-items: center;
+	padding: 15px 5px;
+}
+.overlay_text span,
+.overlay_text img,
+.overlay_text div {
+	background-color: white;
+}
+.resize_overlay {
+	position: absolute;
+	right: 3px;
+	bottom: 0px;
+	background-color: transparent;
+	border: none;
+	transform: rotate(315deg);
+}
+
+.selected_overlay {
+	border: 2px solid #f59e0b;
+}
+
+.overlay_fraction {
+	text-align: center;
+}
+
+.overlay_fraction_numenator {
+	position: relative;
+	margin: 4px 0px;
+	text-align: center;
+}
+.overlay_fraction_numenator::after {
+	content: '.';
+	position: absolute;
+	width: 100%;
+	border-bottom: 3px solid;
+	left: 0;
+}
