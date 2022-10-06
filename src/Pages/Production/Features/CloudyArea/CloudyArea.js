@@ -11,8 +11,11 @@ import * as extent from 'ol/extent';
 import Window from './Window/Window';
 import { endDrawing } from '../../../../Mapping/Map';
 import { useDispatch, useSelector } from 'react-redux';
-import { setModal, setOption } from '../../NewCarte/redux/actions';
-import { setSelectedFeature } from './redux/actions';
+import {
+	setModal,
+	setOption,
+	setSelectedFeature,
+} from '../../NewCarte/redux/actions';
 
 function CloudyArea() {
 	const map = useSelector((state) => state.map);
@@ -43,7 +46,6 @@ function CloudyArea() {
 				sc.getFeatures().clear();
 				sc.getFeatures().push(feature);
 				dispatch(setSelectedFeature(feature));
-				dispatch(setModal('zone_nuageuse'));
 				createTextOverlay(map, feature);
 			}
 		});

@@ -12,9 +12,11 @@ import {
 	inverseFeature,
 } from '../../../../../Mapping/Features/Clouds/Clouds';
 import { useDispatch, useSelector } from 'react-redux';
-import { setModal, setOption } from '../../../NewCarte/redux/actions';
-import { setSelectedFeature } from '../redux/actions';
-
+import {
+	setModal,
+	setOption,
+	setSelectedFeature,
+} from '../../../NewCarte/redux/actions';
 function Window({ vectorLayer }) {
 	const map = useSelector((state) => state.map);
 	const selectedFeature = useSelector((state) => state.selectedFeature);

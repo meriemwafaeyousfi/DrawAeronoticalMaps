@@ -25,7 +25,7 @@ function NewCard() {
 			<MapContextMenu />
 			<CloudyArea />
 			<JetFlow />
-			{map && <FrontFlow map={map} />}
+			<FrontFlow />
 		</div>
 	);
 }

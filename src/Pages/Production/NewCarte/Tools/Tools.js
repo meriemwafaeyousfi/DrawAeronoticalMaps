@@ -23,6 +23,7 @@ function Tools() {
 	const map = useSelector((state) => state.map);
 	const modal = useSelector((state) => state.modal);
 	const option = useSelector((state) => state.option);
+	const selectedFeature = useSelector((state) => state.selectedFeature);
 
 	const dispatch = useDispatch();
 
@@ -116,8 +117,8 @@ function Tools() {
 				case 'courant_jet':
 					toggleToolsOption(jetFlowDrawingON);
 					break;
-				case 'front':
-					toggleDrawingOptions(frontFlowDrawingON);
+				case 'courant_front':
+					toggleToolsOption(frontFlowDrawingON);
 					break;
 				case 'cat':
 					toggleToolsOption(jetFlowDrawingON);
@@ -143,11 +144,20 @@ function Tools() {
 
 				default:
 					toggleToolsOption(selectOn);
-					map.getViewport().addEventListener('dblclick', doubleClick);
+					if (selectedFeature)
+						map.getViewport().addEventListener('dblclick', doubleClick);
 					break;
 			}
 		}
-	}, [doubleClick, dragAndTranslate, map, option, toggleToolsOption, zoom]);
+	}, [
+		doubleClick,
+		dragAndTranslate,
+		map,
+		option,
+		selectedFeature,
+		toggleToolsOption,
+		zoom,
+	]);
 
 	const items = [
 		{
@@ -211,13 +221,13 @@ function Tools() {
 			},
 		},
 		{
-			id: 'front',
+			id: 'courant_front',
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'front icon',
 			command: () => {
-				option !== 'front'
-					? dispatch(setOption('front'))
-					: dispatch(setOption(''));	
+				option !== 'courant_front'
+					? dispatch(setOption('courant_front'))
+					: dispatch(setOption(''));
 			},
 		},
 		{

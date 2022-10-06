@@ -13,7 +13,7 @@ import {
 	verticesCheck,
 } from '../../../../Mapping/Map';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSelectedFeature } from '../../Features/CloudyArea/redux/actions';
+import { setSelectedFeature } from '../redux/actions';
 
 function MapContextMenu() {
 	const map = useSelector((state) => state.map);

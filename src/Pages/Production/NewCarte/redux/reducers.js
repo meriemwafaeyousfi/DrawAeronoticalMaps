@@ -1,4 +1,9 @@
-import { SET_MAP, SET_MODAL, SET_OPTION } from './actions';
+import {
+	SET_MAP,
+	SET_MODAL,
+	SET_OPTION,
+	SET_SELECTED_FEATURE,
+} from './actions';
 
 export const map = (state = null, action) => {
 	const { type, payload } = action;
@@ -24,6 +29,17 @@ export const modal = (state = '', action) => {
 	const { type, payload } = action;
 	switch (type) {
 		case SET_MODAL:
+			return payload;
+
+		default:
+			return state;
+	}
+};
+
+export const selectedFeature = (state = null, action) => {
+	const { type, payload } = action;
+	switch (type) {
+		case SET_SELECTED_FEATURE:
 			return payload;
 
 		default:
