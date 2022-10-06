@@ -1,0 +1,39 @@
+.tools {
+	display: flex;
+	flex-direction: column;
+	background: #f8f9fa;
+	width: 50px;
+	height: calc(100vh - 70px);
+	border: 1px solid black;
+	border-radius: 2px;
+	align-items: center;
+	z-index: 100;
+}
+.tools button {
+	padding: 5px;
+	border-radius: 2px;
+	border: 1px solid black;
+	margin: 1px;
+	width: 80%;
+	height: 5%;
+}
+.tools button:disabled {
+	background-color: #999999;
+}
+
+.tools button:hover:enabled {
+	background-color: #f59e0b;
+	color: white;
+}
+
+.tools button:hover:disabled {
+	background-color: none;
+}
+
+.active {
+	background-color: #f59e0b;
+}
+
+.tools img {
+	pointer-events: none;
+}

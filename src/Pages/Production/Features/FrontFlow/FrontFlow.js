@@ -1,0 +1,66 @@
+import React, { useCallback, useEffect } from 'react';
+import {
+	drawFrontFlow,
+	frontFlowVectorLayer,
+	modifyFrontFlow,
+	selectFrontFlow,
+	translateFrontFlow,
+} from '../../../../Mapping/Features/FrontFlow/FrontFlow';
+import { useDispatch, useSelector } from 'react-redux';
+import { endDrawing } from '../../../../Mapping/Map';
+import {
+	setModal,
+	setOption,
+	setSelectedFeature,
+} from '../../NewCarte/redux/actions';
+
+function FrontFlow() {
+	const map = useSelector((state) => state.map);
+	const dispatch = useDispatch();
+	const init = useCallback(() => {
+		const ffvl = frontFlowVectorLayer();
+		map.addLayer(ffvl);
+
+		const sff = selectFrontFlow(ffvl);
+		sff.set('title', 'courant_front:select');
+		sff.setActive(false);
+		sff.on('select', ({ selected }) => {
+			if (selected[0]) {
+				dispatch(setSelectedFeature(selected[0]));
+			} else {
+				dispatch(setSelectedFeature(null));
+			}
+		});
+		map.addInteraction(sff);
+
+		const djf = drawFrontFlow(ffvl.getSource());
+		djf.set('title', 'courant_front:draw');
+		djf.setActive(false);
+		djf.on('drawend', ({ feature }) => {
+			sff.getFeatures().clear();
+			feature.set('feature_type', 'courant_front');
+			endDrawing(map);
+			dispatch(setSelectedFeature(feature));
+			dispatch(setOption(''));
+
+			sff.getFeatures().push(feature);
+		});
+		map.addInteraction(djf);
+
+		const mff = modifyFrontFlow(sff);
+		mff.set('title', 'courant_front:modify');
+		map.addInteraction(mff);
+
+		const tff = translateFrontFlow(ffvl);
+		tff.set('title', 'courant_front:translate');
+		tff.setActive(false);
+		map.addInteraction(tff);
+	}, [dispatch, map]);
+
+	useEffect(() => {
+		if (map) init();
+	}, [init, map]);
+	return <></>;
+}
+
+export default FrontFlow;
