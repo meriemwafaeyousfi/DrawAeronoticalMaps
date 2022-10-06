@@ -35,14 +35,17 @@ function Tools() {
 			map.forEachFeatureAtPixel(
 				map.getEventPixel(event),
 				(feature) => {
-					if (feature.getGeometry().getType() !== 'Point') {
+					if (
+						feature.getGeometry().getType() !== 'Point' &&
+						feature === selectedFeature
+					) {
 						dispatch(setModal(feature.get('feature_type')));
 					}
 				},
 				{ hitTolerance: 10 }
 			);
 		},
-		[dispatch, map]
+		[dispatch, map, selectedFeature]
 	);
 	const nothing = useCallback(() => {
 		if (map) {
@@ -98,6 +101,7 @@ function Tools() {
 
 	useEffect(() => {
 		if (map) {
+			console.log(option);
 			switch (option) {
 				case 'zoom_in':
 					zoom('zoom_in', zoomingInAndCenter);
@@ -112,6 +116,7 @@ function Tools() {
 					toggleToolsOption(jetFlowDrawingON);
 					break;
 				case 'zone_nuageuse':
+					console.log('zncalled');
 					toggleToolsOption(cloudDrawingON);
 					break;
 				case 'courant_jet':
@@ -141,11 +146,15 @@ function Tools() {
 				case 'condition_en_surface':
 					toggleToolsOption(jetFlowDrawingON);
 					break;
-
+				case 'select':
+					if (modal === '') {
+						toggleToolsOption(selectOn);
+						if (selectedFeature)
+							map.getViewport().addEventListener('dblclick', doubleClick);
+					}
+					break;
 				default:
-					toggleToolsOption(selectOn);
-					if (selectedFeature)
-						map.getViewport().addEventListener('dblclick', doubleClick);
+					nothing();
 					break;
 			}
 		}
@@ -153,6 +162,8 @@ function Tools() {
 		doubleClick,
 		dragAndTranslate,
 		map,
+		modal,
+		nothing,
 		option,
 		selectedFeature,
 		toggleToolsOption,
@@ -167,7 +178,7 @@ function Tools() {
 			command: () => {
 				option !== 'zoom_in'
 					? dispatch(setOption('zoom_in'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -177,7 +188,7 @@ function Tools() {
 			command: () => {
 				option !== 'zoom_out'
 					? dispatch(setOption('zoom_out'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -187,7 +198,7 @@ function Tools() {
 			command: () => {
 				option !== 'drag'
 					? dispatch(setOption('drag'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -197,7 +208,7 @@ function Tools() {
 			command: () => {
 				option !== 'zone_texte'
 					? dispatch(setOption('zone_texte'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -207,7 +218,7 @@ function Tools() {
 			command: () => {
 				option !== 'zone_nuageuse'
 					? dispatch(setOption('zone_nuageuse'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -217,7 +228,7 @@ function Tools() {
 			command: () => {
 				option !== 'courant_jet'
 					? dispatch(setOption('courant_jet'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -227,7 +238,7 @@ function Tools() {
 			command: () => {
 				option !== 'courant_front'
 					? dispatch(setOption('courant_front'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -235,7 +246,9 @@ function Tools() {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'Cat icon',
 			command: () => {
-				option !== 'cat' ? dispatch(setOption('cat')) : dispatch(setOption(''));
+				option !== 'cat'
+					? dispatch(setOption('cat'))
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -245,7 +258,7 @@ function Tools() {
 			command: () => {
 				option !== 'ligne'
 					? dispatch(setOption('ligne'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -255,7 +268,7 @@ function Tools() {
 			command: () => {
 				option !== 'fleche'
 					? dispatch(setOption('fleche'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -265,7 +278,7 @@ function Tools() {
 			command: () => {
 				option !== 'centres_action'
 					? dispatch(setOption('centres_action'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -275,7 +288,7 @@ function Tools() {
 			command: () => {
 				option !== 'volcan'
 					? dispatch(setOption('volcan'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -285,7 +298,7 @@ function Tools() {
 			command: () => {
 				option !== 'tropopause'
 					? dispatch(setOption('tropopause'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -295,7 +308,7 @@ function Tools() {
 			command: () => {
 				option !== 'condition_en_surface'
 					? dispatch(setOption('condition_en_surface'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 	];

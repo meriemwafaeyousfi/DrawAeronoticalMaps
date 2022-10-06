@@ -6,7 +6,10 @@ import {
 	selectCloud,
 	translateCloud,
 } from '../../../../Mapping/Features/Clouds/Clouds';
-import { createTextOverlay } from '../../../../Mapping/Features/Clouds/TextOverLay';
+import {
+	createTextOverlay,
+	updateOverlayContent,
+} from '../../../../Mapping/Features/Clouds/TextOverLay';
 import * as extent from 'ol/extent';
 import Window from './Window/Window';
 import { endDrawing } from '../../../../Mapping/Map';
@@ -42,15 +45,20 @@ function CloudyArea() {
 
 		cvl.getSource().on('addfeature', ({ feature }) => {
 			if (feature.get('feature_type') === 'zone_nuageuse') {
-				console.log('feature added');
 				sc.getFeatures().clear();
 				sc.getFeatures().push(feature);
 				dispatch(setSelectedFeature(feature));
 				createTextOverlay(map, feature);
+				updateOverlayContent(map, feature);
 			}
 		});
 		cvl.getSource().on('removefeature', ({ feature }) => {
-			console.log('feature removed');
+			if (feature.get('feature_type') === 'zone_nuageuse') {
+				const relatedOverlay = map.getOverlayById(feature.ol_uid);
+				const relatedLink = cvl.getSource().getFeatureById(feature.ol_uid);
+				map.removeOverlay(relatedOverlay);
+				cvl.getSource().removeFeature(relatedLink);
+			}
 		});
 
 		const dc = drawCloud(cvl.getSource());
@@ -62,8 +70,9 @@ function CloudyArea() {
 			feature.set('width', 2);
 			feature.set('text', '');
 			feature.set('alignement', 'Gauche');
-			endDrawing(map);
+			dispatch(setModal('zone_nuageuse'));
 			dispatch(setOption(''));
+			endDrawing(map);
 		});
 		map.addInteraction(dc);
 

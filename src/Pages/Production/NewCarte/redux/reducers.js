@@ -15,7 +15,7 @@ export const map = (state = null, action) => {
 			return state;
 	}
 };
-export const option = (state = '', action) => {
+export const option = (state = 'select', action) => {
 	const { type, payload } = action;
 	switch (type) {
 		case SET_OPTION:
