@@ -82,6 +82,7 @@ export const pastFeature = (map, layer, destination) => {
 			];
 		});
 	feature.getGeometry().setCoordinates(newCoords);
+	feature.setStyle([feature.getStyle()(feature)[0]]);
 	layer.getSource().removeFeature(feature);
 	layer.getSource().addFeature(feature);
 };
