@@ -14,10 +14,10 @@ import {
 	save,
 } from '../../../../Mapping/Map';
 import { cloudDrawingON } from '../../../../Mapping/Features/Clouds/Clouds';
-import { jetFlowDrawingON } from '../../../../Mapping/Features/JetFlow/JetFlow';
 import { frontFlowDrawingON } from '../../../../Mapping/Features/FrontFlow/FrontFlow';
 import { useDispatch, useSelector } from 'react-redux';
 import { setModal, setOption } from '../redux/actions';
+import { jetDrawingON } from '../../../../Mapping/Features/Jet/Jet';
 
 function Tools() {
 	const map = useSelector((state) => state.map);
@@ -109,44 +109,43 @@ function Tools() {
 					dragAndTranslate();
 					break;
 				case 'zone_texte':
-					toggleToolsOption(jetFlowDrawingON);
+					console.log('not Define yet');
 					break;
 				case 'zone_nuageuse':
 					toggleToolsOption(cloudDrawingON);
 					break;
-				case 'courant_jet':
-					toggleToolsOption(jetFlowDrawingON);
+				case 'jet':
+					toggleToolsOption(jetDrawingON);
 					break;
 				case 'courant_front':
 					toggleToolsOption(frontFlowDrawingON);
 					break;
 				case 'cat':
-					toggleToolsOption(jetFlowDrawingON);
+					console.log('not Define yet');
 					break;
 				case 'ligne':
-					toggleToolsOption(jetFlowDrawingON);
+					console.log('not Define yet');
 					break;
 				case 'fleche':
-					toggleToolsOption(jetFlowDrawingON);
+					console.log('not Define yet');
 					break;
 				case 'centres_action':
-					toggleToolsOption(jetFlowDrawingON);
+					console.log('not Define yet');
 					break;
 				case 'volcan':
-					toggleToolsOption(jetFlowDrawingON);
+					console.log('not Define yet');
 					break;
 				case 'tropopause':
-					toggleToolsOption(jetFlowDrawingON);
+					console.log('not Define yet');
 					break;
 				case 'condition_en_surface':
-					toggleToolsOption(jetFlowDrawingON);
+					console.log('not Define yet');
 					break;
-				case 'select':
-					toggleToolsOption(selectOn);
-					map.getViewport().addEventListener('dblclick', doubleClick);
-					break;
+
 				default:
-					nothing();
+					toggleToolsOption(selectOn);
+					if (selectedFeature)
+						map.getViewport().addEventListener('dblclick', doubleClick);
 					break;
 			}
 		}
@@ -154,8 +153,8 @@ function Tools() {
 		doubleClick,
 		dragAndTranslate,
 		map,
-		nothing,
 		option,
+		selectedFeature,
 		toggleToolsOption,
 		zoom,
 	]);
@@ -208,17 +207,15 @@ function Tools() {
 			command: () => {
 				option !== 'zone_nuageuse'
 					? dispatch(setOption('zone_nuageuse'))
-					: dispatch(setOption('select'));
+					: dispatch(setOption(''));
 			},
 		},
 		{
-			id: 'courant_jet',
+			id: 'jet',
 			icon: '/Icons/Clouds/wind-solid.svg',
 			alt: 'Courant jet icon',
 			command: () => {
-				option !== 'courant_jet'
-					? dispatch(setOption('courant_jet'))
-					: dispatch(setOption('select'));
+				option !== 'jet' ? dispatch(setOption('jet')) : dispatch(setOption(''));
 			},
 		},
 		{
@@ -263,7 +260,7 @@ function Tools() {
 		},
 		{
 			id: 'centres_action',
-			icon: '/Icons/Clouds/i-cursor-solid.svg',
+			icon: '/Icons/Clouds/centre_action.png',
 			alt: "Centres d'action icon",
 			command: () => {
 				option !== 'centres_action'
@@ -293,7 +290,7 @@ function Tools() {
 		},
 		{
 			id: 'condition_en_surface',
-			icon: '/Icons/Clouds/i-cursor-solid.svg',
+			icon: '/Icons/Clouds/flag.png',
 			alt: 'text Zone icon',
 			command: () => {
 				option !== 'condition_en_surface'

@@ -3,8 +3,9 @@ import MapContextMenu from './ContextMenu/MapContextMenu';
 import { createBlankMap } from '../../../Mapping/Map';
 import { DragPan } from 'ol/interaction';
 import CloudyArea from '../Features/CloudyArea/CloudyArea';
-import JetFlow from '../Features/JetFlow/JetFlow';
 import FrontFlow from '../Features/FrontFlow/FrontFlow';
+import Jet from '../Features/Jet/Jet';
+import CentreAction from '../Features/CentreAction/CentreAction';
 import './NewCard.css';
 
 import Tools from './Tools/Tools';
@@ -24,8 +25,9 @@ function NewCard() {
 			<div id="map-container"></div>
 			<MapContextMenu />
 			<CloudyArea />
-			<JetFlow />
 			<FrontFlow />
+			<Jet />
+			<CentreAction />
 		</div>
 	);
 }
