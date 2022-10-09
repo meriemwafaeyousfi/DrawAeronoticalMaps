@@ -26,6 +26,7 @@ function CloudyArea() {
 	const dispatch = useDispatch();
 
 	const [vectorLayer, setVectorLayer] = useState(null);
+
 	const init = useCallback(() => {
 		const cvl = cloudVectorLayer();
 		setVectorLayer(cvl);

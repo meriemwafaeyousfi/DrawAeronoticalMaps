@@ -4,7 +4,6 @@ import BlankMap from './Layers/BlankMap';
 import * as extent from 'ol/extent';
 import { distance } from 'ol/coordinate';
 import { DragPan, Draw, Select, Translate } from 'ol/interaction';
-import { deleteCloudFeature } from './Features/Clouds/Clouds';
 
 export const createBlankMap = (target) => {
 	return new Promise((resolve, rejecte) => {

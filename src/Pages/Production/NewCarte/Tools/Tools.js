@@ -23,7 +23,6 @@ function Tools() {
 	const map = useSelector((state) => state.map);
 	const modal = useSelector((state) => state.modal);
 	const option = useSelector((state) => state.option);
-	const selectedFeature = useSelector((state) => state.selectedFeature);
 
 	const dispatch = useDispatch();
 
@@ -35,17 +34,15 @@ function Tools() {
 			map.forEachFeatureAtPixel(
 				map.getEventPixel(event),
 				(feature) => {
-					if (
-						feature.getGeometry().getType() !== 'Point' &&
-						feature === selectedFeature
-					) {
+					if (feature.getGeometry().getType() !== 'Point') {
 						dispatch(setModal(feature.get('feature_type')));
+						dispatch(setOption(''));
 					}
 				},
 				{ hitTolerance: 10 }
 			);
 		},
-		[dispatch, map, selectedFeature]
+		[dispatch, map]
 	);
 	const nothing = useCallback(() => {
 		if (map) {
@@ -61,9 +58,9 @@ function Tools() {
 	}, [doubleClick, map]);
 
 	const toggleToolsOption = useCallback(
-		(drawingFunction) => {
+		(Function) => {
 			nothing();
-			drawingFunction(map);
+			Function(map);
 		},
 		[map, nothing]
 	);
@@ -101,7 +98,6 @@ function Tools() {
 
 	useEffect(() => {
 		if (map) {
-			console.log(option);
 			switch (option) {
 				case 'zoom_in':
 					zoom('zoom_in', zoomingInAndCenter);
@@ -116,7 +112,6 @@ function Tools() {
 					toggleToolsOption(jetFlowDrawingON);
 					break;
 				case 'zone_nuageuse':
-					console.log('zncalled');
 					toggleToolsOption(cloudDrawingON);
 					break;
 				case 'courant_jet':
@@ -147,11 +142,8 @@ function Tools() {
 					toggleToolsOption(jetFlowDrawingON);
 					break;
 				case 'select':
-					if (modal === '') {
-						toggleToolsOption(selectOn);
-						if (selectedFeature)
-							map.getViewport().addEventListener('dblclick', doubleClick);
-					}
+					toggleToolsOption(selectOn);
+					map.getViewport().addEventListener('dblclick', doubleClick);
 					break;
 				default:
 					nothing();
@@ -162,10 +154,8 @@ function Tools() {
 		doubleClick,
 		dragAndTranslate,
 		map,
-		modal,
 		nothing,
 		option,
-		selectedFeature,
 		toggleToolsOption,
 		zoom,
 	]);
