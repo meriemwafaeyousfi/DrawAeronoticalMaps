@@ -101,7 +101,7 @@ function MapContextMenu() {
 				rightClickedFeature !== selectedFeature ||
 				rightClickedFeature.get('feature_type') !== 'zone_nuageuse',
 			command: () => {
-				deleteCloudFeature(map, layer, selectedFeature);
+				layer.getSource().removeFeature(selectedFeature);
 				disptach(setSelectedFeature(null));
 			},
 		},

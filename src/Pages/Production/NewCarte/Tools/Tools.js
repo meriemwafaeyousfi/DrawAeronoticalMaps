@@ -23,7 +23,6 @@ function Tools() {
 	const map = useSelector((state) => state.map);
 	const modal = useSelector((state) => state.modal);
 	const option = useSelector((state) => state.option);
-	const selectedFeature = useSelector((state) => state.selectedFeature);
 
 	const dispatch = useDispatch();
 
@@ -37,6 +36,7 @@ function Tools() {
 				(feature) => {
 					if (feature.getGeometry().getType() !== 'Point') {
 						dispatch(setModal(feature.get('feature_type')));
+						dispatch(setOption(''));
 					}
 				},
 				{ hitTolerance: 10 }
@@ -58,9 +58,9 @@ function Tools() {
 	}, [doubleClick, map]);
 
 	const toggleToolsOption = useCallback(
-		(drawingFunction) => {
+		(Function) => {
 			nothing();
-			drawingFunction(map);
+			Function(map);
 		},
 		[map, nothing]
 	);
@@ -167,7 +167,7 @@ function Tools() {
 			command: () => {
 				option !== 'zoom_in'
 					? dispatch(setOption('zoom_in'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -177,7 +177,7 @@ function Tools() {
 			command: () => {
 				option !== 'zoom_out'
 					? dispatch(setOption('zoom_out'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -187,7 +187,7 @@ function Tools() {
 			command: () => {
 				option !== 'drag'
 					? dispatch(setOption('drag'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -197,7 +197,7 @@ function Tools() {
 			command: () => {
 				option !== 'zone_texte'
 					? dispatch(setOption('zone_texte'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -225,7 +225,7 @@ function Tools() {
 			command: () => {
 				option !== 'courant_front'
 					? dispatch(setOption('courant_front'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -233,7 +233,9 @@ function Tools() {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'Cat icon',
 			command: () => {
-				option !== 'cat' ? dispatch(setOption('cat')) : dispatch(setOption(''));
+				option !== 'cat'
+					? dispatch(setOption('cat'))
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -243,7 +245,7 @@ function Tools() {
 			command: () => {
 				option !== 'ligne'
 					? dispatch(setOption('ligne'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -253,7 +255,7 @@ function Tools() {
 			command: () => {
 				option !== 'fleche'
 					? dispatch(setOption('fleche'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -263,7 +265,7 @@ function Tools() {
 			command: () => {
 				option !== 'centres_action'
 					? dispatch(setOption('centres_action'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -273,7 +275,7 @@ function Tools() {
 			command: () => {
 				option !== 'volcan'
 					? dispatch(setOption('volcan'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -283,7 +285,7 @@ function Tools() {
 			command: () => {
 				option !== 'tropopause'
 					? dispatch(setOption('tropopause'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 		{
@@ -293,7 +295,7 @@ function Tools() {
 			command: () => {
 				option !== 'condition_en_surface'
 					? dispatch(setOption('condition_en_surface'))
-					: dispatch(setOption(''));
+					: dispatch(setOption('select'));
 			},
 		},
 	];

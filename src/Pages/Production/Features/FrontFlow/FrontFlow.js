@@ -8,11 +8,7 @@ import {
 } from '../../../../Mapping/Features/FrontFlow/FrontFlow';
 import { useDispatch, useSelector } from 'react-redux';
 import { endDrawing } from '../../../../Mapping/Map';
-import {
-	setModal,
-	setOption,
-	setSelectedFeature,
-} from '../../NewCarte/redux/actions';
+import { setOption, setSelectedFeature } from '../../NewCarte/redux/actions';
 
 function FrontFlow() {
 	const map = useSelector((state) => state.map);

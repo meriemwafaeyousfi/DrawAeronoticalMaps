@@ -5,7 +5,6 @@ import {
 	modal,
 	selectedFeature,
 } from './Pages/Production/NewCarte/redux/reducers';
-
 const reducers = { map, option, modal, selectedFeature };
 
 const rootReducer = combineReducers(reducers);
