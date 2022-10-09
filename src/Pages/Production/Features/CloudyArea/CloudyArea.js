@@ -67,7 +67,7 @@ function CloudyArea() {
 		});
 		map.addInteraction(dc);
 
-		const mc = modifyCloud(sc, cvl);
+		const mc = modifyCloud(sc);
 		mc.set('title', 'zone_nuageuse:modify');
 		map.addInteraction(mc);
 

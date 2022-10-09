@@ -9,50 +9,54 @@ import {
 import * as extent from 'ol/extent';
 import { useDispatch, useSelector } from 'react-redux';
 import { endDrawing } from '../../../../Mapping/Map';
-import {
-	setOption,
-	setSelectedFeature,
-} from '../../NewCarte/redux/actions';
+import { setOption, setSelectedFeature } from '../../NewCarte/redux/actions';
 
 function Jet() {
 	const map = useSelector((state) => state.map);
 	const dispatch = useDispatch();
+
 	const init = useCallback(() => {
-		const cvl = jetVectorLayer();
-		map.addLayer(cvl);
-		const sc = selectJet(cvl);
-		sc.set('title', 'jet:select');
-		sc.setActive(false);
-		sc.on('select', ({ selected }) => {
+		const jvl = jetVectorLayer();
+		map.addLayer(jvl);
+
+		const sj = selectJet(jvl);
+		sj.set('title', 'jet:select');
+		sj.setActive(false);
+		sj.on('select', ({ selected }) => {
 			if (selected[0]) {
 				dispatch(setSelectedFeature(selected[0]));
 			} else {
 				dispatch(setSelectedFeature(null));
 			}
 		});
-		map.addInteraction(sc)
+		map.addInteraction(sj);
 
-		const dc = drawJet(cvl.getSource())
-		dc.set('title', 'jet:draw')
-		dc.setActive(false)
-		dc.on('drawend', ({ feature }) => {
-			sc.getFeatures().clear()
-			feature.set('feature_type', 'jet')
-			endDrawing(map)
+		const dj = drawJet(jvl.getSource());
+		dj.set('title', 'jet:draw');
+		dj.setActive(false);
+		dj.on('drawend', ({ feature }) => {
+			sj.getFeatures().clear();
+			feature.set('feature_type', 'jet');
+			endDrawing(map);
 			dispatch(setOption(''));
-			sc.getFeatures().push(feature)
+			sj.getFeatures().push(feature);
 		});
-		map.addInteraction(dc)
+		map.addInteraction(dj);
 
-		const mc = modifyJet(sc, cvl);
-		mc.set('title', 'jet:modify');
-		map.addInteraction(mc);
-	}, [dispatch, map])
+		const mt = modifyJet(sj, jvl);
+		mt.set('title', 'jet:modify');
+		map.addInteraction(mt);
+
+		const tj = translateJet(jvl);
+		tj.set('title', 'jet:translate');
+		tj.setActive(false);
+		map.addInteraction(tj);
+	}, [dispatch, map]);
 
 	useEffect(() => {
 		if (map) init();
 	}, [init, map]);
-	return<></>
+	return <></>;
 }
 
 export default Jet;

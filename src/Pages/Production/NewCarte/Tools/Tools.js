@@ -14,7 +14,6 @@ import {
 	save,
 } from '../../../../Mapping/Map';
 import { cloudDrawingON } from '../../../../Mapping/Features/Clouds/Clouds';
-import { jetFlowDrawingON } from '../../../../Mapping/Features/JetFlow/JetFlow';
 import { frontFlowDrawingON } from '../../../../Mapping/Features/FrontFlow/FrontFlow';
 import { useDispatch, useSelector } from 'react-redux';
 import { setModal, setOption } from '../redux/actions';
@@ -110,7 +109,7 @@ function Tools() {
 					dragAndTranslate();
 					break;
 				case 'zone_texte':
-					toggleToolsOption(jetFlowDrawingON);
+					console.log('not Define yet');
 					break;
 				case 'zone_nuageuse':
 					toggleToolsOption(cloudDrawingON);
@@ -122,25 +121,25 @@ function Tools() {
 					toggleToolsOption(frontFlowDrawingON);
 					break;
 				case 'cat':
-					toggleToolsOption(jetFlowDrawingON);
+					console.log('not Define yet');
 					break;
 				case 'ligne':
-					toggleToolsOption(jetFlowDrawingON);
+					console.log('not Define yet');
 					break;
 				case 'fleche':
-					toggleToolsOption(jetFlowDrawingON);
+					console.log('not Define yet');
 					break;
 				case 'centres_action':
-					toggleToolsOption(jetFlowDrawingON);
+					console.log('not Define yet');
 					break;
 				case 'volcan':
-					toggleToolsOption(jetFlowDrawingON);
+					console.log('not Define yet');
 					break;
 				case 'tropopause':
-					toggleToolsOption(jetFlowDrawingON);
+					console.log('not Define yet');
 					break;
 				case 'condition_en_surface':
-					toggleToolsOption(jetFlowDrawingON);
+					console.log('not Define yet');
 					break;
 
 				default:
@@ -216,9 +215,7 @@ function Tools() {
 			icon: '/Icons/Clouds/wind-solid.svg',
 			alt: 'Courant jet icon',
 			command: () => {
-				option !== 'jet'
-					? dispatch(setOption('jet'))
-					: dispatch(setOption(''));
+				option !== 'jet' ? dispatch(setOption('jet')) : dispatch(setOption(''));
 			},
 		},
 		{
