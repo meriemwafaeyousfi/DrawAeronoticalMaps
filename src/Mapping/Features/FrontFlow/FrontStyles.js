@@ -25,6 +25,15 @@ const imageStyle = new Style({
   geometry: new Point([]),
 });
 
+const imageStyle2 = new Style({
+  image: new Icon({
+    anchor: [1, 1],
+    src: src2,
+    scale: 0.19,
+  }),
+  geometry: new Point([]),
+});
+
 const drawStyle = new Style({
   image: new Circle({
     radius: 5,
@@ -76,7 +85,7 @@ function distance1(p1, p2) {
   return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
 }
 
-function getClosestPointToCoords(coordinates, point) {
+export const getClosestPointToCoords = (coordinates, point) => {
   let distances = [];
   let distance = 0;
   let min = 0;
@@ -88,13 +97,95 @@ function getClosestPointToCoords(coordinates, point) {
   });
   min = Math.min.apply(null, distances);
   return distances.indexOf(min);
-}
+};
 
 function segmentsStyles(feature, curved) {
   const poignees = feature.getGeometry().getCoordinates();
   const coords = curved.geometry.coordinates;
   const styles = [];
-  poignees.forEach((coord,id) => {
+  poignees.forEach((coord, id) => {
+    if (
+      id === poignees.length - 1 ||
+      (poignees[id][0] === poignees[id + 1][0] &&
+        poignees[id][1] === poignees[id + 1][1])
+    )
+      return;
+    const index0 = getClosestPointToCoords(coords, poignees[id]);
+    const index1 = getClosestPointToCoords(coords, poignees[id + 1]);
+    const coordsSplit = [];
+    for (var j = index0; j <= index1; j++) {
+      coordsSplit.push(coords[j]);
+    }
+    let geometry = new LineString([]);
+    let line = {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "LineString",
+        coordinates: coordsSplit,
+      },
+    };
+    const curved2 = bezierSpline(line);
+    geometry.set("poignees",[ poignees[id],  poignees[id+1]])
+    geometry.setCoordinates(curved2["geometry"]["coordinates"]);
+
+    styleLineCache[id] = splitedLineStyle.clone();
+    const lineSplitStyle = styleLineCache[id];
+    lineSplitStyle
+      .setGeometry(geometry);
+    styles.push(lineSplitStyle);
+  });
+  return styles;
+}
+
+function getShapeStyle(coordinates, styleCache, imageStyle, i, index) {
+  const end = coordinates[index];
+  const prev = coordinates[index - 1];
+  const rotation = -Math.atan2(end[1] - prev[1], end[0] - prev[0]);
+
+  if (styleCache.length - 1 < i) {
+    styleCache[i] = imageStyle.clone();
+  }
+  const pointStyle = styleCache[i];
+  pointStyle.getGeometry().setCoordinates(end);
+  pointStyle.getImage().setRotation(rotation);
+  return pointStyle;
+}
+
+export function frontStyles(feature, resolution) {
+  const styles = [];
+  if (feature.getGeometry().getType() === "LineString") {
+    line.geometry.coordinates = feature.getGeometry().getCoordinates();
+    const curved = bezierSpline(line);
+    segmentsStyles(feature, curved).map((style) => styles.push(style)); //add the styles for each segment line
+    lineStyle.getGeometry().setCoordinates(curved.geometry.coordinates);
+    const curveGeometry = lineStyle.getGeometry();
+    const lengthInPixels = curveGeometry.getLength() / resolution;
+    const pointsNeeded = Math.ceil(lengthInPixels / 30);
+    for (let i = 0; i < pointsNeeded; i++) {
+      point.geometry.coordinates = curveGeometry.getCoordinateAt(
+        (i + 0.5) / pointsNeeded
+      );
+      const split = lineSplit(curved, point);
+      const coordinates = split.features[0].geometry.coordinates;
+      const length = coordinates.length;
+      const index = length - 15;
+      let elm = getShapeStyle(coordinates, styleCache, imageStyle, i, index); // add style for first shape
+      styles.push(elm);
+      /* if (split.features[1]) {
+         elm = getShapeStyle(coordinates, styleCache2, imageStyle0, i , length - 1); // add style for second shape
+        styles.push(elm);
+      }*/
+    }
+  }
+  return styles;
+}
+
+function segmentsStyles2(feature, curved, color, seg) {
+  const poignees = feature.getGeometry().getCoordinates();
+  const coords = curved.geometry.coordinates;
+  const styles = [];
+  poignees.forEach((coord, id) => {
     if (
       id === poignees.length - 1 ||
       (poignees[id][0] === poignees[id + 1][0] &&
@@ -118,9 +209,14 @@ function segmentsStyles(feature, curved) {
     };
     const curved2 = bezierSpline(line);
     geometry.setCoordinates(curved2["geometry"]["coordinates"]);
-
+   
     styleLineCache[id] = splitedLineStyle.clone();
+    if (id === seg - 1 && styleLineCache[id] !== undefined) {
+      styleLineCache[id].getStroke().setColor(color);
+    }
     const lineSplitStyle = styleLineCache[id];
+    console.log("seg in styles", seg, "id is", id);
+
     lineSplitStyle
       .getGeometry()
       .setCoordinates(curved2["geometry"]["coordinates"]);
@@ -129,27 +225,16 @@ function segmentsStyles(feature, curved) {
   return styles;
 }
 
-function getShapeStyle (coordinates, styleCache, imageStyle, i, index)  {
-  const end = coordinates[index];
-  const prev = coordinates[index -1];
-  const rotation = -Math.atan2(end[1] - prev[1], end[0] - prev[0]);
-
-  if (styleCache.length - 1 < i) {
-    styleCache[i] = imageStyle.clone();
-  }
-  const pointStyle = styleCache[i];
-  pointStyle.getGeometry().setCoordinates(end);
-  pointStyle.getImage().setRotation(rotation);
-  return pointStyle;
-};
-
-export function frontStyles(feature, resolution) {
+export function frontStyles2(feature, resolution, color, type, seg) {
   const styles = [];
   if (feature.getGeometry().getType() === "LineString") {
     line.geometry.coordinates = feature.getGeometry().getCoordinates();
     const curved = bezierSpline(line);
-    segmentsStyles(feature, curved).map((style) => styles.push(style)); //add the styles for each segment line
+    segmentsStyles2(feature, curved, color, seg).map((style) =>
+      styles.push(style)
+    ); //add the styles for each segment line
     lineStyle.getGeometry().setCoordinates(curved.geometry.coordinates);
+    
     const curveGeometry = lineStyle.getGeometry();
     const lengthInPixels = curveGeometry.getLength() / resolution;
     const pointsNeeded = Math.ceil(lengthInPixels / 50);
@@ -161,14 +246,56 @@ export function frontStyles(feature, resolution) {
       const coordinates = split.features[0].geometry.coordinates;
       const length = coordinates.length;
       const index = length - 15;
-      let elm = getShapeStyle(coordinates, styleCache, imageStyle, i, index); // add style for first shape
+      let elm = getShapeStyle(coordinates, styleCache, imageStyle, i, index); 
       styles.push(elm);
-    /* if (split.features[1]) {
-         elm = getShapeStyle(coordinates, styleCache2, imageStyle0, i , length - 1); // add style for second shape
+     /* if (type === 2) {
+        let elm = getShapeStyle(
+          coordinates,
+          styleCache2,
+          imageStyle2,
+          i,
+          index
+        ); // add style for first shape
+        styles.push(elm);
+      } else {
+        let elm = getShapeStyle(coordinates, styleCache, imageStyle, i, index); // add style for first shape
         styles.push(elm);
       }*/
-
     }
   }
   return styles;
 }
+
+
+
+export const getSelectedSegment = (feature, point) => {
+  let bool = false;
+  let seg;
+  line.geometry.coordinates = feature.getGeometry().getCoordinates();
+  const curved = bezierSpline(line);
+  const poignees = feature.getGeometry().getCoordinates();
+  const coords = curved.geometry.coordinates;
+  const indexPt = getClosestPointToCoords(coords, point);
+  poignees.map((elm, id) => {
+    if (id === poignees.length - 1) return;
+    let idx = coords.indexOf(elm);
+    let id2;
+    if (!bool) {
+      if (idx === -1) {
+        idx = getClosestPointToCoords(coords, elm);
+        id2 = getClosestPointToCoords(coords, poignees[id + 1]);
+      }
+      if (indexPt > idx && indexPt < id2) {
+        seg = id + 1;
+        bool = true;
+      }
+      if (indexPt > idx && indexPt < id2) {
+        seg = id;
+        bool = true;
+      }
+    }
+  });
+  return seg + 1;
+};
+
+
