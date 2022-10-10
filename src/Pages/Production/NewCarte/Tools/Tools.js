@@ -144,20 +144,11 @@ function Tools() {
 
 				default:
 					toggleToolsOption(selectOn);
-					if (selectedFeature)
-						map.getViewport().addEventListener('dblclick', doubleClick);
+					map.getViewport().addEventListener('dblclick', doubleClick);
 					break;
 			}
 		}
-	}, [
-		doubleClick,
-		dragAndTranslate,
-		map,
-		option,
-		selectedFeature,
-		toggleToolsOption,
-		zoom,
-	]);
+	}, [doubleClick, dragAndTranslate, map, option, toggleToolsOption, zoom]);
 
 	const items = [
 		{
