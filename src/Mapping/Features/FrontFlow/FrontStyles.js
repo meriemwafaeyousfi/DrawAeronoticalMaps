@@ -126,52 +126,73 @@ function segmentsStyles(feature, curved) {
       },
     };
     const curved2 = bezierSpline(line);
-    geometry.set("poignees",[ poignees[id],  poignees[id+1]])
+    geometry.set("poignees", [poignees[id], poignees[id + 1]]);
     geometry.setCoordinates(curved2["geometry"]["coordinates"]);
 
     styleLineCache[id] = splitedLineStyle.clone();
     const lineSplitStyle = styleLineCache[id];
-    lineSplitStyle
-      .setGeometry(geometry);
+    lineSplitStyle.setGeometry(geometry);
     styles.push(lineSplitStyle);
   });
   return styles;
 }
 
-function getShapeStyle(feature, coordinates, i, index, type, seg) {
+function getShapeStyle(feature, coordinates, i, index, type) {
   const end = coordinates[index];
-  console.log("end:",end)
+  console.log("end:", end);
   const prev = coordinates[index - 1];
   const rotation = -Math.atan2(end[1] - prev[1], end[0] - prev[0]);
   console.log("tyyyyyyyyyyyyyyyyype", type);
-  const segPoint = getSelectedSegment(feature,end);
-  console.log("segPoint",segPoint);
-    if(type === 2 && segPoint === seg) 
-   { if (styleCache2.length - 1 < i) {
+  const segPoint = getSelectedSegment(feature, end);
+  let bool = false;
+  let pointStyle;
+  switch (type) {
+    case 1:
+      if (styleCache.length - 1 < i) {
+        styleCache[i] = imageStyle.clone();
+      }
+        pointStyle = styleCache[i];
+        if(pointStyle){
+        pointStyle.getGeometry().setCoordinates(end);
+        pointStyle.getGeometry().set("seg", segPoint);
+        // pointStyle.getGeometry().set("type", type);
+        pointStyle.getImage().setRotation(rotation);
+        console.log("we are in first tyype1",pointStyle);
+        return pointStyle;
+      }
      
-      styleCache2[i] = imageStyle2.clone()
-    }
-  } else {
-
-    if (styleCache.length - 1 < i) {
-      /*switch (type) {
-        case 1 : 
-        case 2 : 
-      }*/
-      styleCache[i] = imageStyle.clone();
-
-    }
+    case 2:
+      if (styleCache2.length - 1 < i) {
+        styleCache2[i] = imageStyle2.clone();
+      }
+      pointStyle = styleCache2[i];
+      if(pointStyle) {
+        pointStyle.getGeometry().setCoordinates(end);
+        pointStyle.getGeometry().set("seg", segPoint);
+        // pointStyle.getGeometry().set("type", type);
+        pointStyle.getImage().setRotation(rotation);
+        return pointStyle;
+      }
+    default:
+      if (styleCache.length - 1 < i) {
+        styleCache[i] = imageStyle.clone();
+      }
+       pointStyle = styleCache[i];
+       if(pointStyle) {
+        pointStyle.getGeometry().setCoordinates(end);
+        pointStyle.getGeometry().set("seg", segPoint);
+        // pointStyle.getGeometry().set("type", type);
+        pointStyle.getImage().setRotation(rotation);
+        return pointStyle;
+       }
   }
-
-
-  let pointStyle ;
-  if (type ===2 && segPoint === seg)  pointStyle =  styleCache2[i];
-  else  pointStyle =  styleCache[i];
+  
   pointStyle.getGeometry().setCoordinates(end);
-  pointStyle.getGeometry().set('seg', segPoint);
-  pointStyle.getGeometry().set('type', type);
-  pointStyle.getImage().setRotation(rotation);
-  return pointStyle;
+      pointStyle.getGeometry().set("seg", segPoint);
+      // pointStyle.getGeometry().set("type", type);
+      pointStyle.getImage().setRotation(rotation);
+  
+
 }
 
 export function frontStyles(feature, resolution) {
@@ -192,18 +213,18 @@ export function frontStyles(feature, resolution) {
       const coordinates = split.features[0].geometry.coordinates;
       const length = coordinates.length;
       const index = length - 15;
-      let elm = getShapeStyle(feature, coordinates, i, index, 1); // add style for first shape
+      const end = coordinates[index];
+      const segPoint = getSelectedSegment(feature, end); 
+      let elm = getShapeStyle(feature, coordinates, i, index);
+       console.log("element",elm)
       styles.push(elm);
-      /* if (split.features[1]) {
-         elm = getShapeStyle(coordinates, styleCache2, imageStyle0, i , length - 1); // add style for second shape
-        styles.push(elm);
-      }*/
+
     }
   }
   return styles;
 }
 
-function segmentsStyles2(feature, curved, color, seg) {
+function segmentsStyles2(feature, curved, color, seg, type) {
   const poignees = feature.getGeometry().getCoordinates();
   const coords = curved.geometry.coordinates;
   const styles = [];
@@ -231,14 +252,15 @@ function segmentsStyles2(feature, curved, color, seg) {
     };
     const curved2 = bezierSpline(line);
     geometry.setCoordinates(curved2["geometry"]["coordinates"]);
-   
     styleLineCache[id] = splitedLineStyle.clone();
-    if (id === seg - 1 && styleLineCache[id] !== undefined) {
+   /* if (id === seg - 1 && styleLineCache[id] !== undefined) {
       styleLineCache[id].getStroke().setColor(color);
+    }*/
+    if(type[id] === 2) {
+      styleLineCache[id].getStroke().setColor('red');
     }
     const lineSplitStyle = styleLineCache[id];
     console.log("seg in styles", seg, "id is", id);
-
     lineSplitStyle
       .getGeometry()
       .setCoordinates(curved2["geometry"]["coordinates"]);
@@ -252,14 +274,13 @@ export function frontStyles2(feature, resolution, color, type, seg) {
   if (feature.getGeometry().getType() === "LineString") {
     line.geometry.coordinates = feature.getGeometry().getCoordinates();
     const curved = bezierSpline(line);
-    segmentsStyles2(feature, curved, color, seg).map((style) =>
+    segmentsStyles2(feature, curved, color, seg, type).map((style) =>
       styles.push(style)
     ); //add the styles for each segment line
     lineStyle.getGeometry().setCoordinates(curved.geometry.coordinates);
-    
     const curveGeometry = lineStyle.getGeometry();
     const lengthInPixels = curveGeometry.getLength() / resolution;
-    const pointsNeeded = Math.ceil(lengthInPixels / 50);
+    const pointsNeeded = Math.ceil(lengthInPixels / 30);
     for (let i = 0; i < pointsNeeded; i++) {
       point.geometry.coordinates = curveGeometry.getCoordinateAt(
         (i + 0.5) / pointsNeeded
@@ -268,27 +289,15 @@ export function frontStyles2(feature, resolution, color, type, seg) {
       const coordinates = split.features[0].geometry.coordinates;
       const length = coordinates.length;
       const index = length - 15;
-      let elm = getShapeStyle(feature, coordinates, i, index, type, seg); 
+      console.log("type array in styles **********------******", type);
+      const end = coordinates[index];
+      const segPoint = getSelectedSegment(feature, end); 
+      let elm = getShapeStyle(feature, coordinates, i, index, type[segPoint-1]);
       styles.push(elm);
-     /* if (type === 2) {
-        let elm = getShapeStyle(
-          coordinates,
-          styleCache2,
-          imageStyle2,
-          i,
-          index
-        ); // add style for first shape
-        styles.push(elm);
-      } else {
-        let elm = getShapeStyle(coordinates, styleCache, imageStyle, i, index); // add style for first shape
-        styles.push(elm);
-      }*/
     }
   }
   return styles;
 }
-
-
 
 export const getSelectedSegment = (feature, point) => {
   let bool = false;
@@ -319,5 +328,3 @@ export const getSelectedSegment = (feature, point) => {
   });
   return seg + 1;
 };
-
-

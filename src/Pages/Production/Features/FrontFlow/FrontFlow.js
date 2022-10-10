@@ -45,8 +45,8 @@ function FrontFlow() {
 		djf.on('drawend', ({ feature }) => {
 			//sff.getFeatures().clear();
 			feature.set('feature_type', 'courant_front');
+			feature.set("number_seg",feature.getGeometry().getCoordinates() -1);
 			endDrawing(map);
-			dispatch(setSelectedFeature(feature));
 			dispatch(setOption(''));
 
 			

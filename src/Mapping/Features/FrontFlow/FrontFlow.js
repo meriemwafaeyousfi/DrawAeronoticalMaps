@@ -26,14 +26,15 @@ export const drawFrontFlow = (vectorSource) => {
       feature.setStyle((feature, resolution) => {
         if (feature.getGeometry().getType() === "LineString") {
           console.log("no me");
-          if (feature.get("color")) {
+          if (feature.get("type")) {
             const color = feature.get("color");
             const type = feature.get("type");
             const seg = feature.get("seg_selected");
+            console.log("color,type,seg",color,type,seg);
             console.log("fifiiiiiiii", new Style(frontStyles2(feature, resolution, color, type, seg)));
             return (frontStyles2(feature, resolution, color, type, seg));
           } else {
-            console.log("draw first", new Style(frontStyles(feature, resolution)))
+          
             return (frontStyles(feature, resolution));
           }
         }
@@ -59,11 +60,11 @@ export const selectFrontFlow = (vectorLayer) => {
       if (feature.getGeometry().getType() === "LineString") {
         const styles = [];
 
-        if (feature.get("color")) {
+        if (feature.get("type")) {
           const color = feature.get("color");
           const type = feature.get("type");
           const seg = feature.get("seg_selected");
-
+           console.log("color,type,seg",color,type,seg);
            frontStyles2(feature, resolution, color, type, seg).map((style) =>
                styles.push((style))
           );
@@ -108,4 +109,9 @@ export const frontFlowDrawingON = (map) => {
       interaction.setActive(true);
     }
   });
+};
+
+export const deleteFrontFeature = ( layer, feature) => {
+	
+	layer.getSource().removeFeature(feature);
 };
