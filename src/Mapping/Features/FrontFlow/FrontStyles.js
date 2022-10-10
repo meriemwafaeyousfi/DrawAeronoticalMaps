@@ -138,16 +138,38 @@ function segmentsStyles(feature, curved) {
   return styles;
 }
 
-function getShapeStyle(coordinates, styleCache, imageStyle, i, index) {
+function getShapeStyle(feature, coordinates, i, index, type, seg) {
   const end = coordinates[index];
+  console.log("end:",end)
   const prev = coordinates[index - 1];
   const rotation = -Math.atan2(end[1] - prev[1], end[0] - prev[0]);
+  console.log("tyyyyyyyyyyyyyyyyype", type);
+  const segPoint = getSelectedSegment(feature,end);
+  console.log("segPoint",segPoint);
+    if(type === 2 && segPoint === seg) 
+   { if (styleCache2.length - 1 < i) {
+     
+      styleCache2[i] = imageStyle2.clone()
+    }
+  } else {
 
-  if (styleCache.length - 1 < i) {
-    styleCache[i] = imageStyle.clone();
+    if (styleCache.length - 1 < i) {
+      /*switch (type) {
+        case 1 : 
+        case 2 : 
+      }*/
+      styleCache[i] = imageStyle.clone();
+
+    }
   }
-  const pointStyle = styleCache[i];
+
+
+  let pointStyle ;
+  if (type ===2 && segPoint === seg)  pointStyle =  styleCache2[i];
+  else  pointStyle =  styleCache[i];
   pointStyle.getGeometry().setCoordinates(end);
+  pointStyle.getGeometry().set('seg', segPoint);
+  pointStyle.getGeometry().set('type', type);
   pointStyle.getImage().setRotation(rotation);
   return pointStyle;
 }
@@ -170,7 +192,7 @@ export function frontStyles(feature, resolution) {
       const coordinates = split.features[0].geometry.coordinates;
       const length = coordinates.length;
       const index = length - 15;
-      let elm = getShapeStyle(coordinates, styleCache, imageStyle, i, index); // add style for first shape
+      let elm = getShapeStyle(feature, coordinates, i, index, 1); // add style for first shape
       styles.push(elm);
       /* if (split.features[1]) {
          elm = getShapeStyle(coordinates, styleCache2, imageStyle0, i , length - 1); // add style for second shape
@@ -246,7 +268,7 @@ export function frontStyles2(feature, resolution, color, type, seg) {
       const coordinates = split.features[0].geometry.coordinates;
       const length = coordinates.length;
       const index = length - 15;
-      let elm = getShapeStyle(coordinates, styleCache, imageStyle, i, index); 
+      let elm = getShapeStyle(feature, coordinates, i, index, type, seg); 
       styles.push(elm);
      /* if (type === 2) {
         let elm = getShapeStyle(

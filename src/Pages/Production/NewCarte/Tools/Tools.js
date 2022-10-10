@@ -42,8 +42,8 @@ function Tools() {
 			const selectedSeg = getSelectedSegment(feature, point);
 			console.log("new selectedSeg",selectedSeg)
 			selectedFeature.set("seg_selected", selectedSeg);
-      dispatch(setModal(feature.get("feature_type")));*/
-      console.log("hiiiiiiiiiiiiiiiiiiiiiiii")
+           dispatch(setModal(feature.get("feature_type")));*/
+           console.log("hiiiiiiiiiiiiiiiiiiiiiiii")
 		}
       }
     },

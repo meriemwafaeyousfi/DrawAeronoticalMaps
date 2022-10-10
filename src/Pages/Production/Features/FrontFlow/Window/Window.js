@@ -79,9 +79,9 @@ const imageStyle = new Style({
             console.log("selectedFeature in windows",selectedFeature);
 		   setBackupFeature(selectedFeature.clone());
 		   console.log("selectedFeature is =========",selectedFeature)
-           selectedFeature.set("color","green");
+           selectedFeature.set("color","red");
            selectedFeature.set("type",2);
-
+          
           
 		} else {
             console.log("we go heere")
