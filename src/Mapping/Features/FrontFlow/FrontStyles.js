@@ -139,10 +139,10 @@ function segmentsStyles(feature, curved) {
 
 function getShapeStyle(feature, coordinates, i, index, type) {
   const end = coordinates[index];
-  console.log("end:", end);
+
   const prev = coordinates[index - 1];
   const rotation = -Math.atan2(end[1] - prev[1], end[0] - prev[0]);
-  console.log("tyyyyyyyyyyyyyyyyype", type);
+ 
   const segPoint = getSelectedSegment(feature, end);
   let bool = false;
   let pointStyle;
@@ -157,7 +157,7 @@ function getShapeStyle(feature, coordinates, i, index, type) {
         pointStyle.getGeometry().set("seg", segPoint);
         // pointStyle.getGeometry().set("type", type);
         pointStyle.getImage().setRotation(rotation);
-        console.log("we are in first tyype1",pointStyle);
+ 
         return pointStyle;
       }
      
@@ -204,7 +204,7 @@ export function frontStyles(feature, resolution) {
     lineStyle.getGeometry().setCoordinates(curved.geometry.coordinates);
     const curveGeometry = lineStyle.getGeometry();
     const lengthInPixels = curveGeometry.getLength() / resolution;
-    const pointsNeeded = Math.ceil(lengthInPixels / 30);
+    const pointsNeeded = Math.ceil(lengthInPixels / 20);
     for (let i = 0; i < pointsNeeded; i++) {
       point.geometry.coordinates = curveGeometry.getCoordinateAt(
         (i + 0.5) / pointsNeeded
@@ -212,11 +212,11 @@ export function frontStyles(feature, resolution) {
       const split = lineSplit(curved, point);
       const coordinates = split.features[0].geometry.coordinates;
       const length = coordinates.length;
-      const index = length - 15;
+      const index = length - 1;
       const end = coordinates[index];
       const segPoint = getSelectedSegment(feature, end); 
       let elm = getShapeStyle(feature, coordinates, i, index);
-       console.log("element",elm)
+  
       styles.push(elm);
 
     }
@@ -224,7 +224,7 @@ export function frontStyles(feature, resolution) {
   return styles;
 }
 
-function segmentsStyles2(feature, curved, color, seg, type) {
+function segmentsStyles2(feature, curved, seg, type) {
   const poignees = feature.getGeometry().getCoordinates();
   const coords = curved.geometry.coordinates;
   const styles = [];
@@ -260,7 +260,6 @@ function segmentsStyles2(feature, curved, color, seg, type) {
       styleLineCache[id].getStroke().setColor('red');
     }
     const lineSplitStyle = styleLineCache[id];
-    console.log("seg in styles", seg, "id is", id);
     lineSplitStyle
       .getGeometry()
       .setCoordinates(curved2["geometry"]["coordinates"]);
@@ -269,18 +268,18 @@ function segmentsStyles2(feature, curved, color, seg, type) {
   return styles;
 }
 
-export function frontStyles2(feature, resolution, color, type, seg) {
+export function frontStyles2(feature, resolution, type, seg) {
   const styles = [];
   if (feature.getGeometry().getType() === "LineString") {
     line.geometry.coordinates = feature.getGeometry().getCoordinates();
     const curved = bezierSpline(line);
-    segmentsStyles2(feature, curved, color, seg, type).map((style) =>
+    segmentsStyles2(feature, curved, seg, type).map((style) =>
       styles.push(style)
     ); //add the styles for each segment line
     lineStyle.getGeometry().setCoordinates(curved.geometry.coordinates);
     const curveGeometry = lineStyle.getGeometry();
     const lengthInPixels = curveGeometry.getLength() / resolution;
-    const pointsNeeded = Math.ceil(lengthInPixels / 30);
+    const pointsNeeded = Math.ceil(lengthInPixels / 20);
     for (let i = 0; i < pointsNeeded; i++) {
       point.geometry.coordinates = curveGeometry.getCoordinateAt(
         (i + 0.5) / pointsNeeded
@@ -288,8 +287,8 @@ export function frontStyles2(feature, resolution, color, type, seg) {
       const split = lineSplit(curved, point);
       const coordinates = split.features[0].geometry.coordinates;
       const length = coordinates.length;
-      const index = length - 15;
-      console.log("type array in styles **********------******", type);
+      const index = length - 1;
+
       const end = coordinates[index];
       const segPoint = getSelectedSegment(feature, end); 
       let elm = getShapeStyle(feature, coordinates, i, index, type[segPoint-1]);

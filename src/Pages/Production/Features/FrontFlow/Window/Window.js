@@ -34,7 +34,7 @@ function Window({ vectorLayer }) {
     if (selectedFeature) {
       const types = selectedFeature.get("type");
       let numSeg = selectedFeature?.getGeometry().getCoordinates().length - 1;
-      if (types) {
+      if (types && types.length !== 0) {
         setShapeTypes(types);
       } else {
         setShapeTypes(new Array(numSeg).fill(1));
@@ -71,23 +71,31 @@ function Window({ vectorLayer }) {
   }, [disptach]);
 
   const handleCancel = useCallback(() => {
-    deleteFrontFeature(vectorLayer, selectedFeature);
-    vectorLayer.getSource().addFeature(backupFeature);
-    disptach(setSelectedFeature(backupFeature));
-    disptach(setOption(""));
-    disptach(setModal(""));
+	if(selectedFeature){
+		deleteFrontFeature(vectorLayer, selectedFeature);
+		vectorLayer.getSource().addFeature(backupFeature);
+		disptach(setSelectedFeature(backupFeature));
+		disptach(setOption(""));
+		disptach(setModal(""));
+	}
+   
     //map.getViewport().removeEventListener("click", singleClick);
   }, [backupFeature, disptach, map, selectedFeature, vectorLayer]);
 
   const handleChange = useCallback((event) => {
     if (selectedFeature) {
       const seg = selectedFeature.get("seg_selected");
+	  let arr = [];
       setShapeTypes((state) =>
-        state.map((elm, index) => {
+        { arr = state.map((elm, index) => {
           if (index + 1 === seg) {
             return Number(event.target.value);
           } else return elm;
         })
+		console.log("arr", arr)
+		selectedFeature.set("type", arr);
+		return arr;
+	   }
       );
     }
   },[selectedFeature]);
@@ -97,13 +105,10 @@ function Window({ vectorLayer }) {
       map.getViewport().removeEventListener("click", singleClick);
       map.getViewport().addEventListener("click", singleClick);
       setBackupFeature(selectedFeature.clone());
-      selectedFeature.set("color", "red");
-      selectedFeature.set("type", shapeTypes);
-	  console.log("selecteFeature ------------",selectedFeature)
     } else {
       console.log("we go heere");
     }
-  }, [selectedFeature, shapeTypes]);
+  }, [ selectedFeature]);
 
 
   return (

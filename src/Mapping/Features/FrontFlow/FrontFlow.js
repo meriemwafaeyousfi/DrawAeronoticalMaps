@@ -25,14 +25,13 @@ export const drawFrontFlow = (vectorSource) => {
     style: (feature) => {
       feature.setStyle((feature, resolution) => {
         if (feature.getGeometry().getType() === "LineString") {
-          console.log("no me");
+     
           if (feature.get("type")) {
-            const color = feature.get("color");
             const type = feature.get("type");
             const seg = feature.get("seg_selected");
-            console.log("color,type,seg",color,type,seg);
-            console.log("fifiiiiiiii", new Style(frontStyles2(feature, resolution, color, type, seg)));
-            return (frontStyles2(feature, resolution, color, type, seg));
+      
+ 
+            return (frontStyles2(feature, resolution, type, seg));
           } else {
           
             return (frontStyles(feature, resolution));
@@ -59,19 +58,16 @@ export const selectFrontFlow = (vectorLayer) => {
     style: (feature, resolution) => {
       if (feature.getGeometry().getType() === "LineString") {
         const styles = [];
-
         if (feature.get("type")) {
-          const color = feature.get("color");
           const type = feature.get("type");
           const seg = feature.get("seg_selected");
-           console.log("color,type,seg",color,type,seg);
-           frontStyles2(feature, resolution, color, type, seg).map((style) =>
+           frontStyles2(feature, resolution, type, seg).map((style) =>
                styles.push((style))
           );
-          console.log("xxxxxx");
+         console.log("we entered to frontStyles2")
         } else {
           frontStyles(feature, resolution).map((style) => styles.push((style)));
-          console.log("yyyyy");
+          console.log("we entered to frontStyles normal")
         }
         const style = new Style({
           image: new CircleStyle({

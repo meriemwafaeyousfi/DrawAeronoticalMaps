@@ -30,40 +30,15 @@ function Tools() {
 
   const [undoRedo, setUndoRedo] = useState(null);
 
-  const singleClick = useCallback(
-	(event) => {
-    map.forEachFeatureAtPixel(
-	  map.getEventPixel(event),
-	   (feature) => {
-       if (feature.getGeometry().getType() != "Point") {
-		if(feature.get("feature_type") === "courant_front") {
-		/*	const point = map.getEventCoordinate(event);
-			console.log("feature in single",feature, "point",point);
-			const selectedSeg = getSelectedSegment(feature, point);
-			console.log("new selectedSeg",selectedSeg)
-			selectedFeature.set("seg_selected", selectedSeg);
-           dispatch(setModal(feature.get("feature_type")));*/
-           console.log("hiiiiiiiiiiiiiiiiiiiiiiii")
-		}
-      }
-    },
-	{ hitTolerance: 10 }
-	);
-  }, [selectedFeature, map]);
 
   const doubleClick = useCallback(
     (event) => {
       dispatch(setModal(""));
-	 // map.getViewport().removeEventListener("click", singleClick);
       map.forEachFeatureAtPixel(
         map.getEventPixel(event),
         (feature) => {
           if (feature.getGeometry().getType() !== "Point") {
             if (feature.get("feature_type") === "courant_front") {
-              /*const point = map.getEventCoordinate(event);
-              const selectedSeg = getSelectedSegment(feature, point);
-              selectedFeature.set("seg_selected", selectedSeg);*/
-			       // map.getViewport().addEventListener("click", singleClick);
               dispatch(setModal(feature.get("feature_type")));
             } else {
               dispatch(setModal(feature.get("feature_type")));
@@ -75,7 +50,7 @@ function Tools() {
         { hitTolerance: 10 }
       );
     },
-    [dispatch, selectedFeature, singleClick, map]
+    [dispatch, selectedFeature, map]
   );
 
   
@@ -84,16 +59,14 @@ function Tools() {
     if (map) {
       map.un("singleclick", zoomingInAndCenter);
       map.un("singleclick", zoomingOutAndCenter);
-	//  map.un("singleclick", singleClick);
       map.getViewport().removeEventListener("dblclick", doubleClick);
-	 //map.getViewport().removeEventListener("click", singleClick);
       dragPanOff(map);
       endDrawing(map);
       selectOff(map);
       translateOff(map);
       document.querySelector("#map-container").style.cursor = "unset";
     }
-  }, [doubleClick, singleClick, map]);
+  }, [doubleClick, map]);
 
   const toggleToolsOption = useCallback(
     (drawingFunction) => {

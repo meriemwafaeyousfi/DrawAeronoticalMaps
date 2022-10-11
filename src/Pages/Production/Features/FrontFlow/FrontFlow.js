@@ -31,10 +31,8 @@ function FrontFlow() {
 		sff.on('select', ({selected}) => {
 			if (selected[0]) {
 				dispatch(setSelectedFeature(selected[0]));
-				console.log("salaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaam")
 			} else {
 				dispatch(setSelectedFeature(null));
-				console.log("byyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
 			}
 		});
 		map.addInteraction(sff);
@@ -55,7 +53,6 @@ function FrontFlow() {
         
 		ffvl.getSource().on('addfeature', ({ feature }) => {
 			if (feature.get('feature_type') === 'courant_front') {
-				console.log('feature added of front');
 				sff.getFeatures().clear();
 				sff.getFeatures().push(feature);
 				dispatch(setSelectedFeature(feature));
@@ -71,7 +68,6 @@ function FrontFlow() {
 		tff.set('title', 'courant_front:translate');
 		tff.setActive(false);
 		map.addInteraction(tff);
-		console.log("vectoreLayer in ",vectorLayer)
 	}, [dispatch, map]);
 
 	useEffect(() => {
