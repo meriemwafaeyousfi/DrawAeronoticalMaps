@@ -139,13 +139,13 @@ function segmentsStyles(feature, curved) {
 
 function getShapeStyle(feature, coordinates, i, index, type) {
   const end = coordinates[index];
-
   const prev = coordinates[index - 1];
   const rotation = -Math.atan2(end[1] - prev[1], end[0] - prev[0]);
  
   const segPoint = getSelectedSegment(feature, end);
   let bool = false;
   let pointStyle;
+  console.log("type inside getShape", type);
   switch (type) {
     case 1:
       if (styleCache.length - 1 < i) {
@@ -157,15 +157,13 @@ function getShapeStyle(feature, coordinates, i, index, type) {
         pointStyle.getGeometry().set("seg", segPoint);
         // pointStyle.getGeometry().set("type", type);
         pointStyle.getImage().setRotation(rotation);
- 
         return pointStyle;
       }
-     
     case 2:
-      if (styleCache2.length - 1 < i) {
-        styleCache2[i] = imageStyle2.clone();
-      }
+      console.log("styleCache2.length ,i",styleCache2, i);
+      styleCache2[i] = imageStyle2.clone();
       pointStyle = styleCache2[i];
+      console.log('pointStyle of type2',pointStyle)
       if(pointStyle) {
         pointStyle.getGeometry().setCoordinates(end);
         pointStyle.getGeometry().set("seg", segPoint);
@@ -173,6 +171,18 @@ function getShapeStyle(feature, coordinates, i, index, type) {
         pointStyle.getImage().setRotation(rotation);
         return pointStyle;
       }
+      case 3: 
+        console.log("3333333333333333333");
+        styleCache2[i] = imageStyle2.clone();
+        pointStyle = styleCache2[i];
+        console.log('pointStyle of type2',pointStyle)
+        if(pointStyle) {
+          pointStyle.getGeometry().setCoordinates(end);
+          pointStyle.getGeometry().set("seg", segPoint);
+          // pointStyle.getGeometry().set("type", type);
+          pointStyle.getImage().setRotation(rotation);
+          return pointStyle;
+        }
     default:
       if (styleCache.length - 1 < i) {
         styleCache[i] = imageStyle.clone();
@@ -187,7 +197,7 @@ function getShapeStyle(feature, coordinates, i, index, type) {
        }
   }
   
-  pointStyle.getGeometry().setCoordinates(end);
+      pointStyle.getGeometry().setCoordinates(end);
       pointStyle.getGeometry().set("seg", segPoint);
       // pointStyle.getGeometry().set("type", type);
       pointStyle.getImage().setRotation(rotation);
@@ -204,7 +214,7 @@ export function frontStyles(feature, resolution) {
     lineStyle.getGeometry().setCoordinates(curved.geometry.coordinates);
     const curveGeometry = lineStyle.getGeometry();
     const lengthInPixels = curveGeometry.getLength() / resolution;
-    const pointsNeeded = Math.ceil(lengthInPixels / 20);
+    const pointsNeeded = Math.ceil(lengthInPixels / 26);
     for (let i = 0; i < pointsNeeded; i++) {
       point.geometry.coordinates = curveGeometry.getCoordinateAt(
         (i + 0.5) / pointsNeeded
@@ -216,9 +226,7 @@ export function frontStyles(feature, resolution) {
       const end = coordinates[index];
       const segPoint = getSelectedSegment(feature, end); 
       let elm = getShapeStyle(feature, coordinates, i, index);
-  
       styles.push(elm);
-
     }
   }
   return styles;
@@ -279,7 +287,7 @@ export function frontStyles2(feature, resolution, type, seg) {
     lineStyle.getGeometry().setCoordinates(curved.geometry.coordinates);
     const curveGeometry = lineStyle.getGeometry();
     const lengthInPixels = curveGeometry.getLength() / resolution;
-    const pointsNeeded = Math.ceil(lengthInPixels / 20);
+    const pointsNeeded = Math.ceil(lengthInPixels / 26);
     for (let i = 0; i < pointsNeeded; i++) {
       point.geometry.coordinates = curveGeometry.getCoordinateAt(
         (i + 0.5) / pointsNeeded
@@ -291,6 +299,7 @@ export function frontStyles2(feature, resolution, type, seg) {
 
       const end = coordinates[index];
       const segPoint = getSelectedSegment(feature, end); 
+     // console.log('type in styles',type);
       let elm = getShapeStyle(feature, coordinates, i, index, type[segPoint-1]);
       styles.push(elm);
     }

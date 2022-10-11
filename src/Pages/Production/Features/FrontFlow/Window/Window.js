@@ -144,6 +144,11 @@ function Window({ vectorLayer }) {
             type2
           </button>
         </div>
+		<div>
+          <button value={3} onClick={handleChange}>
+            type3
+          </button>
+        </div>
         <div>
           <button onClick={handleConfirm}>Confirmer</button>
         </div>
