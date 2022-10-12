@@ -29,11 +29,8 @@ export const drawFrontFlow = (vectorSource) => {
           if (feature.get("type")) {
             const type = feature.get("type");
             const seg = feature.get("seg_selected");
-      
- 
             return (frontStyles2(feature, resolution, type, seg));
           } else {
-          
             return (frontStyles(feature, resolution));
           }
         }

@@ -140,7 +140,6 @@ function Window({ vectorLayer }) {
 	}, [disptach]);
 
 	const handleCancel = useCallback(() => {
-		console.log(backupFeature);
 		deleteCloudFeature(map, vectorLayer, selectedFeature);
 		vectorLayer.getSource().addFeature(backupFeature);
 		disptach(setSelectedFeature(backupFeature));
