@@ -1,10 +1,12 @@
-import React, { useContext, useState , useEffect, useRef} from 'react';
+import React from 'react';
 import "./resizerStyle.css";
 import ResizableContent from "./ResizableContent";
-import { propTypes } from "react-bootstrap/esm/Image";
+import { setSelectedFeature } from '../../../NewCarte/redux/actions';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function Resizer(props) {
-
+  const selectedFeature = useSelector((state) => state.selectedFeature)
+  
   return (
     <div className="Resizer">
       <div id="mnode">
@@ -28,15 +30,15 @@ export default function Resizer(props) {
             rotateAngle={0}>
           <div  className="centreImageDiv varbox content2" >
             <img
-             className="centreImage"
-              src={require("../../media/centers/"+props.nameCentre+".png")}
+             className="centreImage resizerImg"
+             src={"/Icons/Clouds/"+ props.nameCentre +".png"}
               style={{
                 width: "inherit",
                 height: "inherit",
                 position:'absolute',
                 zIndex:'1' }} />
 
-            {props.vitesse && props.direction!= -91 &&
+            {props.vitesse && props.direction !== -91 &&
             <div
               className='fleche'
               style={{ 
@@ -47,13 +49,17 @@ export default function Resizer(props) {
                 position:'absolute',
                }}>
 
-              <img style={{
+              <img 
+              className="resizerImg"
+              style={{
                 width: "80%", 
                 height: "inherit",
                 position:'absolute',
                 marginLeft : ((-2 * props.heightImg)/20 ) +'px',
                 zIndex:'1'
-                }} src={require("../../media/arrow3.png")}/>
+                }} 
+                src={'/Icons/Clouds/arrow.png'}
+                />
             
               <p style={{
                 float : 'right',
