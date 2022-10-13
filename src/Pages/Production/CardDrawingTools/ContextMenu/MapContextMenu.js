@@ -4,16 +4,18 @@ import './MapContextMenu.css';
 import {
 	addAHandle,
 	deleteAHandle,
-	deleteCloudFeature,
-} from '../../../../Mapping/Features/Clouds/Clouds';
+	deleteClouds,
+} from 'Mapping/Features/Clouds/Clouds';
 import {
 	copyFeature,
 	cutFeature,
 	pastFeature,
 	verticesCheck,
-} from '../../../../Mapping/Map';
+} from 'Mapping/Map';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedFeature } from '../redux/actions';
+
+import { useCallback } from 'react';
 
 function MapContextMenu() {
 	const map = useSelector((state) => state.map);
@@ -101,7 +103,7 @@ function MapContextMenu() {
 				rightClickedFeature !== selectedFeature ||
 				rightClickedFeature.get('feature_type') !== 'zone_nuageuse',
 			command: () => {
-				layer.getSource().removeFeature(selectedFeature);
+				deleteClouds(selectedFeature, layer);
 				disptach(setSelectedFeature(null));
 			},
 		},
@@ -133,7 +135,12 @@ function MapContextMenu() {
 		}
 	}, [map]);
 	return (
-		<PrimeContextMenu model={items} style={{ width: '260px' }} ref={CMRef} />
+		<PrimeContextMenu
+			model={items}
+			style={{ width: '260px' }}
+			ref={CMRef}
+			onClick={testfunction}
+		/>
 	);
 }
 

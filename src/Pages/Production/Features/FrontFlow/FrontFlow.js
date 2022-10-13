@@ -5,10 +5,13 @@ import {
 	modifyFrontFlow,
 	selectFrontFlow,
 	translateFrontFlow,
-} from '../../../../Mapping/Features/FrontFlow/FrontFlow';
+} from 'Mapping/Features/FrontFlow/FrontFlow';
 import { useDispatch, useSelector } from 'react-redux';
-import { endDrawing } from '../../../../Mapping/Map';
-import { setOption, setSelectedFeature } from '../../NewCarte/redux/actions';
+import { endDrawing } from 'Mapping/Map';
+import {
+	setOption,
+	setSelectedFeature,
+} from '../../CardDrawingTools/redux/actions';
 
 function FrontFlow() {
 	const map = useSelector((state) => state.map);

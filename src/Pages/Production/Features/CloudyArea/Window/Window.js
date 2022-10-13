@@ -6,17 +6,11 @@ import './Window.css';
 import {
 	alignOverlayContent,
 	updateOverlayContent,
-} from '../../../../../Mapping/Features/Clouds/TextOverLay';
-import {
-	deleteCloudFeature,
-	inverseFeature,
-} from '../../../../../Mapping/Features/Clouds/Clouds';
+} from 'Mapping/Features/Clouds/TextOverLay';
+import { inverseFeature } from 'Mapping/Features/Clouds/Clouds';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-	setModal,
-	setOption,
-	setSelectedFeature,
-} from '../../../NewCarte/redux/actions';
+import { setModal, setOption } from '../../../CardDrawingTools/redux/actions';
+
 function Window({ vectorLayer }) {
 	const map = useSelector((state) => state.map);
 	const selectedFeature = useSelector((state) => state.selectedFeature);

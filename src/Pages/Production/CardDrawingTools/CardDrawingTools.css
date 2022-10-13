@@ -1,20 +1,19 @@
-.new-card-container {
-	top: 70px;
-	position: absolute;
+.card-container {
 	display: flex;
 	width: 100%;
 }
 
 #map-container {
+	background-color: white;
 	width: 100%;
-	height: calc(100vh - 70px);
 	border: 1px solid black;
 }
-
 .overlay_container {
 	width: 100px;
-	border: 0.5px solid grey;
-	text-shadow: 2px;
+	border: 1px solid #000;
+	resize: both;
+	min-width: 100px;
+	background: white;
 }
 .overlay_content {
 	position: relative;
@@ -43,7 +42,8 @@
 }
 
 .selected_overlay {
-	border: 2px solid #f59e0b;
+	border: 3px solid #000;
+	border-style: dashed;
 }
 
 .overlay_fraction {

@@ -5,11 +5,14 @@ import {
 	modifyJet,
 	selectJet,
 	translateJet,
-} from '../../../../Mapping/Features/Jet/Jet';
+} from 'Mapping/Features/Jet/Jet';
 import * as extent from 'ol/extent';
 import { useDispatch, useSelector } from 'react-redux';
-import { endDrawing } from '../../../../Mapping/Map';
-import { setOption, setSelectedFeature } from '../../NewCarte/redux/actions';
+import { endDrawing } from 'Mapping/Map';
+import {
+	setOption,
+	setSelectedFeature,
+} from '../../CardDrawingTools/redux/actions';
 
 function Jet() {
 	const map = useSelector((state) => state.map);
