@@ -5,7 +5,7 @@ import {
   along,
   nearestPointOnLine,
 } from "@turf/turf";
-import { Circle, Style, Icon, Fill, Stroke } from "ol/style";
+import { Circle, Style, Icon, Fill, Stroke, Text } from "ol/style";
 import { LineString, Point } from "ol/geom";
 import {
   src1,
@@ -18,6 +18,10 @@ import {
   src9_2,
   src10_1,
   src10_2,
+  src4_1,
+  src4_2,
+  src5_1,
+  src5_2
 } from "./data/images";
 
 const line = {
@@ -35,6 +39,13 @@ const splitedLineStyle = new Style({
   }),
   geometry: new LineString([]),
 });
+const splitedLineStyle_T7 = new Style({
+  stroke: new Stroke({
+    color: 'white',
+    width: 4,
+  }),
+  geometry: new LineString([]),
+});
 
 const lineStyle = new Style({
   stroke: new Stroke({
@@ -49,12 +60,16 @@ const styleCache1 = [];
 const styleCache2 = [];
 const styleCache3_1 = [];
 const styleCache3_2 = [];
+const styleCache4_1 = [];
+const styleCache4_2 = [];
 const styleCache8_1 = [];
 const styleCache8_2 = [];
 const styleCache9_1 = [];
 const styleCache9_2 = [];
 const styleCache10_1 = [];
 const styleCache10_2 = [];
+const styleCache5_1 = [];
+const styleCache5_2 = [];
 //--------------------------//
 const styleLineCache = [];
 
@@ -141,9 +156,10 @@ const getPointStyle = (styleCache, point, i, src) => {
     }),
     geometry: new Point([]),
   });
-  if (styleCache.length - 1 < i) {
+  /*if (styleCache.length - 1 < i) {
     styleCache[i] = imageStyle.clone();
-  }
+  */
+  styleCache[i] = imageStyle.clone();
   const pointStyle = styleCache[i];
   if (pointStyle) {
     pointStyle.getGeometry().setCoordinates(point.end);
@@ -154,6 +170,7 @@ const getPointStyle = (styleCache, point, i, src) => {
 };
 
 function getShapeStyle(feature, coordinates, i, index, type) {
+  console.log("type is", type)
   const {
     end: end,
     rotation: rotation,
@@ -188,6 +205,40 @@ function getShapeStyle(feature, coordinates, i, index, type) {
         getPointStyle(styleCache3_2, pointInfo2, i, src3_2),
       ];
 
+    case 4:
+         //const point2 = getPointStyle(styleCache4_2, pointInfo2, i, src4_2);
+         const style4_2 = new Style({
+          image: new Icon({
+            anchor: [0.1, 0.1],
+            src: src4_2,
+            scale: 0.24,
+          }),
+          geometry: new Point([])
+        });
+        style4_2.getGeometry().setCoordinates(pointInfo2.end);
+        style4_2.getGeometry().set("seg", pointInfo2.segPoint);
+        style4_2.getImage().setRotation(pointInfo2.rotation);
+        return [
+          getPointStyle(styleCache4_1, pointInfo, i, src4_1),
+          style4_2
+        ];
+    case 5 :
+      const style5_1 = new Style({
+        image: new Icon({
+          anchor: [0.5, 0.5],
+          src: src5_2,
+          scale: 0.7,
+          offset: [1, 1],
+        }),
+        geometry: new Point([])
+      });
+      style5_1.getGeometry().setCoordinates(pointInfo.end);
+      style5_1.getGeometry().set("seg", pointInfo.segPoint);
+      style5_1.getImage().setRotation(pointInfo.rotation + Math.PI/2);
+      return [
+        style5_1,
+        getPointStyle(styleCache5_2, pointInfo, i, src5_2)
+      ];
     case 8:
       return [
         getPointStyle(styleCache8_1, pointInfo, i, src8_1),
@@ -207,7 +258,7 @@ function getShapeStyle(feature, coordinates, i, index, type) {
       ];
 
     default:
-      return getPointStyle(styleCache1, pointInfo, i, src1);
+      return  getPointStyle(styleCache1, pointInfo, i, src1);
   }
 }
 
@@ -230,7 +281,7 @@ export function frontStyles(feature, resolution) {
       const length = coordinates.length;
       const index = length - 15;
       const end = coordinates[index];
-      let elm = getShapeStyle(feature, coordinates, i, index);
+      let elm = getShapeStyle(feature, coordinates, i, index, 1);
       styles.push(elm);
     }
   }
@@ -265,7 +316,9 @@ function segmentsStyles2(feature, curved, type) {
     };
     const curved2 = bezierSpline(line);
     geometry.setCoordinates(curved2["geometry"]["coordinates"]);
-    styleLineCache[id] = splitedLineStyle.clone();
+    
+   styleLineCache[id] = splitedLineStyle.clone();
+  
     switch (type[id]) {
       case 1:
         styleLineCache[id].getStroke().setColor("blue");
@@ -275,6 +328,48 @@ function segmentsStyles2(feature, curved, type) {
         break;
       case 3:
         styleLineCache[id].getStroke().setColor("#ef00c3");
+        break;
+      case 4: 
+        styleLineCache[id].getStroke().setColor("#000");
+      break;
+      case 6:
+        styleLineCache[id].setStroke(
+          new Stroke({
+          color: '#000',
+          width: 2
+         }))
+        break;
+      case 7:
+        styleLineCache[id] = [
+          new Style({
+            geometry:  new LineString([]),
+            stroke: new Stroke({
+              color: "black",
+              width: 7
+            }) }),
+            new Style({
+            geometry:  new LineString([]),
+            stroke: new Stroke({
+              color: "white",
+              width: 4
+            }),
+      }), 
+      new Style({
+        geometry: new LineString([]),
+        text : new Text({
+          //rotation: 0.5,
+          fill: new Fill({
+            color: "#000000"
+          }),
+          textAlign: 'center',
+          placement: 'center', 
+          font: 'bold ',
+          text: 'I.C.T.E',
+          offsetY: +40
+        })
+      })
+      ]
+     
         break;
       case 8:
         styleLineCache[id].getStroke().setColor("#7f00ff");
@@ -290,9 +385,8 @@ function segmentsStyles2(feature, curved, type) {
         break;
     }
     const lineSplitStyle = styleLineCache[id];
-    lineSplitStyle
-      .getGeometry()
-      .setCoordinates(curved2["geometry"]["coordinates"]);
+    if (type[id] !== 7) lineSplitStyle.getGeometry().setCoordinates(curved2["geometry"]["coordinates"]);
+    else lineSplitStyle.map((style) => style.getGeometry().setCoordinates(curved2["geometry"]["coordinates"]))
     styles.push(lineSplitStyle);
   });
   return styles;
@@ -305,8 +399,9 @@ export function frontStyles2(feature, resolution, type, seg) {
     const curved = bezierSpline(line);
     const list = [];
     segmentsStyles2(feature, curved, type).map((style) => {
-      styles.push(style);
-      list.push(style);
+      if(Array.isArray(style)) { console.log("style of 7", style); style.map((elm) => styles.push(elm)) }
+      else styles.push(style);
+    
     }); //add the styles for each segment line
     lineStyle.getGeometry().setCoordinates(curved.geometry.coordinates);
     const curveGeometry = lineStyle.getGeometry();
@@ -335,7 +430,7 @@ export function frontStyles2(feature, resolution, type, seg) {
       if (elm && Array.isArray(elm)) {
         console.log("type is 3 elm arr is", elm);
         elm.map((style) => styles.push(style));
-      } else styles.push(elm);
+      } else if (elm) styles.push(elm);
     }
   }
   return styles;
@@ -345,6 +440,7 @@ export const getSelectedSegment = (feature, point) => {
   let bool = false;
   let seg;
   line.geometry.coordinates = feature.getGeometry().getCoordinates();
+  
   const curved = bezierSpline(line);
   const poignees = feature.getGeometry().getCoordinates();
   const coords = curved.geometry.coordinates;
@@ -370,3 +466,10 @@ export const getSelectedSegment = (feature, point) => {
   });
   return seg + 1;
 };
+
+const reverseSegment = () => {
+   
+}
+const reverseAllSegments = () => {
+   
+}

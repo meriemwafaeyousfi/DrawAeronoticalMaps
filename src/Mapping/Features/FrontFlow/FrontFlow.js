@@ -4,9 +4,9 @@ import VectorSource from "ol/source/Vector";
 import { never, altKeyOnly } from "ol/events/condition";
 import CircleStyle from "ol/style/Circle";
 import { Style, Fill, Stroke } from "ol/style";
-import { MultiPoint } from "ol/geom";
+import { MultiPoint, LineString } from "ol/geom";
 import { frontStyles, frontStyles2 } from "./FrontStyles";
-
+import { distance } from "ol/coordinate";
 export const frontFlowDrawingStartEvent = new CustomEvent(
   "courant_front:start"
 );
@@ -25,13 +25,12 @@ export const drawFrontFlow = (vectorSource) => {
     style: (feature) => {
       feature.setStyle((feature, resolution) => {
         if (feature.getGeometry().getType() === "LineString") {
-     
           if (feature.get("type")) {
             const type = feature.get("type");
             const seg = feature.get("seg_selected");
-            return (frontStyles2(feature, resolution, type, seg));
+            return frontStyles2(feature, resolution, type, seg);
           } else {
-            return (frontStyles(feature, resolution));
+            return frontStyles(feature, resolution);
           }
         }
       });
@@ -58,13 +57,13 @@ export const selectFrontFlow = (vectorLayer) => {
         if (feature.get("type")) {
           const type = feature.get("type");
           const seg = feature.get("seg_selected");
-           frontStyles2(feature, resolution, type, seg).map((style) =>
-               styles.push((style))
+          frontStyles2(feature, resolution, type, seg).map((style) =>
+            styles.push(style)
           );
-         console.log("we entered to frontStyles2")
+          console.log("we entered to frontStyles2");
         } else {
-          frontStyles(feature, resolution).map((style) => styles.push((style)));
-          console.log("we entered to frontStyles normal")
+          frontStyles(feature, resolution).map((style) => styles.push(style));
+          console.log("we entered to frontStyles normal");
         }
         const style = new Style({
           image: new CircleStyle({
@@ -104,7 +103,53 @@ export const frontFlowDrawingON = (map) => {
   });
 };
 
-export const deleteFrontFeature = ( layer, feature) => {
-	
-	layer.getSource().removeFeature(feature);
+export const deleteFrontFeature = (layer, feature) => {
+  layer.getSource().removeFeature(feature);
+  // add delete flech of speed with text
 };
+
+export const addPoigneFrontHandle = (point, feature) => {
+  const pointOnFeature = feature.getGeometry().getClosestPoint(point);
+  let newCoordinates = [feature.getGeometry().getCoordinates()[0]];
+  let index = 0;
+  let bool = false;
+  feature.getGeometry().forEachSegment((start, end) => {
+    const segement = new LineString([start, end]);
+    const pointOnSegement = segement.getClosestPoint(point);
+    const distanceBetweenTheTwoPoint = distance(
+      pointOnFeature,
+      pointOnSegement
+    );
+    if (distanceBetweenTheTwoPoint === 0) {
+      newCoordinates.push(pointOnFeature);
+      newCoordinates.push(end);
+       bool = true;
+    } else {
+      newCoordinates.push(end);
+    }
+    if(!bool) index++;
+  });
+  feature.getGeometry().setCoordinates(newCoordinates);
+  feature.get("type").splice(index+1 ,0,feature.get("type")[index])
+}
+
+export const deletePoigneFrontHandle = (point, feature) => {
+  let newCoordinates = [];
+  feature
+    .getGeometry()
+    .getCoordinates()
+    .forEach((coord) => {
+      if (distance(point, coord) >= 350000) {
+        newCoordinates.push(coord);
+      }
+    });
+  feature.getGeometry().setCoordinates(newCoordinates);
+};
+
+export const inverseFeature = (feature) => {
+  console.log("feature ",feature);
+	feature
+		.getGeometry()
+		.setCoordinates(feature.getGeometry().getCoordinates().reverse());
+};
+

@@ -7,6 +7,11 @@ import {
 	deleteCloudFeature,
 } from '../../../../Mapping/Features/Clouds/Clouds';
 import {
+	deleteFrontFeature,
+	addPoigneFrontHandle,
+	deletePoigneFrontHandle
+} from "../../../../Mapping/Features/FrontFlow/FrontFlow";
+import {
 	copyFeature,
 	cutFeature,
 	pastFeature,
@@ -31,11 +36,16 @@ function MapContextMenu() {
 			icon: 'ajouter-poingee',
 			visible:
 				!!rightClickedFeature &&
-				rightClickedFeature.get('feature_type') === 'zone_nuageuse' &&
+				(rightClickedFeature.get('feature_type') === 'zone_nuageuse' ||
+				rightClickedFeature.get('feature_type') === 'courant_front' )
+				&&
 				!vertex &&
 				rightClickedFeature === selectedFeature,
 			command: () => {
+				if(rightClickedFeature.get('feature_type') === 'zone_nuageuse')
 				addAHandle(eventCoordiantes, rightClickedFeature);
+				else if (rightClickedFeature.get('feature_type') === 'courant_front')
+				 addPoigneFrontHandle(eventCoordiantes, rightClickedFeature)
 			},
 		},
 		{
@@ -43,11 +53,14 @@ function MapContextMenu() {
 			icon: 'supprimer-poingee',
 			visible:
 				!!rightClickedFeature &&
-				rightClickedFeature.get('feature_type') === 'zone_nuageuse' &&
+				(rightClickedFeature.get('feature_type') === 'zone_nuageuse' ||
+				rightClickedFeature.get('feature_type') === 'courant_front') &&
 				vertex &&
 				rightClickedFeature === selectedFeature,
 			command: () => {
+				
 				deleteAHandle(eventCoordiantes, rightClickedFeature);
+				
 			},
 		},
 		{
@@ -99,10 +112,17 @@ function MapContextMenu() {
 			disabled:
 				!rightClickedFeature ||
 				rightClickedFeature !== selectedFeature ||
-				rightClickedFeature.get('feature_type') !== 'zone_nuageuse',
+				rightClickedFeature.get('feature_type') !== 'zone_nuageuse' &&
+                rightClickedFeature.get('feature_type') !== 'courant_front',
 			command: () => {
-				deleteCloudFeature(map, layer, selectedFeature);
-				disptach(setSelectedFeature(null));
+				if (rightClickedFeature.get('feature_type') !== 'zone_nuageuse')
+				{  deleteCloudFeature(map, layer, selectedFeature);
+			     	disptach(setSelectedFeature(null));
+				}
+				else {
+					deleteFrontFeature(layer, selectedFeature);
+					disptach(setSelectedFeature(null));
+				}
 			},
 		},
 	];

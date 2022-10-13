@@ -10,7 +10,7 @@ import {
 import { Style, Icon } from "ol/style";
 import { Point } from "ol/geom";
 import { getSelectedSegment } from "../../../../../Mapping/Features/FrontFlow/FrontStyles";
-import { deleteFrontFeature } from "../../../../../Mapping/Features/FrontFlow/FrontFlow";
+import { deleteFrontFeature, inverseFeature } from "../../../../../Mapping/Features/FrontFlow/FrontFlow";
 
 function Window({ vectorLayer }) {
   const src2 =
@@ -54,6 +54,7 @@ function Window({ vectorLayer }) {
             if (feature.get("feature_type") === "courant_front") {
               const point = map.getEventCoordinate(event);
               const selectedSeg = getSelectedSegment(feature, point);
+              console.log("now selected seg is",selectedSeg);
               setSelectedSeg(selectedSeg);
               selectedFeature.set("seg_selected", selectedSeg);
             }
@@ -110,7 +111,12 @@ function Window({ vectorLayer }) {
     }
   }, [ selectedFeature]);
 
-
+   const types = [1,2,3,4,5,6,7,8,9,10];
+   const inverserHandler = useCallback(() => {
+      if (selectedFeature) {
+          inverseFeature(selectedFeature);
+      }
+   }, [selectedFeature])
   return (
     <Dialog
       header="Front"
@@ -135,31 +141,19 @@ function Window({ vectorLayer }) {
 
       <div className="confirmation_buttons">
         <div>
-          <button value={1} onClick={handleChange}>
-            type1
-          </button>
+          {types.map((type) => 
+            (
+              <button value={type} onClick={handleChange}>
+                    type{type}
+                </button>
+            )
+          )}
+      
         </div>
         <div>
-          <button value={2} onClick={handleChange}>
-            type2
-          </button>
-        </div>
-		<div>
-          <button value={3} onClick={handleChange}>
-            type3
-          </button>
-
-          <button value={8} onClick={handleChange}>
-            type8
-          </button>
-
-          <button value={9} onClick={handleChange}>
-            type9
-          </button>
-
-          <button value={10} onClick={handleChange}>
-            type10
-          </button>
+            <button onClick={inverserHandler}>
+                 reverse
+            </button>
         </div>
         <div>
           <button onClick={handleConfirm}>Confirmer</button>
