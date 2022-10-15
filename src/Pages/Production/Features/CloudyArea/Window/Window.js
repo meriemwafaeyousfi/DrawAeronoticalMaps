@@ -135,17 +135,17 @@ function Window({ vectorLayer }) {
 	}, [selectedFeature]);
 
 	const handleConfirm = useCallback(() => {
-		disptach(setOption(''));
+		disptach(setOption('select'));
 		disptach(setModal(''));
 	}, [disptach]);
 
 	const handleCancel = useCallback(() => {
-		deleteCloudFeature(map, vectorLayer, selectedFeature);
+		vectorLayer.getSource().removeFeature(selectedFeature);
+		backupFeature.setStyle([backupFeature.getStyle()(backupFeature)[0]]);
 		vectorLayer.getSource().addFeature(backupFeature);
-		disptach(setSelectedFeature(backupFeature));
-		disptach(setOption(''));
+		disptach(setOption('select'));
 		disptach(setModal(''));
-	}, [backupFeature, disptach, map, selectedFeature, vectorLayer]);
+	}, [backupFeature, disptach, selectedFeature, vectorLayer]);
 
 	useEffect(() => {
 		if (map && selectedFeature) {

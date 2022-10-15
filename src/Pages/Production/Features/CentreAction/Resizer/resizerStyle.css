@@ -1,0 +1,52 @@
+/* App */
+.Resizer {
+  text-align: center;
+  z-index: 1000;
+  position: fixed;
+}
+/*************resizer color******/
+.CSHAV {
+  border: 1.8px dashed #1c1717 !important;
+}
+.square{
+  border: 1px solid #1c1717 !important;
+}
+.gblcbk {
+  border: 1.8px dashed #1c1717 !important;
+}
+/* Content */
+/* .content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-flow: column;
+  justify-content: center;
+  margin-top: 16px;
+} */
+
+.resizerImg{
+  max-width: 520px;
+  height: auto;
+  max-height: 500px;
+  object-fit: contain;
+  position:relative;
+}
+
+#arrow {
+  position:relative;
+}
+
+.varbox {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+}
+
+.jBpMpe {
+  position: absolute;
+  background-color: blue !important;
+  border: 0px solid #4b48eb !important;
+}

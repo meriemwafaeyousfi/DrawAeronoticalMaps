@@ -3,33 +3,77 @@ import "./Tools.css";
 import { DragPan } from "ol/interaction";
 import UndoRedo from "ol-ext/interaction/UndoRedo";
 import {
-  translateOff,
-  translateOn,
-  endDrawing,
-  selectOff,
-  selectOn,
-  zoomingInAndCenter,
-  zoomingOutAndCenter,
-  dragPanOff,
-  save,
-} from "../../../../Mapping/Map";
-import { cloudDrawingON } from "../../../../Mapping/Features/Clouds/Clouds";
-import { jetFlowDrawingON } from "../../../../Mapping/Features/JetFlow/JetFlow";
-import { frontFlowDrawingON } from "../../../../Mapping/Features/FrontFlow/FrontFlow";
-import { useDispatch, useSelector } from "react-redux";
-import { setModal, setOption } from "../redux/actions";
+	translateOff,
+	translateOn,
+	endDrawing,
+	selectOff,
+	selectOn,
+	zoomingInAndCenter,
+	zoomingOutAndCenter,
+	dragPanOff,
+	save,
+} from '../../../../Mapping/Map';
+import { cloudDrawingON } from '../../../../Mapping/Features/Clouds/Clouds';
+import { jetFlowDrawingON } from '../../../../Mapping/Features/JetFlow/JetFlow';
+import { frontFlowDrawingON } from '../../../../Mapping/Features/FrontFlow/FrontFlow';
+import { useDispatch, useSelector } from 'react-redux';
+import { setMapCoordinate, setModal, setOption } from '../redux/actions';
+import { jetDrawingON } from '../../../../Mapping/Features/Jet/Jet';
+import { centreActionDrawingON } from '../../../../Mapping/Features/CentreAction/CentreAction';
+import { click } from 'ol/events/condition';
 import { getSelectedSegment } from "../../../../Mapping/Features/FrontFlow/FrontStyles";
 
+
 function Tools() {
-  const map = useSelector((state) => state.map);
-  const modal = useSelector((state) => state.modal);
-  const option = useSelector((state) => state.option);
-  const selectedFeature = useSelector((state) => state.selectedFeature);
+	const map = useSelector((state) => state.map);
+	const modal = useSelector((state) => state.modal);
+	const option = useSelector((state) => state.option);
+	const mapCoordinate = useSelector((state) => state.mapCoordinate);
+	const selectedFeature = useSelector((state) => state.selectedFeature);
 
   const dispatch = useDispatch();
 
   const [undoRedo, setUndoRedo] = useState(null);
 
+	const doubleClick = useCallback(
+		(event) => {
+			dispatch(setModal(''));
+			map.forEachFeatureAtPixel(
+				map.getEventPixel(event),
+				(feature) => {
+					if (feature.getGeometry().getType() !== 'Point') {
+						dispatch(setModal(feature.get('feature_type')));
+					}
+				},
+				{ hitTolerance: 10 }
+			);
+		},
+		[dispatch, map]
+	);
+
+	const click = useCallback(
+		(event) => {
+			dispatch(setMapCoordinate(event.coordinate))
+			dispatch(setModal('centre_action'))
+			map.un('click', click)
+		},
+		[dispatch, map]
+	);
+
+	const nothing = useCallback(() => {
+		if (map) {
+			map.un('singleclick', zoomingInAndCenter);
+			map.un('singleclick', zoomingOutAndCenter);
+			map.un('click', click)
+			map.getViewport().removeEventListener('dblclick', doubleClick);
+			
+			dragPanOff(map);
+			endDrawing(map);
+			selectOff(map);
+			translateOff(map);
+			document.querySelector('#map-container').style.cursor = 'unset';
+		}
+	}, [doubleClick,click, map]);
 
   const doubleClick = useCallback(
     (event) => {
@@ -107,68 +151,70 @@ function Tools() {
     }
   }, [map]);
 
-  useEffect(() => {
-    if (map) {
-      switch (option) {
-        case "zoom_in":
-          zoom("zoom_in", zoomingInAndCenter);
-          break;
-        case "zoom_out":
-          zoom("zoom_out", zoomingOutAndCenter);
-          break;
-        case "drag":
-          dragAndTranslate();
-          break;
-        case "zone_texte":
-          toggleToolsOption(jetFlowDrawingON);
-          break;
-        case "zone_nuageuse":
-          toggleToolsOption(cloudDrawingON);
-          break;
-        case "courant_jet":
-          toggleToolsOption(jetFlowDrawingON);
-          break;
-        case "courant_front":
-          toggleToolsOption(frontFlowDrawingON);
-          break;
-        case "cat":
-          toggleToolsOption(jetFlowDrawingON);
-          break;
-        case "ligne":
-          toggleToolsOption(jetFlowDrawingON);
-          break;
-        case "fleche":
-          toggleToolsOption(jetFlowDrawingON);
-          break;
-        case "centres_action":
-          toggleToolsOption(jetFlowDrawingON);
-          break;
-        case "volcan":
-          toggleToolsOption(jetFlowDrawingON);
-          break;
-        case "tropopause":
-          toggleToolsOption(jetFlowDrawingON);
-          break;
-        case "condition_en_surface":
-          toggleToolsOption(jetFlowDrawingON);
-          break;
+	useEffect(() => {
+		if (map) {
+			switch (option) {
+				case 'zoom_in':
+					zoom('zoom_in', zoomingInAndCenter);
+					break;
+				case 'zoom_out':
+					zoom('zoom_out', zoomingOutAndCenter);
+					break;
+				case 'drag':
+					dragAndTranslate();
+					break;
+				case 'zone_texte':
+					toggleToolsOption(jetFlowDrawingON);
+					break;
+				case 'zone_nuageuse':
+					toggleToolsOption(cloudDrawingON);
+					break;
+				case 'jet':
+					toggleToolsOption(jetDrawingON);
+					break;
+				case 'courant_front':
+					toggleToolsOption(frontFlowDrawingON);
+					break;
+				case 'cat':
+					toggleToolsOption(jetFlowDrawingON);
+					break;
+				case 'ligne':
+					toggleToolsOption(jetFlowDrawingON);
+					break;
+				case 'fleche':
+					toggleToolsOption(jetFlowDrawingON);
+					break;
+				case 'centres_action':
+					toggleToolsOption(centreActionDrawingON);
+					map.on('click', click);
+					break;
+				case 'volcan':
+					toggleToolsOption(jetFlowDrawingON);
+					break;
+				case 'tropopause':
+					toggleToolsOption(jetFlowDrawingON);
+					break;
+				case 'condition_en_surface':
+					toggleToolsOption(jetFlowDrawingON);
+					break;
 
-        default:
-          toggleToolsOption(selectOn);
-          if (selectedFeature)
-            map.getViewport().addEventListener("dblclick", doubleClick);
-          break;
-      }
-    }
-  }, [
-    doubleClick,
-    dragAndTranslate,
-    map,
-    option,
-    selectedFeature,
-    toggleToolsOption,
-    zoom,
-  ]);
+				default:
+					toggleToolsOption(selectOn);
+					if (selectedFeature)
+						map.getViewport().addEventListener('dblclick', doubleClick);
+					break;
+			}
+		}
+	}, [
+		doubleClick,
+		click,
+		dragAndTranslate,
+		map,
+		option,
+		selectedFeature,
+		toggleToolsOption,
+		zoom,
+	]);
 
   const items = [
     {

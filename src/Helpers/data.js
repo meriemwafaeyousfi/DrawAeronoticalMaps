@@ -71,3 +71,12 @@ let IL = [];
 Images.forEach((image) => (IL[image.value] = image.src));
 
 export const imagesLink = IL;
+
+export const centresImages = [
+	 [{name: 'high', src: '/Icons/Clouds/high.png'},{name: 'low', src: '/Icons/Clouds/low.png'}],
+	 [{name: 'anticyclone', src: '/Icons/Clouds/anticyclone.png'},{name: 'depression', src: '/Icons/Clouds/depression.png'}],
+	 [{name: 'cyclone', src: '/Icons/Clouds/cyclone.png'},{name: 'typhon', src: '/Icons/Clouds/typhon.png'}],
+	 [{name: 'td', src: '/Icons/Clouds/td.png'},{name: 'c', src: '/Icons/Clouds/c.png'}],
+];
+
+export const directions = [-1,0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360]

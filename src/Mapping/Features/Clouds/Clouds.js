@@ -38,7 +38,7 @@ export const drawCloud = (vectorSource) => {
 	});
 };
 
-export const modifyCloud = (select, cvl) => {
+export const modifyCloud = (select) => {
 	return new Modify({
 		features: select.getFeatures(),
 		insertVertexCondition: never,

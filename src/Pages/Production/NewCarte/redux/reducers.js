@@ -3,6 +3,7 @@ import {
 	SET_MODAL,
 	SET_OPTION,
 	SET_SELECTED_FEATURE,
+	SET_MAP_COORDINATE
 } from './actions';
 
 export const map = (state = null, action) => {
@@ -40,6 +41,17 @@ export const selectedFeature = (state = null, action) => {
 	const { type, payload } = action;
 	switch (type) {
 		case SET_SELECTED_FEATURE:
+			return payload;
+
+		default:
+			return state;
+	}
+};
+
+export const mapCoordinate = (state = null, action) => {
+	const { type, payload } = action;
+	switch (type) {
+		case SET_MAP_COORDINATE:
 			return payload;
 
 		default:
