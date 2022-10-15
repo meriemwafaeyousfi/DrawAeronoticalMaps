@@ -14,15 +14,21 @@ import {
 	save,
 } from '../../../../Mapping/Map';
 import { cloudDrawingON } from '../../../../Mapping/Features/Clouds/Clouds';
+import { jetFlowDrawingON } from '../../../../Mapping/Features/JetFlow/JetFlow';
 import { frontFlowDrawingON } from '../../../../Mapping/Features/FrontFlow/FrontFlow';
 import { useDispatch, useSelector } from 'react-redux';
-import { setModal, setOption } from '../redux/actions';
+import { setMapCoordinate, setModal, setOption } from '../redux/actions';
 import { jetDrawingON } from '../../../../Mapping/Features/Jet/Jet';
+import { centreActionDrawingON } from '../../../../Mapping/Features/CentreAction/CentreAction';
+import { click } from 'ol/events/condition';
+
 
 function Tools() {
 	const map = useSelector((state) => state.map);
 	const modal = useSelector((state) => state.modal);
 	const option = useSelector((state) => state.option);
+	const mapCoordinate = useSelector((state) => state.mapCoordinate);
+	const selectedFeature = useSelector((state) => state.selectedFeature);
 
 	const dispatch = useDispatch();
 
@@ -36,7 +42,6 @@ function Tools() {
 				(feature) => {
 					if (feature.getGeometry().getType() !== 'Point') {
 						dispatch(setModal(feature.get('feature_type')));
-						dispatch(setOption(''));
 					}
 				},
 				{ hitTolerance: 10 }
@@ -44,23 +49,35 @@ function Tools() {
 		},
 		[dispatch, map]
 	);
+
+	const click = useCallback(
+		(event) => {
+			dispatch(setMapCoordinate(event.coordinate))
+			dispatch(setModal('centre_action'))
+			map.un('click', click)
+		},
+		[dispatch, map]
+	);
+
 	const nothing = useCallback(() => {
 		if (map) {
 			map.un('singleclick', zoomingInAndCenter);
 			map.un('singleclick', zoomingOutAndCenter);
+			map.un('click', click)
 			map.getViewport().removeEventListener('dblclick', doubleClick);
+			
 			dragPanOff(map);
 			endDrawing(map);
 			selectOff(map);
 			translateOff(map);
 			document.querySelector('#map-container').style.cursor = 'unset';
 		}
-	}, [doubleClick, map]);
+	}, [doubleClick,click, map]);
 
 	const toggleToolsOption = useCallback(
-		(Function) => {
+		(drawingFunction) => {
 			nothing();
-			Function(map);
+			drawingFunction(map);
 		},
 		[map, nothing]
 	);
@@ -109,7 +126,7 @@ function Tools() {
 					dragAndTranslate();
 					break;
 				case 'zone_texte':
-					console.log('not Define yet');
+					toggleToolsOption(jetFlowDrawingON);
 					break;
 				case 'zone_nuageuse':
 					toggleToolsOption(cloudDrawingON);
@@ -121,34 +138,45 @@ function Tools() {
 					toggleToolsOption(frontFlowDrawingON);
 					break;
 				case 'cat':
-					console.log('not Define yet');
+					toggleToolsOption(jetFlowDrawingON);
 					break;
 				case 'ligne':
-					console.log('not Define yet');
+					toggleToolsOption(jetFlowDrawingON);
 					break;
 				case 'fleche':
-					console.log('not Define yet');
+					toggleToolsOption(jetFlowDrawingON);
 					break;
 				case 'centres_action':
-					console.log('not Define yet');
+					toggleToolsOption(centreActionDrawingON);
+					map.on('click', click);
 					break;
 				case 'volcan':
-					console.log('not Define yet');
+					toggleToolsOption(jetFlowDrawingON);
 					break;
 				case 'tropopause':
-					console.log('not Define yet');
+					toggleToolsOption(jetFlowDrawingON);
 					break;
 				case 'condition_en_surface':
-					console.log('not Define yet');
+					toggleToolsOption(jetFlowDrawingON);
 					break;
 
 				default:
 					toggleToolsOption(selectOn);
-					map.getViewport().addEventListener('dblclick', doubleClick);
+					if (selectedFeature)
+						map.getViewport().addEventListener('dblclick', doubleClick);
 					break;
 			}
 		}
-	}, [doubleClick, dragAndTranslate, map, option, toggleToolsOption, zoom]);
+	}, [
+		doubleClick,
+		click,
+		dragAndTranslate,
+		map,
+		option,
+		selectedFeature,
+		toggleToolsOption,
+		zoom,
+	]);
 
 	const items = [
 		{
@@ -158,7 +186,7 @@ function Tools() {
 			command: () => {
 				option !== 'zoom_in'
 					? dispatch(setOption('zoom_in'))
-					: dispatch(setOption('select'));
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -168,7 +196,7 @@ function Tools() {
 			command: () => {
 				option !== 'zoom_out'
 					? dispatch(setOption('zoom_out'))
-					: dispatch(setOption('select'));
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -178,7 +206,7 @@ function Tools() {
 			command: () => {
 				option !== 'drag'
 					? dispatch(setOption('drag'))
-					: dispatch(setOption('select'));
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -188,7 +216,7 @@ function Tools() {
 			command: () => {
 				option !== 'zone_texte'
 					? dispatch(setOption('zone_texte'))
-					: dispatch(setOption('select'));
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -206,7 +234,9 @@ function Tools() {
 			icon: '/Icons/Clouds/wind-solid.svg',
 			alt: 'Courant jet icon',
 			command: () => {
-				option !== 'jet' ? dispatch(setOption('jet')) : dispatch(setOption(''));
+				option !== 'jet'
+					? dispatch(setOption('jet'))
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -216,7 +246,7 @@ function Tools() {
 			command: () => {
 				option !== 'courant_front'
 					? dispatch(setOption('courant_front'))
-					: dispatch(setOption('select'));
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -224,9 +254,7 @@ function Tools() {
 			icon: '/Icons/Clouds/i-cursor-solid.svg',
 			alt: 'Cat icon',
 			command: () => {
-				option !== 'cat'
-					? dispatch(setOption('cat'))
-					: dispatch(setOption('select'));
+				option !== 'cat' ? dispatch(setOption('cat')) : dispatch(setOption(''));
 			},
 		},
 		{
@@ -236,7 +264,7 @@ function Tools() {
 			command: () => {
 				option !== 'ligne'
 					? dispatch(setOption('ligne'))
-					: dispatch(setOption('select'));
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -246,17 +274,17 @@ function Tools() {
 			command: () => {
 				option !== 'fleche'
 					? dispatch(setOption('fleche'))
-					: dispatch(setOption('select'));
+					: dispatch(setOption(''));
 			},
 		},
 		{
 			id: 'centres_action',
-			icon: '/Icons/Clouds/centre_action.png',
+			icon: '/Icons/Clouds/c.png',
 			alt: "Centres d'action icon",
 			command: () => {
 				option !== 'centres_action'
 					? dispatch(setOption('centres_action'))
-					: dispatch(setOption('select'));
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -266,7 +294,7 @@ function Tools() {
 			command: () => {
 				option !== 'volcan'
 					? dispatch(setOption('volcan'))
-					: dispatch(setOption('select'));
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -276,7 +304,7 @@ function Tools() {
 			command: () => {
 				option !== 'tropopause'
 					? dispatch(setOption('tropopause'))
-					: dispatch(setOption('select'));
+					: dispatch(setOption(''));
 			},
 		},
 		{
@@ -286,7 +314,7 @@ function Tools() {
 			command: () => {
 				option !== 'condition_en_surface'
 					? dispatch(setOption('condition_en_surface'))
-					: dispatch(setOption('select'));
+					: dispatch(setOption(''));
 			},
 		},
 	];

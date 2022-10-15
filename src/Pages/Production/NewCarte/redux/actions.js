@@ -21,3 +21,9 @@ export const setSelectedFeature = (feature) => ({
 	type: SET_SELECTED_FEATURE,
 	payload: feature,
 });
+
+export const SET_MAP_COORDINATE = 'SET_MAP_COORDINATE';
+export const setMapCoordinate = (coordinate) => ({
+	type: SET_MAP_COORDINATE,
+	payload: coordinate,
+});
