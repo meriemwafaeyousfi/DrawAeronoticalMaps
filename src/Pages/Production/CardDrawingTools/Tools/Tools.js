@@ -158,11 +158,12 @@ function Tools() {
         case "condition_en_surface":
           toggleToolsOption(jetFlowDrawingON);
           break;
-
-        default:
+        case "select":
           toggleToolsOption(selectOn);
-          if (selectedFeature)
-            map.getViewport().addEventListener("dblclick", doubleClick);
+          map.getViewport().addEventListener("dblclick", doubleClick);
+          break;
+        default:
+          nothing();
           break;
       }
     }
@@ -229,7 +230,7 @@ function Tools() {
       command: () => {
         option !== "zone_nuageuse"
           ? dispatch(setOption("zone_nuageuse"))
-          : dispatch(setOption(""));
+          : dispatch(setOption("select"));
       },
     },
     {
@@ -238,7 +239,9 @@ function Tools() {
       alt: "Courant jet icon",
       title: "Courant jet",
       command: () => {
-        option !== "jet" ? dispatch(setOption("jet")) : dispatch(setOption(""));
+        option !== "jet"
+          ? dispatch(setOption("jet"))
+          : dispatch(setOption("select"));
       },
     },
     {
