@@ -3,8 +3,10 @@ import { imagesLink } from '../../../Helpers/data';
 import * as extent from 'ol/extent';
 import { LineString } from 'ol/geom';
 import { Stroke, Style } from 'ol/style';
+import { transform } from 'ol/proj';
 
 export const createTextOverlay = (map, feature) => {
+	console.log(feature);
 	const overlayText = document.createElement('div');
 	overlayText.className = 'overlay_text';
 
@@ -18,7 +20,7 @@ export const createTextOverlay = (map, feature) => {
 
 	const textOverlay = new Overlay({
 		element: overlay_container,
-		position: extent.getCenter(feature.getGeometry().getExtent()),
+		position: [feature.get('legendX'), feature.get('legendY')],
 		positioning: 'center-center',
 		id: feature.ol_uid,
 	});
@@ -39,6 +41,8 @@ export const createTextOverlay = (map, feature) => {
 	);
 	overlay_container.addEventListener('mousedown', () => {
 		const pointermove = (event) => {
+			feature.set('legendX', event.coordinate[0]);
+			feature.set('legendY', event.coordinate[1]);
 			textOverlay.setPosition(event.coordinate);
 			link
 				.getGeometry()
@@ -64,22 +68,14 @@ export const createTextOverlay = (map, feature) => {
 	return textOverlay;
 };
 
-export const unHighlightOverlay = (overlay) => {
-	overlay
-		.getElement()
-		.querySelector('.overlay_content')
-		.classList.remove('selected_overlay');
+export const unHighlightOverlay = (map, feature) => {
+	const overlay = map.getOverlayById(feature.ol_uid);
+	overlay.getElement().classList.remove('selected_overlay');
 };
 
-export const highlightOverlay = (overlay) => {
-	overlay
-		.getElement()
-		.querySelector('.overlay_content')
-		.classList.add('selected_overlay');
-};
-
-export const getOverlay = (map, feature) => {
-	return map.getOverlayById(feature.ol_uid);
+export const highlightOverlay = (map, feature) => {
+	const overlay = map.getOverlayById(feature.ol_uid);
+	overlay.getElement().classList.add('selected_overlay');
 };
 
 export const updateOverlayContent = (map, feature) => {
@@ -146,57 +142,4 @@ export const alignOverlayContent = (overlay, alignement) => {
 		default:
 			break;
 	}
-};
-
-export const getOverlayText = (overlay) => {
-	let data = {
-		text: '',
-		numenator: 0,
-		denominator: 0,
-		show: false,
-		alignement: 'Gauche',
-	};
-	overlay
-		.getElement()
-		.querySelector('.overlay_text')
-		.childNodes.forEach((node) => {
-			if (node.tagName === 'IMG') {
-				data.text = data.text + ' ' + node.getAttribute('alt');
-			} else if (node.tagName === 'DIV') {
-				data.numenator =
-					node.querySelector('.overlay_fraction_numenator').innerHTML === 'XXX'
-						? 0
-						: node.querySelector('.overlay_fraction_numenator').innerHTML;
-				data.denominator =
-					node.querySelector('.overlay_fraction_denominator').innerHTML ===
-					'XXX'
-						? 0
-						: node.querySelector('.overlay_fraction_denominator').innerHTML;
-				data.show = true;
-			} else {
-				if (node.innerHTML !== '') {
-					data.text = data.text + ' ' + node.innerHTML;
-					data.numenator = 0;
-					data.denominator = 0;
-					data.show = false;
-				}
-			}
-		});
-	switch (
-		overlay.getElement().querySelector('.overlay_text').style.justifyContent
-	) {
-		case 'start':
-			data.alignement = 'Gauche';
-			break;
-		case 'center':
-			data.alignement = 'Center';
-			break;
-		case 'end':
-			data.alignement = 'Droite';
-			break;
-
-		default:
-			break;
-	}
-	return data;
 };

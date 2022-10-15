@@ -137,7 +137,7 @@ function NavBar() {
 					label: 'Carte sauvegardée',
 					icon: 'pi pi-save',
 					command: () => {
-						navigate('/production/carte_sauvegardees', {
+						navigate('/production/carte_sauvegardee', {
 							replace: true,
 						});
 					},

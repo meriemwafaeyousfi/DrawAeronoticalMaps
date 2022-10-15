@@ -102,7 +102,6 @@ function Tools() {
     },
     [map, nothing]
   );
-
   useEffect(() => {
     if (map) {
       const ur = new UndoRedo({
@@ -177,12 +176,12 @@ function Tools() {
     toggleToolsOption,
     zoom,
   ]);
-
   const items = [
     {
       id: "zoom_in",
       icon: "/Icons/Clouds/magnifying-glass-plus-solid.svg",
       alt: "Zoom In icon",
+      title: "zoom_in",
       command: () => {
         option !== "zoom_in"
           ? dispatch(setOption("zoom_in"))
@@ -193,6 +192,7 @@ function Tools() {
       id: "zoom_out",
       icon: "/Icons/Clouds/magnifying-glass-minus-solid.svg",
       alt: "Zoom Out icon",
+      title: "zoom_out",
       command: () => {
         option !== "zoom_out"
           ? dispatch(setOption("zoom_out"))
@@ -203,6 +203,7 @@ function Tools() {
       id: "drag",
       icon: "/Icons/Clouds/hand-solid.svg",
       alt: "Drag icon",
+      title: "drag",
       command: () => {
         option !== "drag"
           ? dispatch(setOption("drag"))
@@ -213,6 +214,7 @@ function Tools() {
       id: "zone_texte",
       icon: "/Icons/Clouds/message-regular.svg",
       alt: "Zone de texte icon",
+      title: "Zone de texte",
       command: () => {
         option !== "zone_texte"
           ? dispatch(setOption("zone_texte"))
@@ -223,6 +225,7 @@ function Tools() {
       id: "zone_nuageuse",
       icon: "/Icons/Clouds/cloud-solid.svg",
       alt: "Zone nuageuse icon",
+      title: "Zone nuageuse",
       command: () => {
         option !== "zone_nuageuse"
           ? dispatch(setOption("zone_nuageuse"))
@@ -233,6 +236,7 @@ function Tools() {
       id: "jet",
       icon: "/Icons/Clouds/wind-solid.svg",
       alt: "Courant jet icon",
+      title: "Courant jet",
       command: () => {
         option !== "jet" ? dispatch(setOption("jet")) : dispatch(setOption(""));
       },
@@ -241,6 +245,7 @@ function Tools() {
       id: "courant_front",
       icon: "/Icons/Clouds/i-cursor-solid.svg",
       alt: "front icon",
+      title: "Courant front",
       command: () => {
         option !== "courant_front"
           ? dispatch(setOption("courant_front"))
@@ -251,6 +256,7 @@ function Tools() {
       id: "cat",
       icon: "/Icons/Clouds/i-cursor-solid.svg",
       alt: "Cat icon",
+      title: "Cat",
       command: () => {
         option !== "cat"
           ? dispatch(setOption("cat"))
@@ -261,6 +267,7 @@ function Tools() {
       id: "ligne",
       icon: "/Icons/Clouds/i-cursor-solid.svg",
       alt: "ligne icon",
+      title: "Ligne",
       command: () => {
         option !== "ligne"
           ? dispatch(setOption("ligne"))
@@ -271,6 +278,7 @@ function Tools() {
       id: "fleche",
       icon: "/Icons/Clouds/i-cursor-solid.svg",
       alt: "Flèche icon",
+      title: "Flèche",
       command: () => {
         option !== "fleche"
           ? dispatch(setOption("fleche"))
@@ -281,6 +289,7 @@ function Tools() {
       id: "centres_action",
       icon: "/Icons/Clouds/centre_action.png",
       alt: "Centres d'action icon",
+      title: "Centres d'action",
       command: () => {
         option !== "centres_action"
           ? dispatch(setOption("centres_action"))
@@ -291,6 +300,7 @@ function Tools() {
       id: "volcan",
       icon: "/Icons/Clouds/volcano-solid.svg",
       alt: "Volcan icon",
+      title: "Volcan",
       command: () => {
         option !== "volcan"
           ? dispatch(setOption("volcan"))
@@ -301,6 +311,7 @@ function Tools() {
       id: "tropopause",
       icon: "/Icons/Clouds/i-cursor-solid.svg",
       alt: "tropopause icon",
+      title: "Tropopause",
       command: () => {
         option !== "tropopause"
           ? dispatch(setOption("tropopause"))
@@ -311,6 +322,7 @@ function Tools() {
       id: "condition_en_surface",
       icon: "/Icons/Clouds/flag.png",
       alt: "text Zone icon",
+      title: "Condition en surface",
       command: () => {
         option !== "condition_en_surface"
           ? dispatch(setOption("condition_en_surface"))
@@ -326,6 +338,7 @@ function Tools() {
           save(map);
         }}
         id={"save"}
+        title="Sauvgarder"
       >
         <img
           src="/Icons/Clouds/floppy-disk-solid.svg"
@@ -339,6 +352,7 @@ function Tools() {
           undoRedo.undo();
         }}
         id={"save"}
+        title="Undo"
       >
         <img
           src="/Icons/Clouds/rotate-left-solid.svg"
@@ -352,6 +366,7 @@ function Tools() {
           undoRedo.redo();
         }}
         id={"save"}
+        title="Redo"
       >
         <img
           src="/Icons/Clouds/rotate-right-solid.svg"
@@ -367,6 +382,7 @@ function Tools() {
           id={item.id}
           disabled={modal !== ""}
           className={option === item.id ? "active" : ""}
+          title={item.title}
         >
           <img src={item.icon} alt={item.alt} height={20} width={20} />
         </button>

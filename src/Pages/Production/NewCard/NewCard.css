@@ -1,0 +1,11 @@
+.saved_cards_page_content {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	padding: 20px;
+}
+
+.saved_cards {
+	display: flex;
+	gap: 20px;
+}
