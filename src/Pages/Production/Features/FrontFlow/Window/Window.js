@@ -6,11 +6,14 @@ import {
   setModal,
   setOption,
   setSelectedFeature,
-} from "../../../NewCarte/redux/actions";
+} from "Pages/Production/CardDrawingTools/redux/actions";
 import { Style, Icon } from "ol/style";
 import { Point } from "ol/geom";
-import { getSelectedSegment } from "../../../../../Mapping/Features/FrontFlow/FrontStyles";
-import { deleteFrontFeature, inverseFeature } from "../../../../../Mapping/Features/FrontFlow/FrontFlow";
+import { getSelectedSegment } from "Mapping/Features/FrontFlow/FrontStyles";
+import {
+  deleteFrontFeature,
+  inverseFeature,
+} from "Mapping/Features/FrontFlow/FrontFlow";
 
 function Window({ vectorLayer }) {
   const src2 =
@@ -43,7 +46,7 @@ function Window({ vectorLayer }) {
   }, [selectedFeature]);
 
   const [backupFeature, setBackupFeature] = useState(null);
- 
+
   const [selectSeg, setSelectedSeg] = useState();
   const singleClick = useCallback(
     (event) => {
@@ -54,7 +57,7 @@ function Window({ vectorLayer }) {
             if (feature.get("feature_type") === "courant_front") {
               const point = map.getEventCoordinate(event);
               const selectedSeg = getSelectedSegment(feature, point);
-              console.log("now selected seg is",selectedSeg);
+              console.log("now selected seg is", selectedSeg);
               setSelectedSeg(selectedSeg);
               selectedFeature.set("seg_selected", selectedSeg);
             }
@@ -72,34 +75,36 @@ function Window({ vectorLayer }) {
   }, [disptach]);
 
   const handleCancel = useCallback(() => {
-	if(selectedFeature){
-		deleteFrontFeature(vectorLayer, selectedFeature);
-		vectorLayer.getSource().addFeature(backupFeature);
-		disptach(setSelectedFeature(backupFeature));
-		disptach(setOption(""));
-		disptach(setModal(""));
-	}
-   
+    if (selectedFeature) {
+      deleteFrontFeature(vectorLayer, selectedFeature);
+      vectorLayer.getSource().addFeature(backupFeature);
+      disptach(setSelectedFeature(backupFeature));
+      disptach(setOption(""));
+      disptach(setModal(""));
+    }
+
     //map.getViewport().removeEventListener("click", singleClick);
   }, [backupFeature, disptach, map, selectedFeature, vectorLayer]);
 
-  const handleChange = useCallback((event) => {
-    if (selectedFeature) {
-      const seg = selectedFeature.get("seg_selected");
-	  let arr = [];
-      setShapeTypes((state) =>
-        { arr = state.map((elm, index) => {
-          if (index + 1 === seg) {
-            return Number(event.target.value);
-          } else return elm;
-        })
-		console.log("arr", arr)
-		selectedFeature.set("type", arr);
-		return arr;
-	   }
-      );
-    }
-  },[selectedFeature]);
+  const handleChange = useCallback(
+    (event) => {
+      if (selectedFeature) {
+        const seg = selectedFeature.get("seg_selected");
+        let arr = [];
+        setShapeTypes((state) => {
+          arr = state.map((elm, index) => {
+            if (index + 1 === seg) {
+              return Number(event.target.value);
+            } else return elm;
+          });
+          console.log("arr", arr);
+          selectedFeature.set("type", arr);
+          return arr;
+        });
+      }
+    },
+    [selectedFeature]
+  );
 
   useEffect(() => {
     if (selectedFeature) {
@@ -109,14 +114,14 @@ function Window({ vectorLayer }) {
     } else {
       console.log("we go heere");
     }
-  }, [ selectedFeature]);
+  }, [selectedFeature]);
 
-   const types = [1,2,3,4,5,6,7,8,9,10];
-   const inverserHandler = useCallback(() => {
-      if (selectedFeature) {
-          inverseFeature(selectedFeature);
-      }
-   }, [selectedFeature])
+  const types = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const inverserHandler = useCallback(() => {
+    if (selectedFeature) {
+      inverseFeature(selectedFeature);
+    }
+  }, [selectedFeature]);
   return (
     <Dialog
       header="Front"
@@ -141,19 +146,14 @@ function Window({ vectorLayer }) {
 
       <div className="confirmation_buttons">
         <div>
-          {types.map((type) => 
-            (
-              <button value={type} onClick={handleChange}>
-                    type{type}
-                </button>
-            )
-          )}
-      
+          {types.map((type) => (
+            <button value={type} onClick={handleChange}>
+              type{type}
+            </button>
+          ))}
         </div>
         <div>
-            <button onClick={inverserHandler}>
-                 reverse
-            </button>
+          <button onClick={inverserHandler}>reverse</button>
         </div>
         <div>
           <button onClick={handleConfirm}>Confirmer</button>

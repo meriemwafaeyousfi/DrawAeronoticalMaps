@@ -5,7 +5,7 @@ import {
   modal,
   selectedFeature,
   mapCoordinate,
-} from "./Pages/Production/NewCarte/redux/reducers";
+} from "Pages/Production/CardDrawingTools/redux/reducers";
 
 const reducers = { map, option, modal, selectedFeature, mapCoordinate };
 

@@ -7,12 +7,12 @@ import {
   translateFrontFlow,
 } from "Mapping/Features/FrontFlow/FrontFlow";
 import { useDispatch, useSelector } from "react-redux";
-import { endDrawing } from "../../../../Mapping/Map";
+import { endDrawing } from "Mapping/Map";
 import {
   setModal,
   setOption,
   setSelectedFeature,
-} from "../../NewCarte/redux/actions";
+} from "Pages/Production/CardDrawingTools/redux/actions";
 import Window from "./Window/Window";
 
 function FrontFlow() {

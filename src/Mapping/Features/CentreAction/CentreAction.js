@@ -21,7 +21,7 @@ import {
 import { distance } from "ol/coordinate";
 import { feature } from "@turf/turf";
 import Overlay from "ol/Overlay";
-import { setSelectedFeature } from "../../../Pages/Production/NewCarte/redux/actions";
+import { setSelectedFeature } from "Pages/Production/CardDrawingTools/redux/actions";
 
 export const centreActionVectorLayer = () => {
   return new VectorLayer({
