@@ -1,0 +1,132 @@
+.cloudWindow {
+	min-width: 400px;
+	width: 15%;
+	box-shadow: 0 0 15px -5px grey !important;
+}
+
+.cloudWindowHeader {
+	background-color: #000000 !important;
+	color: #f59e0b !important;
+	padding: 2% 4% !important;
+}
+
+.cloudWindowContent {
+	background-color: #d5d5d5 !important;
+	padding: 2% 4% !important;
+	color: #000000 !important;
+}
+
+.choosen {
+	background-color: #f59e0b;
+}
+
+.content_container {
+	display: flex;
+	justify-content: space-between;
+	flex-wrap: wrap;
+}
+
+.choosing_panel {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 5px 5px;
+}
+
+.choosing_panel button {
+	width: 50%;
+}
+
+.col_4 {
+	width: 33.33%;
+}
+
+.col_8 {
+	width: 66.66%;
+}
+
+.signImages {
+	display: flex;
+	height: 100%;
+	padding: 5px;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.signImages button {
+	width: 27%;
+	padding: 2%;
+}
+
+.input_field {
+	display: flex;
+	margin: 3px 0px;
+	width: 100%;
+}
+
+.input_field label {
+	width: 60%;
+	font-size: 14px;
+}
+
+.input_field input,
+.input_field select {
+	width: 40%;
+}
+
+.input_field input::-webkit-outer-spin-button,
+.input_field input::-webkit-inner-spin-button {
+	/*-webkit-appearance: none;*/
+	margin: 0;
+}
+
+.Niveau {
+	display: flex;
+	padding: 5px;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.text {
+	padding: 5px;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.text textarea {
+	width: 100%;
+	height: 100%;
+	resize: none;
+}
+
+.courbe {
+	display: flex;
+	flex-wrap: wrap;
+	padding: 5px;
+}
+
+.confirmation_buttons {
+	display: flex;
+	justify-content: flex-end;
+	width: 100%;
+}
+
+.confirmation_buttons button {
+	padding: 7px;
+	margin: 11px 5px;
+	border-radius: 5px;
+	font-size: 16px;
+	border: 1px solid grey;
+	color: white;
+	font-weight: 600;
+}
+
+.confirmation_buttons div:first-child button {
+	background-color: #f59e0b;
+	color: black;
+}
+
+.confirmation_buttons div:last-child button {
+	background-color: black;
+}

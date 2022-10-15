@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
 	drawFrontFlow,
 	frontFlowVectorLayer,
@@ -8,19 +8,27 @@ import {
 } from '../../../../Mapping/Features/FrontFlow/FrontFlow';
 import { useDispatch, useSelector } from 'react-redux';
 import { endDrawing } from '../../../../Mapping/Map';
-import { setOption, setSelectedFeature } from '../../NewCarte/redux/actions';
+import {
+	setModal,
+	setOption,
+	setSelectedFeature,
+} from '../../NewCarte/redux/actions';
+import Window from './Window/Window';
 
 function FrontFlow() {
 	const map = useSelector((state) => state.map);
+	const modal = useSelector((state) => state.modal);
+    const [vectorLayer, setVectorLayer] = useState(null);
+
 	const dispatch = useDispatch();
 	const init = useCallback(() => {
 		const ffvl = frontFlowVectorLayer();
 		map.addLayer(ffvl);
-
+        setVectorLayer(ffvl);
 		const sff = selectFrontFlow(ffvl);
 		sff.set('title', 'courant_front:select');
 		sff.setActive(false);
-		sff.on('select', ({ selected }) => {
+		sff.on('select', ({selected}) => {
 			if (selected[0]) {
 				dispatch(setSelectedFeature(selected[0]));
 			} else {
@@ -33,15 +41,24 @@ function FrontFlow() {
 		djf.set('title', 'courant_front:draw');
 		djf.setActive(false);
 		djf.on('drawend', ({ feature }) => {
-			sff.getFeatures().clear();
+			//sff.getFeatures().clear();
 			feature.set('feature_type', 'courant_front');
+			feature.set("number_seg",feature.getGeometry().getCoordinates() -1);
 			endDrawing(map);
-			dispatch(setSelectedFeature(feature));
 			dispatch(setOption(''));
 
-			sff.getFeatures().push(feature);
+			
 		});
 		map.addInteraction(djf);
+        
+		ffvl.getSource().on('addfeature', ({ feature }) => {
+			if (feature.get('feature_type') === 'courant_front') {
+				sff.getFeatures().clear();
+				sff.getFeatures().push(feature);
+				dispatch(setSelectedFeature(feature));
+				
+			}
+		});
 
 		const mff = modifyFrontFlow(sff);
 		mff.set('title', 'courant_front:modify');
@@ -56,7 +73,7 @@ function FrontFlow() {
 	useEffect(() => {
 		if (map) init();
 	}, [init, map]);
-	return <></>;
+	return modal === 'courant_front' && <Window vectorLayer={vectorLayer} />;
 }
 
 export default FrontFlow;
