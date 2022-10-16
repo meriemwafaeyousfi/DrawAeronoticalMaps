@@ -13,6 +13,7 @@ import { setMap } from './redux/actions';
 import { api } from 'axiosConfig';
 import './CardDrawingTools.css';
 import { useParams } from 'react-router-dom';
+import CAT from '../Features/CAT/CAT';
 
 function CardDrawingTools() {
 	const dispatch = useDispatch();
@@ -29,9 +30,9 @@ function CardDrawingTools() {
 					console.log(err);
 				});
 		}
-		createBlankMap('map-container').then((res) => {
-			res.addInteraction(new DragPan());
-			dispatch(setMap(res));
+		createBlankMap('map-container').then((map) => {
+			map.addInteraction(new DragPan());
+			dispatch(setMap(map));
 		});
 	}, [dispatch, params.cardid]);
 	return (
@@ -40,13 +41,11 @@ function CardDrawingTools() {
 				<Tools />
 				<div id="map-container"></div>
 				<MapContextMenu />
-				<CloudyArea
-					clouds={(() => (card ? card.zone_nuageuse : []))()}
-					cardid={params.cardid}
-				/>
+				<CloudyArea clouds={card.zone_nuageuse} cardid={params.cardid} />
 				<FrontFlow />
 				<Jet />
 				<CentreAction />
+				<CAT />
 			</div>
 		</>
 	);

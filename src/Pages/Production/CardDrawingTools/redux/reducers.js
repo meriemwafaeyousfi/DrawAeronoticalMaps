@@ -3,7 +3,8 @@ import {
 	SET_MODAL,
 	SET_OPTION,
 	SET_SELECTED_FEATURE,
-	SET_MAP_COORDINATE
+	SET_MAP_COORDINATE,
+	SET_CENTER_RESIZER,
 } from './actions';
 
 export const map = (state = null, action) => {
@@ -52,6 +53,17 @@ export const mapCoordinate = (state = null, action) => {
 	const { type, payload } = action;
 	switch (type) {
 		case SET_MAP_COORDINATE:
+			return payload;
+
+		default:
+			return state;
+	}
+};
+
+export const centerResizer = (state = null, action) => {
+	const { type, payload } = action;
+	switch (type) {
+		case SET_CENTER_RESIZER:
 			return payload;
 
 		default:

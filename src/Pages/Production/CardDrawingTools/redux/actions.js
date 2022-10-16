@@ -27,3 +27,9 @@ export const setMapCoordinate = (coordinate) => ({
 	type: SET_MAP_COORDINATE,
 	payload: coordinate,
 });
+
+export const SET_CENTER_RESIZER = 'SET_CENTER_RESIZER';
+export const setCenterResizer = (overlay) => ({
+	type: SET_CENTER_RESIZER,
+	payload: overlay,
+});

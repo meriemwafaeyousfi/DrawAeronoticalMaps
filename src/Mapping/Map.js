@@ -134,6 +134,13 @@ export const dragPanOff = (map) => {
 		}
 	});
 };
+export const dragPanOn = (map) => {
+	map.getInteractions().forEach((interaction) => {
+		if (interaction instanceof DragPan) {
+			interaction.setActive(true);
+		}
+	});
+};
 
 export const verticesCheck = (point, feature) => {
 	let vertex = false;

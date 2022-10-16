@@ -58,8 +58,8 @@ function CloudyArea({ clouds, cardid }) {
 			if (feature.get('feature_type') === 'zone_nuageuse') {
 				console.log('feature added');
 				sc.getFeatures().clear();
-				sc.getFeatures().push(feature);
-				dispatch(setSelectedFeature(feature));
+				//sc.getFeatures().push(feature);
+				//dispatch(setSelectedFeature(feature));
 				createTextOverlay(map, feature);
 				updateOverlayContent(map, feature);
 				highlightOverlay(map, feature);
