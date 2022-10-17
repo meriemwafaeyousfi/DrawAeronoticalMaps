@@ -71,7 +71,7 @@
 
 .input_field input,
 .input_field select {
-	width: 40%;
+	width: 100%;
 }
 
 .input_field input::-webkit-outer-spin-button,

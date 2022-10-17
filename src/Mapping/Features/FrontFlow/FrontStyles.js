@@ -169,8 +169,9 @@ const getPointStyle = (styleCache, point, i, src) => {
   }
 };
 
-function getShapeStyle(feature, coordinates, i, index, type) {
+function getShapeStyle(feature, coordinates, i, index, type, reverse) {
   console.log("type is", type);
+  console.log("inside getShape",reverse);
   const {
     end: end,
     rotation: rotation,
@@ -184,12 +185,12 @@ function getShapeStyle(feature, coordinates, i, index, type) {
 
   const pointInfo = {
     end: end,
-    rotation: rotation,
+    rotation: !reverse ? rotation : rotation + Math.PI ,
     seg: segPoint,
   };
   const pointInfo2 = {
     end: end2,
-    rotation: rotation2,
+    rotation: !reverse ? rotation2 : rotation2 + Math.PI ,
     seg: segPoint2,
   };
   switch (type ? type : 1) {
@@ -418,6 +419,7 @@ export function frontStyles2(feature, resolution) {
     line.geometry.coordinates = feature.getGeometry().getCoordinates();
     const curved = bezierSpline(line);
     const type = feature.get("type");
+    const reverse = feature.get('reverse');
     if (!type) type = [1];
     segmentsStyles2(feature, curved, type).map((style) => {
       if (Array.isArray(style)) {
@@ -443,7 +445,8 @@ export function frontStyles2(feature, resolution) {
         coordinates,
         i,
         index,
-        type ? type[segPoint - 1] : 1
+        type ? type[segPoint - 1] : 1,
+        reverse ? reverse[segPoint -1] : false
       );
       if (elm && Array.isArray(elm)) {
         elm.map((style) => styles.push(style));
@@ -534,7 +537,6 @@ export const getSelectedSegment = (feature, point) => {
   let bool = false;
   let seg;
   line.geometry.coordinates = feature.getGeometry().getCoordinates();
-
   const curved = bezierSpline(line);
   const poignees = feature.getGeometry().getCoordinates();
   const coords = curved.geometry.coordinates;
@@ -561,5 +563,4 @@ export const getSelectedSegment = (feature, point) => {
   return seg + 1;
 };
 
-const reverseSegment = () => {};
-const reverseAllSegments = () => {};
+
