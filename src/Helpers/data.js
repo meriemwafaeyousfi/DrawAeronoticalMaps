@@ -73,10 +73,67 @@ Images.forEach((image) => (IL[image.value] = image.src));
 export const imagesLink = IL;
 
 export const centresImages = [
-	 [{name: 'high', src: '/Icons/Clouds/high.png'},{name: 'low', src: '/Icons/Clouds/low.png'}],
-	 [{name: 'anticyclone', src: '/Icons/Clouds/anticyclone.png'},{name: 'depression', src: '/Icons/Clouds/depression.png'}],
-	 [{name: 'cyclone', src: '/Icons/Clouds/cyclone.png'},{name: 'typhon', src: '/Icons/Clouds/typhon.png'}],
-	 [{name: 'td', src: '/Icons/Clouds/td.png'},{name: 'c', src: '/Icons/Clouds/c.png'}],
+	[
+		{ name: 'high', src: '/Icons/Clouds/high.png' },
+		{ name: 'low', src: '/Icons/Clouds/low.png' },
+	],
+	[
+		{ name: 'anticyclone', src: '/Icons/Clouds/anticyclone.png' },
+		{ name: 'depression', src: '/Icons/Clouds/depression.png' },
+	],
+	[
+		{ name: 'cyclone', src: '/Icons/Clouds/cyclone.png' },
+		{ name: 'typhon', src: '/Icons/Clouds/typhon.png' },
+	],
+	[
+		{ name: 'td', src: '/Icons/Clouds/td.png' },
+		{ name: 'c', src: '/Icons/Clouds/c.png' },
+	],
 ];
 
-export const directions = [-1,0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360]
+export const directions = [
+	-1, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160,
+	170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310,
+	320, 330, 340, 350, 360,
+];
+
+export const directions2 = [
+	{ name: -1, code: '-1' },
+	{ name: 0, code: '0' },
+	{ name: 10, code: '10' },
+	{ name: 20, code: '20' },
+	{ name: 30, code: '30' },
+	{ name: 40, code: '40' },
+	{ name: 50, code: '50' },
+	{ name: 60, code: '60' },
+	{ name: 70, code: '70' },
+	{ name: 80, code: '80' },
+	{ name: 90, code: '90' },
+	{ name: 100, code: '100' },
+	{ name: 110, code: '110' },
+	{ name: 120, code: '120' },
+	{ name: 130, code: '130' },
+	{ name: 140, code: '140' },
+	{ name: 150, code: '150' },
+	{ name: 160, code: '160' },
+	{ name: 170, code: '170' },
+	{ name: 180, code: '180' },
+	{ name: 190, code: '190' },
+	{ name: 200, code: '200' },
+	{ name: 210, code: '210' },
+	{ name: 220, code: '220' },
+	{ name: 230, code: '230' },
+	{ name: 240, code: '240' },
+	{ name: 250, code: '250' },
+	{ name: 260, code: '260' },
+	{ name: 270, code: '270' },
+	{ name: 280, code: '280' },
+	{ name: 290, code: '290' },
+	{ name: 300, code: '300' },
+	{ name: 310, code: '310' },
+	{ name: 320, code: '320' },
+	{ name: 330, code: '330' },
+	{ name: 340, code: '340' },
+	{ name: 350, code: '350' },
+	{ name: 360, code: '360' },
+];

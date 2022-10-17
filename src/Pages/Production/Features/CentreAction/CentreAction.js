@@ -32,7 +32,7 @@ function CentreAction() {
 	const [heightImg, setHeightImg] = useState(100);
 
 	const [nameCentre, setNameCentre] = useState('c');
-	const [vitesse, setVitesse] = useState(null);
+	const [vitesse, setVitesse] = useState(0);
 	const [texte, setTexte] = useState('');
 	const [direction, setDirection] = useState(0);
 

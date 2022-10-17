@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import TextField from '@mui/material/TextField';
-import Button from 'react-bootstrap/Button';
 import Radio from '@mui/material/Radio';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -13,8 +12,12 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import './Window.css';
 import { styled } from '@mui/material/styles';
-import { centresImages, directions } from 'Helpers/data';
+import { centresImages, directions, directions2 } from 'Helpers/data';
 import { useDispatch, useSelector } from 'react-redux';
+import { InputNumber } from 'primereact/inputnumber';
+import { Dropdown } from 'primereact/dropdown';
+import { InputText } from 'primereact/inputtext';
+import { Button } from 'primereact/button';
 import {
 	setMapCoordinate,
 	setModal,
@@ -22,21 +25,19 @@ import {
 	setSelectedFeature,
 } from 'Pages/Production/CardDrawingTools/redux/actions';
 import { createCentreAction } from 'Mapping/Features/CentreAction/CentreAction';
+import { Dialog } from 'primereact/dialog';
 
 function Window(props) {
 	const selectedFeature = useSelector((state) => state.selectedFeature);
 	const map = useSelector((state) => state.map);
 	const mapCoordinate = useSelector((state) => state.mapCoordinate);
 	const dispatch = useDispatch();
+	const [dir2, setDir2] = useState(0);
 
-	const handleChangeName = (
-		event: React.MouseEvent<HTMLElement>,
-		newName: string
-	) => {
-		if (newName) {
-			props.setNameCentre(newName);
-			selectedFeature.set('nameCentre', newName);
-		}
+	const handleChangeName = (event) => {
+		const newName = event.target.name;
+		props.setNameCentre(newName);
+		selectedFeature.set('nameCentre', newName);
 	};
 
 	const handleChangeVitesse = useCallback(
@@ -64,9 +65,10 @@ function Window(props) {
 	const handleChangeDirection = useCallback(
 		(event) => {
 			if (selectedFeature) {
-				const { value } = event.target;
-				props.setDirection(value);
-				selectedFeature.set('directionCentre', value);
+				const value = event.value;
+				props.setDirection(value.name);
+				setDir2(event.value);
+				selectedFeature.set('directionCentre', value.name);
 			}
 		},
 		[props, selectedFeature]
@@ -111,112 +113,96 @@ function Window(props) {
 	}, [dispatch]);
 
 	return (
-		<div className="modalContainer">
-			<Container className="title">
-				<Row>
-					<Col sm={10}>
-						<h1>Haut, Bas, Cyclone et Typhon</h1>
-					</Col>
-					<Col sm={2} className="titleCloseBtn">
-						<button onClick={handleCancel}> X </button>
-					</Col>
-				</Row>
-			</Container>
-
-			<div className="body">
-				{/********************* Properties**********************/}
-				<Box sx={{ width: '100%' }}>
-					<Grid container rowSpacing={1}>
-						<Grid item xs={6}>
-							<Grid container rowSpacing={4} p={2}>
-								<Grid item>
-									<TextField
-										size="small"
-										type="number"
-										label=" Vitesse"
-										InputProps={{
-											inputProps: { max: 100, min: 0 },
-										}}
-										value={props.vitesse ? props.vitesse : 0}
-										onChange={handleChangeVitesse}
-									/>
-								</Grid>
-								<Grid item>
-									<FormControl size="small">
-										<InputLabel id="demo-simple-select-label">
-											Direction
-										</InputLabel>
-										<Select
-											labelId="demo-simple-select-label"
-											id="demo-simple-select"
-											style={{ width: '100px' }}
-											label="Style"
-											value={props.direction}
-											onChange={handleChangeDirection}>
-											{directions.map((elet, index) => {
-												if (elet != -1) {
-													return (
-														<MenuItem key={index} value={elet}>
-															{elet}
-														</MenuItem>
-													);
-												} else {
-													return (
-														<MenuItem key={index} value={elet}>
-															Stationnaire
-														</MenuItem>
-													);
-												}
-											})}
-										</Select>
-									</FormControl>
-								</Grid>
-								<Grid item>
-									<TextField
-										size="small"
-										label="Texte"
-										value={props.texte}
-										onChange={handleChangeTexte}
-									/>
-								</Grid>
-							</Grid>
-						</Grid>
-						<Grid item xs={6}>
-							{centresImages.map((elt, index) => (
-								<StyledToggleButtonGroup
-									key={index}
-									color="primary"
-									value={props.nameCentre}
-									exclusive
-									onChange={handleChangeName}
-									aria-label="Platform">
-									<ToggleButton value={elt[0].name}>
+		<>
+			<Dialog
+				header="Haut, Bas, Cyclone et Typhon"
+				position="bottom-left"
+				modal={false}
+				visible={true}
+				className="cloudWindow"
+				keepInViewport={false}
+				dismissableMask={false}
+				closable={false}>
+				<div className="grid p-fluid col-12">
+					<div className="col-6">
+						<div>
+							<label htmlFor="stacked">ٍVitesse</label>
+							<InputNumber
+								inputId="stacked"
+								value={props.vitesse}
+								onValueChange={handleChangeVitesse}
+								showButtons
+							/>
+						</div>
+						<h5>Direction</h5>
+						<Dropdown
+							value={dir2}
+							options={directions2}
+							onChange={handleChangeDirection}
+							optionLabel="name"
+							placeholder="Direction"
+						/>
+						<div>
+							<h5>Texte</h5>
+							<InputText
+								value={props.texte}
+								onChange={handleChangeTexte}
+								placeholder="Texte"
+							/>
+						</div>
+					</div>
+					<div className="col-6 grid p-fluid">
+						{centresImages.map((image, key) => (
+							<div className="grid p-fluid" key={key}>
+								<div className="col-6">
+									<Button
+										className="p-button-text"
+										name={image[0].name}
+										onClick={handleChangeName}>
 										<img
-											src={elt[0].src}
-											style={{ width: '30px', height: '30px' }}
-											alt=""></img>
-									</ToggleButton>
-
-									<ToggleButton value={elt[1].name}>
+											src={image[0].src}
+											alt=""
+											width="30px"
+											height="30px"
+											style={{ pointerEvents: 'none' }}></img>
+									</Button>
+								</div>
+								<div className="col-6">
+									<Button
+										className="p-button-text"
+										name={image[1].name}
+										onClick={handleChangeName}>
 										<img
-											src={elt[1].src}
-											style={{ width: '30px', height: '30px' }}
-											alt=""></img>
-									</ToggleButton>
-								</StyledToggleButtonGroup>
-							))}
-						</Grid>
-					</Grid>
-				</Box>
-			</div>
+											src={image[1].src}
+											alt=""
+											width="30px"
+											height="30px"
+											style={{ pointerEvents: 'none' }}></img>
+									</Button>
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
 
-			<div className="footer">
-				<button id="cancelBtn" onClick={handleCancel}>
-					Annuler
-				</button>
-				<button onClick={handleConfirm}>OK</button>
-			</div>
-		</div>
+				<div className="col-12 grid p-fluid">
+					<div className="col-6">
+						<Button
+							label="Confirmer"
+							className="p-button-warning"
+							onClick={handleConfirm}
+						/>
+					</div>
+					<div className="col-6">
+						<Button
+							label="Annuler"
+							className="p-button-secondary"
+							onClick={handleCancel}
+						/>
+					</div>
+				</div>
+			</Dialog>
+		</>
 	);
 }
 
