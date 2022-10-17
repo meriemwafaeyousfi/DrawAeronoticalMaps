@@ -113,27 +113,27 @@ function Window(props) {
 	}, [dispatch]);
 
 	return (
-		<>
-			<Dialog
-				header="Haut, Bas, Cyclone et Typhon"
-				position="bottom-left"
-				modal={false}
-				visible={true}
-				className="cloudWindow"
-				keepInViewport={false}
-				dismissableMask={false}
-				closable={false}>
-				<div className="grid p-fluid col-12">
-					<div className="col-6">
-						<div>
-							<label htmlFor="stacked">ٍVitesse</label>
-							<InputNumber
-								inputId="stacked"
-								value={props.vitesse}
-								onValueChange={handleChangeVitesse}
-								showButtons
-							/>
-						</div>
+		<Dialog
+			header="Haut, Bas, Cyclone et Typhon"
+			position="bottom-left"
+			modal={false}
+			visible={true}
+			className="cloudWindow"
+			keepInViewport={false}
+			dismissableMask={false}
+			closable={false}>
+			<div className="grid p-fluid col-12 ">
+				<div className="col-6">
+					<div className="my-2">
+						<label htmlFor="stacked">Vitesse</label>
+						<InputNumber
+							inputId="stacked"
+							value={props.vitesse}
+							onValueChange={handleChangeVitesse}
+							showButtons
+						/>
+					</div>
+					<div className="my-2">
 						<h5>Direction</h5>
 						<Dropdown
 							value={dir2}
@@ -142,67 +142,67 @@ function Window(props) {
 							optionLabel="name"
 							placeholder="Direction"
 						/>
-						<div>
-							<h5>Texte</h5>
-							<InputText
-								value={props.texte}
-								onChange={handleChangeTexte}
-								placeholder="Texte"
-							/>
-						</div>
 					</div>
-					<div className="col-6 grid p-fluid">
-						{centresImages.map((image, key) => (
-							<div className="grid p-fluid" key={key}>
-								<div className="col-6">
-									<Button
-										className="p-button-text"
-										name={image[0].name}
-										onClick={handleChangeName}>
-										<img
-											src={image[0].src}
-											alt=""
-											width="30px"
-											height="30px"
-											style={{ pointerEvents: 'none' }}></img>
-									</Button>
-								</div>
-								<div className="col-6">
-									<Button
-										className="p-button-text"
-										name={image[1].name}
-										onClick={handleChangeName}>
-										<img
-											src={image[1].src}
-											alt=""
-											width="30px"
-											height="30px"
-											style={{ pointerEvents: 'none' }}></img>
-									</Button>
-								</div>
+					<div className="my-2">
+						<h5>Texte</h5>
+						<InputText
+							value={props.texte}
+							onChange={handleChangeTexte}
+							placeholder="Texte"
+						/>
+					</div>
+				</div>
+				<div className="col-6 grid p-fluid">
+					{centresImages.map((image, key) => (
+						<div className="grid p-fluid" key={key}>
+							<div className="col-6">
+								<Button
+									className="p-button-text"
+									name={image[0].name}
+									onClick={handleChangeName}>
+									<img
+										src={image[0].src}
+										alt=""
+										width="30px"
+										height="30px"
+										style={{ pointerEvents: 'none' }}></img>
+								</Button>
 							</div>
-						))}
-					</div>
+							<div className="col-6">
+								<Button
+									className="p-button-text"
+									name={image[1].name}
+									onClick={handleChangeName}>
+									<img
+										src={image[1].src}
+										alt=""
+										width="30px"
+										height="30px"
+										style={{ pointerEvents: 'none' }}></img>
+								</Button>
+							</div>
+						</div>
+					))}
 				</div>
+			</div>
 
-				<div className="col-12 grid p-fluid">
-					<div className="col-6">
-						<Button
-							label="Confirmer"
-							className="p-button-warning"
-							onClick={handleConfirm}
-						/>
-					</div>
-					<div className="col-6">
-						<Button
-							label="Annuler"
-							className="p-button-secondary"
-							onClick={handleCancel}
-						/>
-					</div>
+			<div className="col-12 grid p-fluid">
+				<div className="col-6">
+					<Button
+						label="Confirmer"
+						className="p-button-warning"
+						onClick={handleConfirm}
+					/>
 				</div>
-			</Dialog>
-		</>
+				<div className="col-6">
+					<Button
+						label="Annuler"
+						className="p-button-secondary"
+						onClick={handleCancel}
+					/>
+				</div>
+			</div>
+		</Dialog>
 	);
 }
 
