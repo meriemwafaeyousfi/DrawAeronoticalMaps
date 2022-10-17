@@ -1,18 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
-import TextField from '@mui/material/TextField';
-import Radio from '@mui/material/Radio';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import ToggleButton from '@mui/material/ToggleButton';
+import { useCallback, useState } from 'react';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
 import './Window.css';
 import { styled } from '@mui/material/styles';
-import { centresImages, directions, directions2 } from 'Helpers/data';
+import { centresImages, directions2 } from 'Helpers/data';
 import { useDispatch, useSelector } from 'react-redux';
 import { InputNumber } from 'primereact/inputnumber';
 import { Dropdown } from 'primereact/dropdown';
@@ -73,22 +63,6 @@ function Window(props) {
 		},
 		[props, selectedFeature]
 	);
-
-	const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
-		'& .MuiToggleButtonGroup-grouped': {
-			margin: theme.spacing(0.5),
-			border: 1,
-			'&.Mui-disabled': {
-				border: 1,
-			},
-			'&:not(:first-of-type)': {
-				borderRadius: theme.shape.borderRadius,
-			},
-			'&:first-of-type': {
-				borderRadius: theme.shape.borderRadius,
-			},
-		},
-	}));
 
 	const handleConfirm = useCallback(() => {
 		createCentreAction(map, mapCoordinate, selectedFeature);
@@ -157,7 +131,12 @@ function Window(props) {
 						<div className="grid p-fluid" key={key}>
 							<div className="col-6">
 								<Button
-									className="p-button-text"
+									className={
+										selectedFeature &&
+										selectedFeature.get('nameCentre') === image[0].name
+											? 'p-button-outlined p-button-warning'
+											: 'p-button-text'
+									}
 									name={image[0].name}
 									onClick={handleChangeName}>
 									<img
@@ -170,7 +149,12 @@ function Window(props) {
 							</div>
 							<div className="col-6">
 								<Button
-									className="p-button-text"
+									className={
+										selectedFeature &&
+										selectedFeature.get('nameCentre') === image[1].name
+											? 'p-button-outlined p-button-warning'
+											: 'p-button-text'
+									}
 									name={image[1].name}
 									onClick={handleChangeName}>
 									<img
