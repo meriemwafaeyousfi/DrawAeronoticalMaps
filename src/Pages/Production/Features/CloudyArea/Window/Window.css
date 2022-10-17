@@ -36,8 +36,14 @@
 	width: 50%;
 }
 
+.d_flex {
+	display: flex;
+}
 .col_4 {
 	width: 33.33%;
+}
+.col_6 {
+	width: 50%;
 }
 
 .col_8 {
