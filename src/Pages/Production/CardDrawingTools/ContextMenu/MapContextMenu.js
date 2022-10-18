@@ -12,9 +12,11 @@ import {
 	cutFeature,
 	pastFeature,
 	verticesCheck,
+	verticesCheckPolygon,
 } from 'Mapping/Map';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedFeature } from '../redux/actions';
+import { addAHandleCat, deleteAHandleCat } from 'Mapping/Features/CAT/CAT';
 
 function MapContextMenu() {
 	const map = useSelector((state) => state.map);
@@ -52,12 +54,36 @@ function MapContextMenu() {
 			},
 		},
 		{
+			label: 'Ajouter un poignée',
+			icon: 'ajouter-poingee',
+			visible:
+				!!rightClickedFeature &&
+				rightClickedFeature.get('feature_type') === 'CAT' &&
+				!vertex &&
+				rightClickedFeature === selectedFeature,
+			command: () => {
+				addAHandle(eventCoordiantes, rightClickedFeature);
+			},
+		},
+		{
 			label: 'Supprimer le poignée',
 			icon: 'supprimer-poingee',
 			visible:
 				!!rightClickedFeature &&
 				(rightClickedFeature.get('feature_type') === 'zone_nuageuse' ||
 					rightClickedFeature.get('feature_type') === 'courant_front') &&
+				vertex &&
+				rightClickedFeature === selectedFeature,
+			command: () => {
+				deleteAHandle(eventCoordiantes, rightClickedFeature);
+			},
+		},
+		{
+			label: 'Supprimer le poignée',
+			icon: 'supprimer-poingee',
+			visible:
+				!!rightClickedFeature &&
+				rightClickedFeature.get('feature_type') === 'CAT' &&
 				vertex &&
 				rightClickedFeature === selectedFeature,
 			command: () => {
@@ -158,7 +184,7 @@ function MapContextMenu() {
 				map.forEachFeatureAtPixel(
 					map.getEventPixel(event),
 					(feature, layer) => {
-						if (feature.getGeometry().getType() !== 'Point') {
+						if (feature.getGeometry().getType() === 'LineString') {
 							setLayer(layer);
 							setRightClickedFeature(feature);
 							setVertex(verticesCheck(eventCoordinate, feature));
