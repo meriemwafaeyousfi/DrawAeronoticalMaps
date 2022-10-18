@@ -7,6 +7,7 @@ import { Style, Fill, Stroke } from "ol/style";
 import { MultiPoint, LineString } from "ol/geom";
 import { frontStyles, frontStyles2 } from "./FrontStyles";
 import { distance } from "ol/coordinate";
+
 export const frontFlowDrawingStartEvent = new CustomEvent(
   "courant_front:start"
 );

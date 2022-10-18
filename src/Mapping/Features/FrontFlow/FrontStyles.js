@@ -170,8 +170,7 @@ const getPointStyle = (styleCache, point, i, src) => {
 };
 
 function getShapeStyle(feature, coordinates, i, index, type, reverse) {
-  console.log("type is", type);
-  console.log("inside getShape",reverse);
+ 
   const {
     end: end,
     rotation: rotation,
@@ -451,10 +450,10 @@ export function frontStyles2(feature, resolution) {
       if (elm && Array.isArray(elm)) {
         elm.map((style) => styles.push(style));
       } else if (elm) styles.push(elm);
-      console.log("arrow is ", feature.get("arrow"));
+   
       const seg = feature.get("seg_selected");
       const arrow = feature.get("arrow");
-      console.log("arrow in styles is, ", arrow);
+  
       arrow.map((elmt, index) => {
         if (
           feature.getGeometry().getCoordinates() &&
@@ -467,9 +466,7 @@ export function frontStyles2(feature, resolution) {
           let dx = dy / Math.tan(rad);
           let pointEnd = [poigne[0] + dx, poigne[1] + dy];
           let line_arrow = new LineString([poigne, pointEnd]);
-          console.log("curved is", curved);
           const idx = (getClosestPointToCoords(curved.geometry.coordinates, poigne));
-          console.log("idx of poigne is", idx);
            let end = [curved.geometry.coordinates[idx-1][0],curved.geometry.coordinates[idx-1][1]];
           let start = [curved.geometry.coordinates[idx-2][0],curved.geometry.coordinates[idx-2][1]];
           let cos = calculateCos(poigne,end)
@@ -484,10 +481,6 @@ export function frontStyles2(feature, resolution) {
             deg = 0;
           }
           }
-        /* if(!orientation){
-            deg = deg + Math.PI
-          }*/
-          console.log("deg is ", deg)
           const style = new Style({
             geometry: line_arrow,
             stroke: new Stroke({

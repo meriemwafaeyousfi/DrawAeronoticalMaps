@@ -12,6 +12,16 @@ import {
   deleteFrontFeature,
   inverseFeature,
 } from "../../../../../Mapping/Features/FrontFlow/FrontFlow";
+import type1 from "../Window/images/multiTriangle.svg"
+import type2 from "../Window/images/multiHalfCircles.svg";
+import type3 from"../Window/images/circleTrianglePink.svg";
+import type4 from "../Window/images/circleTriangleUpDown.svg";
+import type5 from "../Window/images/inclinedMultiLines.svg";
+import type6 from "../Window/images/line.svg";
+import type7 from "../Window/images/twoLines.svg";
+import type8 from "../Window/images/circleTrianglePurple.svg";
+import type9 from "../Window/images/circleTriangleNotFillPurple.svg";
+import type10 from"../Window/images/circleNotFillTrinaglePurple.svg"
 
 function Window({ vectorLayer }) {
   const directions = [
@@ -20,7 +30,8 @@ function Window({ vectorLayer }) {
     320, 330, 340, 350, 360,
   ];
 
-  const types = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const types = [1,2,3,4,5,6,7,8,9,10]
+  console.log("types are", types)
   const map = useSelector((state) => state.map);
   const selectedFeature = useSelector((state) => state.selectedFeature);
   const disptach = useDispatch();
@@ -41,7 +52,6 @@ function Window({ vectorLayer }) {
   const editHandler = (event) => {
     const { value } = event.target;
     setEdit(value);
-    selectedFeature.set("editState", value);
   };
 
   useEffect(() => {
@@ -124,28 +134,25 @@ function Window({ vectorLayer }) {
   }, [backupFeature, disptach, map, selectedFeature, vectorLayer]);
 
   const handleChange = useCallback(
-    (event) => {
+    (val) => {
       if (selectedFeature) {
+    
         const seg = selectedFeature.get("seg_selected");
+        console.log("event val",val);
         let arr = [];
         setShapeTypes((state) => {
           arr = state.map((elm, index) => {
-            if (index + 1 === seg) {
-              return Number(event.target.value);
-            } else return elm;
+            if (editState === "all") {
+              return (val);
+            } else {
+              if (index + 1 === seg) {
+                return (val);
+              } else return elm;
+            }
           });
-
           selectedFeature.set("type", arr);
           return arr;
         });
-        if (editState === "all") {
-          setShapeTypes((state) => {
-            arr = state.map(() => Number(event.target.value));
-
-            selectedFeature.set("type", arr);
-            return arr;
-          });
-        }
       }
     },
     [selectedFeature, editState]
@@ -155,28 +162,18 @@ function Window({ vectorLayer }) {
     (event) => {
       const { id, value } = event.target;
       const seg = selectedFeature.get("seg_selected");
-      console.log("seg is", seg);
       let arr = [];
       setArrowInfo((state) => {
         arr = state.map((elm, index) => {
-          if (index + 1 === seg) {
+          if (editState === "all") {
+            return { ...elm, [id]: id === "direction" ? Number(value) : value };
+          } else if (index + 1 === seg) {
             return { ...elm, [id]: id === "direction" ? Number(value) : value };
           } else return elm;
         });
-
         selectedFeature.set("arrow", arr);
         return arr;
       });
-      if (editState === "all") {
-        setArrowInfo((state) => {
-          arr = state.map((elm, index) => {
-            return { ...elm, [id]: id === "direction" ? Number(value) : value };
-          });
-
-          selectedFeature.set("arrow", arr);
-          return arr;
-        });
-      }
     },
     [selectedFeature, editState]
   );
@@ -186,7 +183,6 @@ function Window({ vectorLayer }) {
       map.getViewport().removeEventListener("click", singleClick);
       map.getViewport().addEventListener("click", singleClick);
       setBackupFeature(selectedFeature.clone());
-      console.log("arrowInfo", arrowInfo);
     } else {
       console.log("we go heere");
     }
@@ -195,28 +191,20 @@ function Window({ vectorLayer }) {
   const reverseHandler = useCallback(
     (event) => {
       const seg = selectedFeature.get("seg_selected");
-      console.log("seg is", seg);
       let arr = [];
       setReverse((state) => {
         arr = state.map((elm, index) => {
-          if (index + 1 === seg) {
+          if (editState === "all") {
             return !elm;
-          } else return elm;
+          } else {
+            if (index + 1 === seg) {
+              return !elm;
+            } else return elm;
+          }
         });
-        console.log("reverse", arr);
         selectedFeature.set("reverse", arr);
         return arr;
       });
-      if (editState === "all") {
-        setReverse((state) => {
-          arr = state.map((elm) => {
-            return !elm;
-          });
-          console.log("reverse", arr);
-          selectedFeature.set("reverse", arr);
-          return arr;
-        });
-      }
     },
     [selectedFeature, editState]
   );
@@ -236,11 +224,38 @@ function Window({ vectorLayer }) {
     >
       <div className="frontWindowContent">
         <div className="typesContainer">
-          {types.map((type) => (
-            <button value={type} onClick={handleChange}>
-              type{type}
-            </button>
-          ))}
+          
+            
+              <button value={1} onClick={() => handleChange(1)}>
+                 <img src={type1} />
+              </button>
+              <button value={2} onClick={() => handleChange(2)}>
+                 <img src={type2} />
+              </button>
+              <button value={3} onClick={() => handleChange(3)}>
+                 <img src={type3} />
+              </button>
+              <button value={4} onClick={() => handleChange(4)}>
+                 <img src={type4} />
+              </button>
+              <button value={5} onClick={() => handleChange(5)}>
+                 <img src={type5} />
+              </button>
+              <button value={6} onClick={() => handleChange(6)}>
+                 <img src={type6} />
+              </button>
+              <button value={7} onClick={() => handleChange(7)}>
+                <img src={type7} />
+              </button>
+              <button value={8} onClick={() => handleChange(8)}>
+                <img src={type8} />
+              </button>
+              <button value={9} onClick={() => handleChange(9)}>
+                <img src={type9} />
+              </button>
+              <button value={10} onClick={() => handleChange(10)}>
+                <img src={type10} />
+              </button>
         </div>
         <div>
           <div className="title">Appliquer à ce :</div>
