@@ -137,3 +137,36 @@ export const directions2 = [
 	{ name: 350, code: '350' },
 	{ name: 360, code: '360' },
 ];
+
+export const forces = [
+	{
+		value: 'Modere',
+		label: 'Modere',
+		src: '/Icons/CAT/Modere.png',
+	},
+	{
+		value: 'Severe',
+		label: 'Severe',
+		src: '/Icons/CAT/Severe.png',
+	},
+
+	{
+		value: 'Mod ISOL Severe',
+		label: 'Mod ISOL Severe',
+		src: '/Icons/CAT/ModISOLSevere.png',
+	},
+	{
+		value: 'Mod OCNL Severe',
+		label: 'Mod OCNL Severe',
+		src: '/Icons/CAT/ModOCNLSevere.png',
+	},
+	{
+		value: 'Mod FRQ Severe',
+		label: 'Mod FRQ Severe',
+		src: '/Icons/CAT/ModFRQSevere.png',
+	},
+];
+
+let FI = [];
+forces.forEach((force) => (FI[force.value] = force.src));
+export const forcesImages = FI;

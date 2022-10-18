@@ -110,13 +110,36 @@ function MapContextMenu() {
 		{
 			label: 'Supprimer la figure',
 			icon: 'supprimer-figure',
-			disabled:
-				!rightClickedFeature ||
-				rightClickedFeature !== selectedFeature ||
-				(rightClickedFeature.get('feature_type') !== 'zone_nuageuse' &&
-					rightClickedFeature.get('feature_type') !== 'courant_front'),
+			visible:
+				!!rightClickedFeature &&
+				rightClickedFeature !== selectedFeature &&
+				rightClickedFeature.get('feature_type') === 'zone_nuageuse',
 			command: () => {
 				deleteClouds(selectedFeature, layer);
+				disptach(setSelectedFeature(null));
+			},
+		},
+		{
+			label: 'Supprimer la figure',
+			icon: 'supprimer-figure',
+			visible:
+				!!rightClickedFeature &&
+				rightClickedFeature === selectedFeature &&
+				rightClickedFeature.get('feature_type') === 'courant_front',
+			command: () => {
+				layer.getSource().removeFeature(rightClickedFeature);
+				disptach(setSelectedFeature(null));
+			},
+		},
+		{
+			label: 'Supprimer la figure',
+			icon: 'supprimer-figure',
+			visible:
+				!!rightClickedFeature &&
+				rightClickedFeature === selectedFeature &&
+				rightClickedFeature.get('feature_type') === 'CAT',
+			command: () => {
+				layer.getSource().removeFeature(rightClickedFeature);
 				disptach(setSelectedFeature(null));
 			},
 		},
