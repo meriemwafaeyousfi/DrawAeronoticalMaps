@@ -34,7 +34,8 @@ function MapContextMenu() {
 			icon: 'ajouter-poingee',
 			visible:
 				!!rightClickedFeature &&
-				rightClickedFeature.get('feature_type') === 'zone_nuageuse' &&
+				(rightClickedFeature.get('feature_type') === 'zone_nuageuse'||
+				rightClickedFeature.get('feature_type') === 'jet' ) &&
 				!vertex &&
 				rightClickedFeature === selectedFeature,
 			command: () => {
@@ -71,7 +72,8 @@ function MapContextMenu() {
 			visible:
 				!!rightClickedFeature &&
 				(rightClickedFeature.get('feature_type') === 'zone_nuageuse' ||
-					rightClickedFeature.get('feature_type') === 'courant_front') &&
+					rightClickedFeature.get('feature_type') === 'courant_front'||
+					rightClickedFeature.get('feature_type') === 'jet') &&
 				vertex &&
 				rightClickedFeature === selectedFeature,
 			command: () => {

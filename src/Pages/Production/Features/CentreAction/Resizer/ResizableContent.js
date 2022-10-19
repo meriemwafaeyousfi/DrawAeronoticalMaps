@@ -1,34 +1,34 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import ResizableRect from "react-resizable-rotatable-draggable";
+import { useDispatch, useSelector } from 'react-redux';
 
 const ResizableContent = (props) => {
   const [width, setWidth] = useState(80);
   const [height, setHeight] = useState(80);
- 
   const [rotateAngle, setRotateAngle] = useState(props.rotateAngle);
+  const selectedFeature = useSelector((state) => state.selectedFeature)
+  const map = useSelector((state) => state.map)
+  const dispatch = useDispatch()
 
   const contentStyle = {
     top: props.top,
     left : props.left,
-    width : props.widthResizer,
-    height : props.heightResizer,
+    width : props.widthImg,
+    height : props.heightImg,
     position: "absolute",
     transform: `rotate(${rotateAngle}deg)`
   };
 
   const handleResize = (style, isShiftKey, type) => {
     const { top, left, width, height } = style
-    if(!props.resizeActive){
-        props.setResizeActive(true)
-    }
-    props.setWidthResizer(Math.round(width))
-    props.setHeightResizer(Math.round(height))
-
-    props.setWidthImg(Math.round(width))
+    props.setWidthImg(Math.round(width)) 
     props.setHeightImg(Math.round(height))
-    
     props.setTop(Math.round(top))
     props.setLeft(Math.round(left))
+    selectedFeature.set('left', Math.round(left))
+    selectedFeature.set('top',Math.round(top))
+    selectedFeature.set('width',Math.round(width))
+    selectedFeature.set('height',Math.round(height))
   }
 
   const handleRotate = (rotateAngle) => {
@@ -36,12 +36,12 @@ const ResizableContent = (props) => {
   }
 
   const handleDrag = (deltaX, deltaY) => {
-    if(!props.resizeActive){
-      props.setResizeActive(true)
-  }
     props.setLeft(props.left + deltaX)
     props.setTop(props.top + deltaY)
+    selectedFeature.set('left',props.left + deltaX)
+    selectedFeature.set('top',props.top + deltaY)
   }
+
 
   return (
     <Fragment>
@@ -50,9 +50,9 @@ const ResizableContent = (props) => {
         top={props.top}
         left={props.left}
         minWidth={10}
-        width={props.widthResizer}
+        width={props.widthImg}
         minHeight={10}
-        height={props.heightResizer}
+        height={props.heightImg}
         onDrag={handleDrag}
         onResize={handleResize}
         zoomable="n, e, w, s, nw, ne, se, sw"

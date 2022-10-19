@@ -21,69 +21,73 @@ import {
 import { distance } from 'ol/coordinate';
 import { feature } from '@turf/turf';
 import Overlay from 'ol/Overlay';
-import { setSelectedFeature } from 'Pages/Production/CardDrawingTools/redux/actions';
+import { setSelectedFeature , setModal, setMapCoordinate} from '../../../Pages/Production/CardDrawingTools/redux/actions'
 
 export const centreActionVectorLayer = () => {
 	return new VectorLayer({
 		title: 'Centre Action',
-		source: new VectorSource(),
-	});
-};
-
-export const createCentreAction = (map, mapCoordinate) => {
-	const resizer = document.getElementById('resizer');
-	resizer.style.display = 'none';
-	let c = document.getElementById('mnode').firstChild;
-	let cc = c.cloneNode(true);
-	cc.className = 'Resizer';
-	cc.firstChild.className = 'varbox content2';
-	let element = cc;
-	let overlayElt = new Overlay({
-		position: mapCoordinate,
-		element: element,
-		stopEvent: false,
-	});
-	let clickTimes = 0;
-	let timer = null;
-	clearTimeout(timer);
-	element.onclick = (e) => {
+		source: new VectorSource()
+	})
+}
+    
+export const createCentreAction = (map,mapCoordinate,overlay,dispatch) => { 
+        const resizer = document.getElementById("resizer")
+		resizer.style.display = 'none'
+		let c = document.getElementById('mnode').firstChild
+		let cc = c.cloneNode(true)
+		cc.className = "Resizer"
+		cc.firstChild.className = "varbox content2"  
+		let element = cc
+		//changer la position de ce overlay and set it in selectedFeature
+		overlay.setElement(element)
+		overlay.setPosition(mapCoordinate)
+		overlay.set('coordinates', mapCoordinate)
+		let clickTimes = 0
+		let timer = null
+		clearTimeout(timer)
+		element.onclick = (e) =>{
 		//on single click
-		timer = setTimeout(() => {
-			if (clickTimes === 1) {
-				console.log('signle click');
-				setSelectedFeature(overlayElt);
-				clearTimeout(timer);
-				selectCentreAction(map, overlayElt);
-				clickTimes = 0;
+		timer = setTimeout(() => { 
+			if(clickTimes === 1){
+				dispatch(setSelectedFeature(overlay))
+				clearTimeout(timer)
+				clickTimes = 0
 			}
-		}, 200);
-		clickTimes++;
+		}, 200)
+		clickTimes++
 		//on double click
-		if (clickTimes === 2) {
-			console.log('dblclickkkkkkkkkkk');
-			setSelectedFeature(overlayElt);
-			clearTimeout(timer);
-			clickTimes = 0;
+			if (clickTimes === 2) {
+				//ask about this is it okay to dispatch values from here..?
+				dispatch(setSelectedFeature(overlay))
+				dispatch(setModal('centre_action'))
+				dispatch(setMapCoordinate(mapCoordinate))
+				clearTimeout(timer)
+				clickTimes = 0
+			}
 		}
-	};
-	overlayElt.set('feature_type', 'centre_action');
-	map.addOverlay(overlayElt);
-	return overlayElt;
+		map.addOverlay(overlay)
+		return
 };
 
-export const drawCentreAction = (vectorSource) => {
-	return;
-};
 
-export const modifyCentreAction = (select, cvl) => {
-	return;
-};
+export const modifyCentreAction = () => {
+	return 
+}
 
-export const selectCentreAction = (map, overlay) => {
-	let element = document.getElementById('resizer');
-	element.style.display = 'block';
-	map.removeOverlay(overlay);
-	return;
-};
+export const selectCentreAction = (map,overlay, resizer) => {
+	map.removeOverlay(overlay)
+	let element = document.getElementById("resizer")
+    element.style.display = 'block'
+	resizer.setPosition(overlay.get('coordinates'))
+	return 
+}
+
+export const deselectCentreAction = (map,mapCoordinate,overlay,dispatch) => {
+	let element = document.getElementById("resizer")
+    element.style.display = "none"
+	createCentreAction(map,mapCoordinate,overlay,dispatch)
+	return 
+}
 
 export const centreActionDrawingON = (map) => {};
+

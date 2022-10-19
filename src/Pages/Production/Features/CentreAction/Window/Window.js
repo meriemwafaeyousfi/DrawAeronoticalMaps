@@ -65,7 +65,7 @@ function Window(props) {
 	);
 
 	const handleConfirm = useCallback(() => {
-		createCentreAction(map, mapCoordinate, selectedFeature);
+		createCentreAction(map, mapCoordinate, selectedFeature,dispatch);
 		//init the states
 		props.setNameCentre('c');
 		props.setVitesse(null);
