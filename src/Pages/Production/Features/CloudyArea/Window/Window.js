@@ -259,7 +259,7 @@ function Window({ vectorLayer }) {
 						<textarea value={text} onChange={handleText} />
 						<div className="input_field">
 							<label htmlFor="alignement">Alignement</label>
-							<select onChange={handleAlignement} value={alignement}>
+							<select  >
 								<option value={'Gauche'}>Gauche</option>
 								<option value={'Centre'}>Centre</option>
 								<option value={'Droite'}>Droite</option>

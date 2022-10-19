@@ -7,48 +7,39 @@ import {
   setOption,
   setSelectedFeature,
 } from "Pages/Production/CardDrawingTools/redux/actions";
-import { Style, Icon } from "ol/style";
-import { Point } from "ol/geom";
 import { getSelectedSegment } from "Mapping/Features/FrontFlow/FrontStyles";
 import {
   deleteFrontFeature,
   inverseFeature,
 } from "Mapping/Features/FrontFlow/FrontFlow";
+import type1 from "../Window/images/multiTriangle.svg"
+import type2 from "../Window/images/multiHalfCircles.svg";
+import type3 from"../Window/images/circleTrianglePink.svg";
+import type4 from "../Window/images/circleTriangleUpDown.svg";
+import type5 from "../Window/images/inclinedMultiLines.svg";
+import type6 from "../Window/images/line.svg";
+import type7 from "../Window/images/twoLines.svg";
+import type8 from "../Window/images/circleTrianglePurple.svg";
+import type9 from "../Window/images/circleTriangleNotFillPurple.svg";
+import type10 from"../Window/images/circleNotFillTrinaglePurple.svg"
 
-import Feature from "ol/Feature";
-import { LineString } from "ol/geom";
-import { preventDefault } from "ol/events/Event";
-
-function Window({ vectorLayer, sff }) {
-  const src2 =
-    "data:image/svg+xml,%3Csvg fill='white' width='60px' id='Layer_1' data-name='Layer 1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 25'%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bfill:red;%7D%3C/style%3E%3C/defs%3E%3Ctitle%3E01%3C/title%3E%3Cpath class='cls-1' d='M50,36.5H0a25,25,0,0,1,50,0Z' transform='translate(0 -11.5)'/%3E%3C/svg%3E";
+function Window({ vectorLayer }) {
   const directions = [
     0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160,
     170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310,
     320, 330, 340, 350, 360,
   ];
 
-  const imageStyle = new Style({
-    image: new Icon({
-      anchor: [1, 1],
-      src: src2,
-      scale: 0.19,
-    }),
-    geometry: new Point([]),
-  });
-
+  const types = [1,2,3,4,5,6,7,8,9,10]
+  console.log("types are", types)
   const map = useSelector((state) => state.map);
   const selectedFeature = useSelector((state) => state.selectedFeature);
   const disptach = useDispatch();
+  const [backupFeature, setBackupFeature] = useState(null);
+  const [selectedSeg, setSelectedSeg] = useState(1);
+  const [editState, setEdit] = useState("one");
   const [shapeTypes, setShapeTypes] = useState([]);
-  const [speed, setSpeed] = useState();
-  const [direction, setDirection] = useState("20");
-  const [color, setColor] = useState();
-  const arrow = {
-    direction: undefined,
-    speed: null,
-    color: "#000",
-  };
+  const [reverseBtn, setReverseBtn] = useState(false);
   const [arrowInfo, setArrowInfo] = useState([
     {
       direction: 0,
@@ -56,17 +47,25 @@ function Window({ vectorLayer, sff }) {
       color: "#000",
     },
   ]);
+  const [reverse, setReverse] = useState([]);
+
+  const editHandler = (event) => {
+    const { value } = event.target;
+    setEdit(value);
+  };
 
   useEffect(() => {
     if (selectedFeature) {
       const types = selectedFeature.get("type");
       let numSeg = selectedFeature?.getGeometry().getCoordinates().length - 1;
+      // types ------------------------
       if (types && types.length !== 0) {
         setShapeTypes(types);
       } else {
         selectedFeature.set("type", new Array(numSeg).fill(1));
         setShapeTypes(new Array(numSeg).fill(1));
       }
+      // arrow------------------------
       const arrow = selectedFeature.get("arrow");
       if (arrow && types.length !== 0) {
         setArrowInfo(arrow);
@@ -87,12 +86,17 @@ function Window({ vectorLayer, sff }) {
           })
         );
       }
+      //reverse ----------------------------------
+      const reverse = selectedFeature.get("reverse");
+      if (reverse && reverse.length !== 0) {
+        setReverse(reverse);
+      } else {
+        selectedFeature.set("reverse", new Array(numSeg).fill(false));
+        setReverse(new Array(numSeg).fill(false));
+      }
     }
   }, [selectedFeature]);
 
-  const [backupFeature, setBackupFeature] = useState(null);
-
-  const [selectedSeg, setSelectedSeg] = useState(1);
   const singleClick = useCallback(
     (event) => {
       map.forEachFeatureAtPixel(
@@ -127,56 +131,52 @@ function Window({ vectorLayer, sff }) {
       disptach(setOption(""));
       disptach(setModal(""));
     }
-
-    //map.getViewport().removeEventListener("click", singleClick);
   }, [backupFeature, disptach, map, selectedFeature, vectorLayer]);
 
   const handleChange = useCallback(
-    (event) => {
+    (val) => {
       if (selectedFeature) {
+    
         const seg = selectedFeature.get("seg_selected");
+        console.log("event val",val);
         let arr = [];
         setShapeTypes((state) => {
           arr = state.map((elm, index) => {
-            if (index + 1 === seg) {
-              return Number(event.target.value);
-            } else return elm;
+            if (editState === "all") {
+              return (val);
+            } else {
+              if (index + 1 === seg) {
+                return (val);
+              } else return elm;
+            }
           });
-          console.log("arr", arr);
           selectedFeature.set("type", arr);
           return arr;
         });
       }
     },
-    [selectedFeature]
+    [selectedFeature, editState]
   );
-  const arrowHandleChange = useCallback((event) => {
-    const { id, value } = event.target;
-    const seg = selectedFeature.get("seg_selected");
-    console.log("seg is", seg);
-    let arr = [];
-    setArrowInfo((state) => {
-      arr = state.map((elm, index) => {
-        if (index + 1 === seg) {
-          return { ...elm, [id]: id === "direction" ? Number(value) : value };
-        } else return elm;
-      });
-      console.log("arr", arr);
-      selectedFeature.set("arrow", arr);
-      return arr;
-    });
-  }, []);
 
-  const directionHandleChange = (event) => {
-    const { value } = event.target;
-    console.log("value direction", value);
-    setDirection(event.target.value);
-  };
-  const speedHandleChange = useCallback((event) => {}, []);
-  const addArrowHandler = useCallback(() => {
-    if (selectedFeature) {
-    }
-  }, [selectedFeature]);
+  const arrowHandleChange = useCallback(
+    (event) => {
+      const { id, value } = event.target;
+      const seg = selectedFeature.get("seg_selected");
+      let arr = [];
+      setArrowInfo((state) => {
+        arr = state.map((elm, index) => {
+          if (editState === "all") {
+            return { ...elm, [id]: id === "direction" ? Number(value) : value };
+          } else if (index + 1 === seg) {
+            return { ...elm, [id]: id === "direction" ? Number(value) : value };
+          } else return elm;
+        });
+        selectedFeature.set("arrow", arr);
+        return arr;
+      });
+    },
+    [selectedFeature, editState]
+  );
 
   useEffect(() => {
     if (selectedFeature) {
@@ -189,60 +189,100 @@ function Window({ vectorLayer, sff }) {
     }
   }, [selectedFeature, arrowInfo]);
 
-  const types = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  const inverserHandler = useCallback(() => {
-    if (selectedFeature) {
-      inverseFeature(selectedFeature);
-    }
-  }, [selectedFeature]);
+  const reverseHandler = useCallback(
+    (event) => {
+      const seg = selectedFeature.get("seg_selected");
+      let arr = [];
+      setReverse((state) => {
+        arr = state.map((elm, index) => {
+          if (editState === "all") {
+            return !elm;
+          } else {
+            if (index + 1 === seg) {
+              return !elm;
+            } else return elm;
+          }
+        });
+        selectedFeature.set("reverse", arr);
+        return arr;
+      });
+    },
+    [selectedFeature, editState]
+  );
 
   return (
     <Dialog
       header="Front"
-      headerClassName="cloudWindowHeader"
-      contentClassName="cloudWindowContent"
+      headerClassName="frontWindowHeader"
+      contentClassName="frontWindowContent"
       position="bottom-left"
       modal={false}
       visible={true}
-      className="cloudWindow"
+      className="frontWindow"
       keepInViewport={false}
       dismissableMask={false}
       closable={false}
     >
-      <div className="cloudWindowContent">
-        <div>
-          {types.map((type) => (
-            <button value={type} onClick={handleChange}>
-              type{type}
-            </button>
-          ))}
+      <div className="frontWindowContent">
+        <div className="typesContainer">
+          
+            
+              <button value={1} onClick={() => handleChange(1)}>
+                 <img src={type1} />
+              </button>
+              <button value={2} onClick={() => handleChange(2)}>
+                 <img src={type2} />
+              </button>
+              <button value={3} onClick={() => handleChange(3)}>
+                 <img src={type3} />
+              </button>
+              <button value={4} onClick={() => handleChange(4)}>
+                 <img src={type4} />
+              </button>
+              <button value={5} onClick={() => handleChange(5)}>
+                 <img src={type5} />
+              </button>
+              <button value={6} onClick={() => handleChange(6)}>
+                 <img src={type6} />
+              </button>
+              <button value={7} onClick={() => handleChange(7)}>
+                <img src={type7} />
+              </button>
+              <button value={8} onClick={() => handleChange(8)}>
+                <img src={type8} />
+              </button>
+              <button value={9} onClick={() => handleChange(9)}>
+                <img src={type9} />
+              </button>
+              <button value={10} onClick={() => handleChange(10)}>
+                <img src={type10} />
+              </button>
         </div>
         <div>
-          <div className="text">Appliquer à ce :</div>
-          <form>
-            <fieldset
-              id="group1"
-              //value={props.inverseSeg}
-              // onChange={(e) => {props.setInverseSeg(e.target.value);console.log("inverseg in radio",props.inverseSeg) }
-            >
-              <label htmlFor="color">ce Segment</label>
-              <input
-                type="radio"
-                value="one"
-                name="group1"
-                label="ce segment"
-              />
-              <label htmlFor="color">Tout le front</label>
-              <input
-                type="radio"
-                value="all"
-                name="group1"
-                label="tout le front"
-              />
-            </fieldset>
-          </form>
-          <div className="input_field">
-            <label htmlFor="color">Couleur</label>
+          <div className="title">Appliquer à ce :</div>
+          <div className="input-field-front" onChange={editHandler}>
+            <input
+              type="radio"
+              value="one"
+              name="group1"
+              checked={editState === "one"}
+            />
+            <label htmlFor="color" className="form-control">
+              ce Segment
+            </label>
+
+            <input
+              type="radio"
+              value="all"
+              name="group1"
+              checked={editState === "all"}
+            />
+            <label htmlFor="color" className="form-control">
+              Tout le front
+            </label>
+          </div>
+          <div className="title">coleur du text</div>
+          <div className="input-field-front">
             <input
               type="color"
               id="color"
@@ -254,11 +294,10 @@ function Window({ vectorLayer, sff }) {
               onChange={arrowHandleChange}
             />
           </div>
-          <div className="input_field">
-            <label>Direction</label>
+          <div className="title">direction</div>
+          <div className="input-field-front">
             <select
               id="direction"
-              style={{ width: "100px" }}
               label="Style"
               value={
                 arrowInfo[selectedSeg - 1]
@@ -277,8 +316,8 @@ function Window({ vectorLayer, sff }) {
             </select>
           </div>
         </div>
-        <div className="input_field">
-          <label htmlFor="width">vitesse</label>
+        <div className="title">vitesse</div>
+        <div className="input-field-front">
           <input
             type="number"
             id="speed"
@@ -290,16 +329,17 @@ function Window({ vectorLayer, sff }) {
           />
         </div>
         <div>
-          <button onClick={inverserHandler}>inverser</button>
-        </div>
-        <div>
-          <button>add arrow speed</button>
+          <button onClick={reverseHandler} className="inverse-btn">
+            inverser
+          </button>
         </div>
         <div className="confirmation_buttons">
-          <button onClick={handleConfirm}>Confirmer</button>
-        </div>
-        <div>
-          <button onClick={handleCancel}>Annuler</button>
+          <div>
+            <button onClick={handleConfirm}>Confirmer</button>
+          </div>
+          <div>
+            <button onClick={handleCancel}>Annuler</button>
+          </div>
         </div>
       </div>
     </Dialog>

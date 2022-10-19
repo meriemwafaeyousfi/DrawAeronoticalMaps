@@ -169,8 +169,8 @@ const getPointStyle = (styleCache, point, i, src) => {
   }
 };
 
-function getShapeStyle(feature, coordinates, i, index, type) {
-  console.log("type is", type);
+function getShapeStyle(feature, coordinates, i, index, type, reverse) {
+ 
   const {
     end: end,
     rotation: rotation,
@@ -184,12 +184,12 @@ function getShapeStyle(feature, coordinates, i, index, type) {
 
   const pointInfo = {
     end: end,
-    rotation: rotation,
+    rotation: !reverse ? rotation : rotation + Math.PI ,
     seg: segPoint,
   };
   const pointInfo2 = {
     end: end2,
-    rotation: rotation2,
+    rotation: !reverse ? rotation2 : rotation2 + Math.PI ,
     seg: segPoint2,
   };
   switch (type ? type : 1) {
@@ -224,7 +224,8 @@ function getShapeStyle(feature, coordinates, i, index, type) {
         image: new Icon({
           anchor: [0.5, 0.5],
           src: src5_1,
-          scale: 0.2,
+          scale: 0.20,
+        
         }),
         geometry: new Point([]),
       });
@@ -417,6 +418,7 @@ export function frontStyles2(feature, resolution) {
     line.geometry.coordinates = feature.getGeometry().getCoordinates();
     const curved = bezierSpline(line);
     const type = feature.get("type");
+    const reverse = feature.get('reverse');
     if (!type) type = [1];
     segmentsStyles2(feature, curved, type).map((style) => {
       if (Array.isArray(style)) {
@@ -442,97 +444,12 @@ export function frontStyles2(feature, resolution) {
         coordinates,
         i,
         index,
-        type ? type[segPoint - 1] : 1
+        type ? type[segPoint - 1] : 1,
+        reverse ? reverse[segPoint -1] : false
       );
       if (elm && Array.isArray(elm)) {
         elm.map((style) => styles.push(style));
       } else if (elm) styles.push(elm);
-      console.log("arrow is ", feature.get("arrow"));
-      const seg = feature.get("seg_selected");
-      const arrow = feature.get("arrow");
-      console.log("arrow in styles is, ", arrow);
-      arrow.map((elmt, index) => {
-        if (
-          feature.getGeometry().getCoordinates() &&
-          feature.getGeometry().getCoordinates()[index + 1]
-        ) {
-          const poigne = feature.getGeometry().getCoordinates()[index + 1];
-          const long = 600000;
-          const rad = (arrow[index].direction * Math.PI) / 180;
-          let dy = long * Math.sin(rad);
-          let dx = dy / Math.tan(rad);
-          let pointEnd = [poigne[0] + dx, poigne[1] + dy];
-          let line_arrow = new LineString([poigne, pointEnd]);
-          console.log("curved is", curved);
-          const idx = getClosestPointToCoords(
-            curved.geometry.coordinates,
-            poigne
-          );
-          console.log("idx of poigne is", idx);
-          let end = [
-            curved.geometry.coordinates[idx - 1][0],
-            curved.geometry.coordinates[idx - 1][1],
-          ];
-          let start = [
-            curved.geometry.coordinates[idx - 2][0],
-            curved.geometry.coordinates[idx - 2][1],
-          ];
-          let cos = calculateCos(poigne, end);
-          let tan = calculateTan(end, start);
-          let deg = 0;
-          if (tan > 0) {
-            deg = -Math.acos(cos);
-          } else {
-            if (tan != 0) {
-              deg = Math.acos(cos);
-            } else {
-              deg = 0;
-            }
-          }
-          /* if(!orientation){
-            deg = deg + Math.PI
-          }*/
-          console.log("deg is ", deg);
-          const style = new Style({
-            geometry: line_arrow,
-            stroke: new Stroke({
-              color: "#000",
-              width: 2,
-            }),
-            text: new Text({
-              rotation: deg,
-              fill: new Fill({
-                color: arrow[index].color,
-              }),
-              font: "bold ",
-              text: arrow[index].speed,
-              offsetY: +40,
-            }),
-            image: new Icon({
-              anchor: [1, 1],
-              //offset: [1,1],
-              // size: [60,60],
-              src: "data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='70px' height='70px' viewBox='0 0 24 24'%3E%3Cpolygon points='7.293 4.707 14.586 12 7.293 19.293 8.707 20.707 17.414 12 8.707 3.293 7.293 4.707'/%3E%3C/svg%3E%0A",
-              rotation: Math.PI / 2 - Math.atan2(dy, dx),
-            }),
-          });
-
-          const endArrow = new Style({
-            geometry: new Point(pointEnd),
-            image: new Icon({
-              anchor: [0.5, 0.5],
-              offset: [1, 1],
-              // size: [60,60],
-              scale: 0.25,
-              src: "data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='70px' height='70px' viewBox='0 0 24 24'%3E%3Cpolygon points='7.293 4.707 14.586 12 7.293 19.293 8.707 20.707 17.414 12 8.707 3.293 7.293 4.707'/%3E%3C/svg%3E%0A",
-              rotation: -Math.atan2(dy, dx),
-            }),
-          });
-
-          styles.push(style);
-          styles.push(endArrow);
-        }
-      });
     }
   }
   return styles;
@@ -542,7 +459,7 @@ export const getSelectedSegment = (feature, point) => {
   let bool = false;
   let seg;
   line.geometry.coordinates = feature.getGeometry().getCoordinates();
-
+  
   const curved = bezierSpline(line);
   const poignees = feature.getGeometry().getCoordinates();
   const coords = curved.geometry.coordinates;
@@ -569,5 +486,4 @@ export const getSelectedSegment = (feature, point) => {
   return seg + 1;
 };
 
-const reverseSegment = () => {};
-const reverseAllSegments = () => {};
+

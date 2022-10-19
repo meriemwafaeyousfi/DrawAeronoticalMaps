@@ -7,6 +7,7 @@ import { Style, Fill, Stroke } from "ol/style";
 import { MultiPoint, LineString } from "ol/geom";
 import { frontStyles, frontStyles2 } from "./FrontStyles";
 import { distance } from "ol/coordinate";
+
 export const frontFlowDrawingStartEvent = new CustomEvent(
   "courant_front:start"
 );
@@ -25,7 +26,7 @@ export const drawFrontFlow = (vectorSource) => {
     style: (feature) => {
       feature.setStyle((feature, resolution) => {
         if (feature.getGeometry().getType() === "LineString") {
-          if (feature.get("type") || feature.get("arrow")) {
+          if (feature.get("type") ||feature.get("arrow"))  {
             const type = feature.get("type");
             const seg = feature.get("seg_selected");
             return frontStyles2(feature, resolution);
@@ -54,10 +55,12 @@ export const selectFrontFlow = (vectorLayer) => {
     style: (feature, resolution) => {
       if (feature.getGeometry().getType() === "LineString") {
         const styles = [];
-        if (feature.get("type") || feature.get("arrow")) {
+        if (feature.get("type") ||feature.get("arrow"))  {
           const type = feature.get("type");
           const seg = feature.get("seg_selected");
-          frontStyles2(feature, resolution).map((style) => styles.push(style));
+          frontStyles2(feature, resolution).map((style) =>
+            styles.push(style)
+          );
           console.log("we entered to frontStyles2");
         } else {
           frontStyles(feature, resolution).map((style) => styles.push(style));
@@ -128,10 +131,10 @@ export const addPoigneFrontHandle = (point, feature) => {
     if (!bool) index++;
   });
   feature.getGeometry().setCoordinates(newCoordinates);
-  feature.get("type").splice(index + 1, 0, feature.get("type")[index]);
+  feature.get("type").splice(index+1 ,0,feature.get("type")[index])
   feature.getGeometry().setCoordinates(newCoordinates);
-  feature.get("arrow").splice(index + 1, 0, feature.get("arrow")[index]);
-};
+  feature.get("arrow").splice(index+1 ,0,feature.get("arrow")[index])
+}
 
 export const deletePoigneFrontHandle = (point, feature) => {
   let newCoordinates = [];

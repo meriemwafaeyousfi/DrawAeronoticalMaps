@@ -18,9 +18,9 @@ export const src4_2 =
 
 //type5
 export const src5_2 =
-  "data:image/svg+xml,%3Csvg id='Layer_1' data-name='Layer 1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bfill:black;%7D%3C/style%3E%3C/defs%3E%3Ctitle%3E09%3C/title%3E%3Crect class='cls-1' x='-7.39' y='22.03' width='56.78px' height='1.7px' transform='translate(25 60.36) rotate(-135)'/%3E%3C/svg%3E";
+  "data:image/svg+xml,%3Csvg id='Layer_1' data-name='Layer 1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bfill:black;%7D%3C/style%3E%3C/defs%3E%3Ctitle%3E09%3C/title%3E%3Crect class='cls-1' x='-7.39' y='22.03' width='58.78px' height='1.7px' transform='translate(25 60.36) rotate(-135)'/%3E%3C/svg%3E";
 export const src5_1 =
-  "data:image/svg+xml,%3Csvg id='Layer_1' data-name='Layer 1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bfill:red;%7D%3C/style%3E%3C/defs%3E%3Ctitle%3E09%3C/title%3E%3Crect class='cls-1' x='-7.39' y='22.03' width='56.78px' height='1.7px' transform='translate(25 60.36) rotate(-135)'/%3E%3C/svg%3E";
+  "data:image/svg+xml,%3Csvg id='Layer_1' data-name='Layer 1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bfill:black;%7D%3C/style%3E%3C/defs%3E%3Ctitle%3E09%3C/title%3E%3Crect class='cls-1' x='-7.39' y='22.03' width='58.78px' height='1.7px' transform='translate(25 60.36) rotate(-135)'/%3E%3C/svg%3E";
 
 //type8
 export const src8_1 =

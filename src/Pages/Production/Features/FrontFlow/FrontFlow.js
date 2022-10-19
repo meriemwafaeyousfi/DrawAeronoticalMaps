@@ -37,25 +37,29 @@ function FrontFlow() {
     });
     map.addInteraction(sff);
 
-    const djf = drawFrontFlow(ffvl.getSource());
-    djf.set("title", "courant_front:draw");
-    djf.setActive(false);
-    djf.on("drawend", ({ feature }) => {
-      //sff.getFeatures().clear();
-      feature.set("feature_type", "courant_front");
-      feature.set("number_seg", feature.getGeometry().getCoordinates() - 1);
-      endDrawing(map);
-      dispatch(setOption(""));
-    });
-    map.addInteraction(djf);
+		const djf = drawFrontFlow(ffvl.getSource());
+		djf.set('title', 'courant_front:draw');
+		djf.setActive(false);
+		djf.on('drawend', ({ feature }) => {
+			//sff.getFeatures().clear();
+			feature.set('feature_type', 'courant_front');
+			feature.set("number_seg",feature.getGeometry().getCoordinates() -1);			
+			endDrawing(map);
+			dispatch(setOption(''));
+			dispatch(setModal('courant_front'))
 
-    ffvl.getSource().on("addfeature", ({ feature }) => {
-      if (feature.get("feature_type") === "courant_front") {
-        sff.getFeatures().clear();
-        sff.getFeatures().push(feature);
-        dispatch(setSelectedFeature(feature));
-      }
-    });
+			
+		});
+		map.addInteraction(djf);
+        
+		ffvl.getSource().on('addfeature', ({ feature }) => {
+			if (feature.get('feature_type') === 'courant_front') {
+				sff.getFeatures().clear();
+				sff.getFeatures().push(feature);
+				dispatch(setSelectedFeature(feature));
+				
+			}
+		});
 
     const mff = modifyFrontFlow(sff);
     mff.set("title", "courant_front:modify");
