@@ -13,9 +13,11 @@ import {
 	setOption,
 	setSelectedFeature,
 } from '../../CardDrawingTools/redux/actions';
+import Window from './Window/FlecheVentWindow'
 
 function Jet() {
 	const map = useSelector((state) => state.map);
+	const modal = useSelector((state) => state.modal);
 	const dispatch = useDispatch();
 
 	const init = useCallback(() => {
@@ -40,9 +42,10 @@ function Jet() {
 		dj.on('drawend', ({ feature }) => {
 			sj.getFeatures().clear();
 			feature.set('feature_type', 'jet');
-			endDrawing(map);
 			dispatch(setOption(''));
-			sj.getFeatures().push(feature);
+			dispatch(setOption('select'));
+			endDrawing(map);
+			//sj.getFeatures().push(feature);
 		});
 		map.addInteraction(dj);
 
@@ -59,7 +62,7 @@ function Jet() {
 	useEffect(() => {
 		if (map) init();
 	}, [init, map]);
-	return <></>;
+	return modal === 'fleche_vent' && <Window />;
 }
 
 export default Jet;

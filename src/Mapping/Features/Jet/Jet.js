@@ -94,7 +94,7 @@ const selectStyleFunction = function (feature) {
 			width: 4.5,
 		}),
 		geometry: (feature) => {
-			return arc(feature.getGeometry().getCoordinates());
+			return arc(feature.getGeometry().getCoordinates())
 		},
 	});
 	const styles3 = new Style({
@@ -103,12 +103,13 @@ const selectStyleFunction = function (feature) {
 			fill: new Fill({
 				color: '#0000FF',
 			}),
-		}),
+		}), 
 		geometry: function (feature) {
-			let coordinates = feature.getGeometry().getCoordinates();
-			coordinates.pop();
-			return new MultiPoint(coordinates);
+			let coordinates = feature.getGeometry().getCoordinates()
+			coordinates.pop()
+			return new MultiPoint(coordinates)
 		},
+		
 	});
 	return [styles3, styles2, styles1];
 };
@@ -125,7 +126,7 @@ export const drawJet = (vectorSource) => {
 	return new Draw({
 		source: vectorSource,
 		type: 'LineString',
-		style: selectStyleFunction,
+		style: styleFunction,
 	});
 };
 

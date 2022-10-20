@@ -21,6 +21,7 @@ import { setMapCoordinate, setModal, setOption } from "../redux/actions";
 import { jetDrawingON } from "../../../../Mapping/Features/Jet/Jet";
 import { centreActionDrawingON } from "../../../../Mapping/Features/CentreAction/CentreAction";
 import { CATDrawingON } from "Mapping/Features/CAT/CAT";
+import { selectedFeature } from "../redux/reducers";
 
 function Tools() {
   const map = useSelector((state) => state.map);
@@ -39,9 +40,11 @@ function Tools() {
       map.forEachFeatureAtPixel(
         map.getEventPixel(event),
         (feature) => {
-          if (feature.getGeometry().getType() !== "Point") {
+          if (feature.getGeometry().getType() !== "Point" && feature.get('feature_type') !== 'jet') {
             dispatch(setModal(feature.get("feature_type")));
             dispatch(setOption(""));
+          }else if(feature.getGeometry().getType() === "Point") {
+            dispatch(setModal("fleche_vent"));
           }
         },
         { hitTolerance: 10 }

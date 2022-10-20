@@ -95,6 +95,7 @@ export const endDrawing = (map) => {
 };
 
 export const selectOn = (map) => {
+	console.log('selecton')
 	map.getInteractions().forEach((interaction) => {
 		if (interaction instanceof Select) {
 			interaction.setActive(true);
@@ -103,6 +104,7 @@ export const selectOn = (map) => {
 };
 
 export const selectOff = (map) => {
+	console.log('selectoff')
 	map.getInteractions().forEach((interaction) => {
 		if (interaction instanceof Select) {
 			interaction.setActive(false);
