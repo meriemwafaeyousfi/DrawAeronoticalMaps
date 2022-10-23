@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState , useEffect} from 'react';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import './Window.css';
 import { styled } from '@mui/material/styles';
@@ -60,6 +60,14 @@ function Window(props) {
 		dispatch(setSelectedFeature(null));
 	}, [dispatch]);
 
+    useEffect(() => {
+        if (selectedFeature) {
+          setCondition(selectedFeature.get("condition"));
+          setValeur(selectedFeature.get("valeur"));
+        }
+      }, [selectedFeature]);
+    
+
 return (
     <Dialog
         header="Conditions surface"
@@ -69,6 +77,7 @@ return (
         className="conditionWindow"
         keepInViewport={false}
         dismissableMask={false}
+        style={{ width: '360px' }}
         closable={false}>
         <div className="grid p-fluid col-12 ">
                 <div className="field-radiobutton">
