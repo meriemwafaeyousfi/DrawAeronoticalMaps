@@ -14,6 +14,7 @@ import { api } from 'axiosConfig';
 import './CardDrawingTools.css';
 import { useParams } from 'react-router-dom';
 import CAT from '../Features/CAT/CAT';
+import ConditionSurface from '../Features/ConditionSurface/ConditionSurface';
 
 function CardDrawingTools() {
 	const dispatch = useDispatch();
@@ -46,6 +47,7 @@ function CardDrawingTools() {
 				<Jet />
 				<CentreAction />
 				<CAT />
+				<ConditionSurface/>
 			</div>
 		</>
 	);

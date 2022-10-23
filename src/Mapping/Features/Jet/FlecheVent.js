@@ -1,4 +1,5 @@
 import { D3WindBarb, ConversionFactors } from "d3-wind-barbs";
+import { Point } from 'ol/geom';
 
 function createWindBarb(speed , fl, orientation){
     const windBarb = new D3WindBarb(speed,fl,{
@@ -10,8 +11,7 @@ function createWindBarb(speed , fl, orientation){
         fullBarClassName: "",
         shortBarClassName: "",
         stroke: "#0000FF",
-      },
-      
+      },  
     }).draw()
 
     windBarb.setAttribute('xmlns',  "http://www.w3.org/2000/svg")
@@ -22,7 +22,6 @@ function createWindBarb(speed , fl, orientation){
     windBarb.setAttribute('height', Math.round(h))
     let w = (zoomMap != 0) ? ((zoomMap * 50) / 4) : 50
     windBarb.setAttribute('width', Math.round(w))
-    
     let x = windBarb.firstChild.getAttribute("transform")
     windBarb.firstChild.setAttribute("transform","scale(-1,1)translate(0, 0)rotate(90)")
     if(vitesse != 0){
@@ -35,21 +34,32 @@ function createWindBarb(speed , fl, orientation){
     return windBarb
 }
 
-export const addFlecheVent = () =>{
-
+export const addFlecheVent = (coordinates, point, vitesse, type) =>{
+    const {end, start} = getClosestPoints()
+    let cos = calculateCos(point,end)
+    let tan = calculateTan( end, start)
+    let x = end[0] - start[0]
+    let y = end[1] - start[1]
+    let orientation = true
+    if(( x < 0 && y < 0) || (x < 0 && y > 0)){
+     orientation = false
+    }
+    const windBarb = createWindBarb(vitesse,90,orientation)
+    let flecheVent = new Point(point)
+    
     return
 }
 export const deleteFlecheVent = () =>{
     return
 }
 
-function drawWindBarb(point, vitesse, type){ 
+function drawWindBarb(coordinates, point, vitesse, type){ 
     let coords2 = dblClickFeature.getGeometry().get('jetCoordinates')
     let dis2 = closestPoint(coords2, point)
   
     let coordinates = dblClickFeature.getGeometry().getCoordinates()
     let styles = dblClickFeature.getStyle() 
-   let i =-1
+    let i =-1
    
    styles.forEach((element, id) => {   
      if (element.getGeometry()){
@@ -173,7 +183,7 @@ function drawWindBarb(point, vitesse, type){
           }),
             image: new Icon (({
             rotation: deg + (Math.PI/2) ,
-          anchor : (vitesse < 150) ? [0.48, 0.85] : [0.5,0.5],
+            anchor : (vitesse < 150) ? [0.48, 0.85] : [0.5,0.5],
             src: 'data:image/svg+xml;charset=utf-8,' + escape(windBarb.outerHTML )
             }))
           }))}

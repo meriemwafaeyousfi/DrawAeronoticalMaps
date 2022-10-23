@@ -19,6 +19,7 @@ import { frontFlowDrawingON } from "../../../../Mapping/Features/FrontFlow/Front
 import { useDispatch, useSelector } from "react-redux";
 import { setMapCoordinate, setModal, setOption } from "../redux/actions";
 import { jetDrawingON } from "../../../../Mapping/Features/Jet/Jet";
+import { conditionDrawingON } from "../../../../Mapping/Features/ConditionSurface/ConditionSurface"
 import { centreActionDrawingON } from "../../../../Mapping/Features/CentreAction/CentreAction";
 import { CATDrawingON } from "Mapping/Features/CAT/CAT";
 import { selectedFeature } from "../redux/reducers";
@@ -121,7 +122,7 @@ function Tools() {
           console.log("not defined yet");
           break;
         case "condition_en_surface":
-          console.log("not defined yet");
+          conditionDrawingON(map)
           break;
         case "select":
           selectOn(map);
