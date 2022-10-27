@@ -16,6 +16,8 @@ import {
 } from 'Pages/Production/CardDrawingTools/redux/actions';
 import { createCentreAction } from 'Mapping/Features/CentreAction/CentreAction';
 import { Dialog } from 'primereact/dialog';
+import { feature } from '@turf/turf';
+import { RadioButton } from 'primereact/radiobutton';
 
 function Window(props) {
 	const selectedFeature = useSelector((state) => state.selectedFeature);
@@ -27,13 +29,32 @@ function Window(props) {
     const [flightLevel, setFlightLevel] = useState(0)
     const [epaisseurSup,setEpaisseurSup] = useState(0)
     const [epaisseurInf,setEpaisseurInf] = useState(0)
+    const [affichEp, setAffichEp] = useState('auto')
+    const [affich , setAffich] = useState('auto')
 
 	const handleChangeVitesse = useCallback(
 		(event) => {
 			if (selectedFeature) {
 				const { value } = event.target;
 				setVitesse(value);
-			//	selectedFeature.set('vitesseFleche', value);
+                let fleches = selectedFeature.get('fleches')
+                let x = fleches.find(elt => ((elt.point[0] ===  selectedFeature.get('dblclickpoint')[0] ) && (elt.point[1] ===  selectedFeature.get('dblclickpoint')[1])));
+                let coords = selectedFeature.getGeometry().getCoordinates()
+                if (!x){    
+                    selectedFeature.set('fleches', fleches.concat([({
+                        point : selectedFeature.get('dblclickpoint'), 
+                        vitesse : value,
+                        index :  coords.findIndex(elt => ((elt[0] ===  selectedFeature.get('dblclickpoint')[0] ) && (elt[1] ===  selectedFeature.get('dblclickpoint')[1])))
+                         })
+                      ]
+                    ))
+                }else{
+                    let i = fleches.indexOf(x)
+                    x.vitesse = value
+                    //x.point = coords[x.index]
+                    fleches[i] = x
+                    selectedFeature.set('fleches', fleches.concat([]))
+                }
 			}
 		},
 		[props, selectedFeature]
@@ -44,7 +65,7 @@ function Window(props) {
 			if (selectedFeature) {
 				const { value } = event.target;
 				setFlightLevel(value);
-				//selectedFeature.set('flightFleche', value);
+				selectedFeature.set('flightFleche', value);
 			}
 		},
 		[props, selectedFeature]
@@ -72,12 +93,30 @@ function Window(props) {
 		[props, selectedFeature]
 	);
 
+    const handleChangeAffich = useCallback(
+		(event) => {
+            
+			if (selectedFeature) {
+				const { value } = event.target
+				setAffich(value)
+			} 
+		},
+		[props, selectedFeature]
+	);
 
-
+    const handleChangeAffichEp= useCallback(
+		(event) => {
+            
+			if (selectedFeature) {
+				const { value } = event.target
+				setAffichEp(value)
+			} 
+		},
+		[props, selectedFeature]
+	);
+ 
 	const handleConfirm = useCallback(() => {
-		dispatch(setSelectedFeature(null));
-		dispatch(setOption(''));
-		dispatch(setModal(''));
+        dispatch(setModal(''));
 	}, [map, mapCoordinate, selectedFeature, props, dispatch]);
 
 	const handleCancel = useCallback(() => {
@@ -95,6 +134,7 @@ return (
         className="felecheVentWindow"
         keepInViewport={false}
         dismissableMask={false}
+        style={{ width: '300px' }}
         closable={false}>
             <p>Fleche de vent</p>
         <div className="grid p-fluid col-12 ">
@@ -121,8 +161,19 @@ return (
                     />
                 </div>
             </div>
-            <div className="col-6 ">
-              
+            <div className="col-6">
+                <div className="field-radiobutton">
+                        <RadioButton inputId="affichage1" name="affichage" value="auto" onChange={handleChangeAffich} checked={affich === 'auto'}  />
+                        <label htmlFor="affichage1">Auto</label>
+                </div>
+                <div className="field-radiobutton">
+                        <RadioButton inputId="affichage2" name="affichage" value="affiche" onChange={handleChangeAffich} checked={affich === 'affiche'}   />
+                        <label htmlFor="affichage2">Affiché</label>
+                </div>
+                <div className="field-radiobutton">
+                        <RadioButton inputId="affichage3" name="affichage" value="cassure"  onChange={handleChangeAffich} checked={affich === 'cassure'}  />
+                        <label htmlFor="affichage3">Cassure</label>
+                </div> 
             </div>
             </div>
             <p>Epaisseur</p>
@@ -152,7 +203,18 @@ return (
                
             </div>
             <div className="col-6">
-              
+            <div className="field-radiobutton">
+                        <RadioButton inputId="affichageEp1" name="affichageEp" value="auto" onChange={handleChangeAffichEp} checked={affichEp === 'auto'}  />
+                        <label htmlFor="affichageEp1">Auto</label>
+                </div>
+                <div className="field-radiobutton">
+                        <RadioButton inputId="affichageEp2" name="affichageEp" value="affiche" onChange={handleChangeAffichEp} checked={affichEp === 'affiche'}   />
+                        <label htmlFor="affichageEp2">Affiché</label>
+                </div>
+                <div className="field-radiobutton">
+                        <RadioButton inputId="affichageEp3" name="affichageEp" value="cache"  onChange={handleChangeAffichEp} checked={affichEp === 'cache'}  />
+                        <label htmlFor="affichageEp3">Caché</label>
+                </div>
             </div>
         </div>
 

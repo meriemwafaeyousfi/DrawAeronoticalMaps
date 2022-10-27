@@ -17,6 +17,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedFeature } from '../redux/actions';
 import { addAHandleCat, deleteAHandleCat } from 'Mapping/Features/CAT/CAT';
+import {addJetAHandle} from 'Mapping/Features/Jet/Jet'
 
 function MapContextMenu() {
 	const map = useSelector((state) => state.map);
@@ -34,12 +35,23 @@ function MapContextMenu() {
 			icon: 'ajouter-poingee',
 			visible:
 				!!rightClickedFeature &&
-				(rightClickedFeature.get('feature_type') === 'zone_nuageuse'||
-				rightClickedFeature.get('feature_type') === 'jet' ) &&
+				(rightClickedFeature.get('feature_type') === 'zone_nuageuse' )&&
 				!vertex &&
 				rightClickedFeature === selectedFeature,
 			command: () => {
 				addAHandle(eventCoordiantes, rightClickedFeature);
+			},
+		},
+		{
+			label: 'Ajouter un poignée',
+			icon: 'ajouter-poingee',
+			visible:
+				!!rightClickedFeature &&
+				(rightClickedFeature.get('feature_type') === 'jet' ) &&
+				!vertex &&
+				rightClickedFeature === selectedFeature,
+			command: () => {
+				addJetAHandle(eventCoordiantes, rightClickedFeature);
 			},
 		},
 		{

@@ -42,10 +42,10 @@ function Jet() {
 		dj.on('drawend', ({ feature }) => {
 			sj.getFeatures().clear();
 			feature.set('feature_type', 'jet');
+			feature.set('fleches', [])
 			dispatch(setOption(''));
 			dispatch(setOption('select'));
 			endDrawing(map);
-			//sj.getFeatures().push(feature);
 		});
 		map.addInteraction(dj);
 

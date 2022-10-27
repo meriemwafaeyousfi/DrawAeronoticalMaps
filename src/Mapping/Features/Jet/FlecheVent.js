@@ -1,5 +1,21 @@
+import * as turf from '@turf/turf';
 import { D3WindBarb, ConversionFactors } from "d3-wind-barbs";
 import { Point } from 'ol/geom';
+import { fromLonLat, transform , toLonLat} from 'ol/proj';
+import {
+	Stroke,
+	Style,
+	Fill,
+	RegularShape,
+	Icon,
+	Text as olText,
+} from 'ol/style';
+
+const fill = new Fill({ color: '#0000FF', opacity: 1 });
+const stroke = new Stroke({
+	color: '#0000FF',
+	width: 4,
+});
 
 function createWindBarb(speed , fl, orientation){
     const windBarb = new D3WindBarb(speed,fl,{
@@ -17,88 +33,77 @@ function createWindBarb(speed , fl, orientation){
     windBarb.setAttribute('xmlns',  "http://www.w3.org/2000/svg")
     windBarb.setAttribute('overflow', "visible")
     windBarb.setAttribute('viewBox', "0 0 80 45")
-    let zoom = map.getView().getZoom()
-    let h = (zoomMap != 0) ? ((zoomMap * 75) / 4) : 75
+    //let zoom = map.getView().getZoom()
+    //let h = (zoomMap != 0) ? ((zoomMap * 75) / 4) : 75
+    let h =  75
     windBarb.setAttribute('height', Math.round(h))
-    let w = (zoomMap != 0) ? ((zoomMap * 50) / 4) : 50
+    //let w = (zoomMap != 0) ? ((zoomMap * 50) / 4) : 50
+    let w = 50
     windBarb.setAttribute('width', Math.round(w))
     let x = windBarb.firstChild.getAttribute("transform")
     windBarb.firstChild.setAttribute("transform","scale(-1,1)translate(0, 0)rotate(90)")
-    if(vitesse != 0){
+    if(speed != 0){
         const line = windBarb.getElementsByClassName("wind-barb-root")[0]
         const old = (windBarb.firstChild).firstChild
         if(old){
-        old.parentElement.removeChild(old)}
+          old.parentElement.removeChild(old)}
           }
    
     return windBarb
 }
 
-export const addFlecheVent = (coordinates, point, vitesse, type) =>{
-    const {end, start} = getClosestPoints()
-    let cos = calculateCos(point,end)
-    let tan = calculateTan( end, start)
-    let x = end[0] - start[0]
-    let y = end[1] - start[1]
-    let orientation = true
-    if(( x < 0 && y < 0) || (x < 0 && y > 0)){
-     orientation = false
-    }
-    const windBarb = createWindBarb(vitesse,90,orientation)
-    let flecheVent = new Point(point)
-    
-    return
-}
-export const deleteFlecheVent = () =>{
-    return
+function calculateCos(center, point){
+  let cos = 0;
+  let a = Math.abs(center[0] - point[0]);
+  let b = Math.sqrt(Math.pow(point[1]-center[1],2) + Math.pow(point[0]-center[0],2));
+  cos = a/b;
+  return cos;
 }
 
-function drawWindBarb(coordinates, point, vitesse, type){ 
-    let coords2 = dblClickFeature.getGeometry().get('jetCoordinates')
-    let dis2 = closestPoint(coords2, point)
-  
-    let coordinates = dblClickFeature.getGeometry().getCoordinates()
-    let styles = dblClickFeature.getStyle() 
-    let i =-1
-   
-   styles.forEach((element, id) => {   
-     if (element.getGeometry()){
-      if((element.getGeometry().getCoordinates()[0] === point[0]) && (element.getGeometry().getCoordinates()[1]=== point[1]))
-      {
-        i = id
+//calculate the tangante
+function calculateTan(point1, point2){
+   return ((point1[1]-point2[1])/(point1[0]-point2[0]))
+}
+
+export const addFlecheVent = (feature, point, vitesse, type) =>{
+  if(!feature) return
+    let start, end = null
+    let p1 = transform(feature.getGeometry().getCoordinates()[0],'EPSG:3857', 'EPSG:4326')
+    let p2 = transform(point,'EPSG:3857', 'EPSG:4326')
+    let newCoor = []
+    feature.getGeometry().getCoordinates().forEach(point => {
+      newCoor.push(transform(point,'EPSG:3857', 'EPSG:4326'))
+    })
+    let line1 = {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "LineString",
+        coordinates: newCoor
+        }
       }
+    let line2 = turf.bezierSpline(line1);
+    if(p1[0]===p2[0] && p1[1]===p2[1]){
+        start = point
+        let myPoint1 = turf.along(line2, 10);
+        let myPoint2 = turf.along(line2, 20);
+        point = transform(myPoint1.geometry.coordinates,'EPSG:4326', 'EPSG:3857')
+        end = transform(myPoint2.geometry.coordinates,'EPSG:4326', 'EPSG:3857')
+    }else{
+        let d = turf.distance(p1, p2 );
+        let myPoint1 = turf.along(line2, d+10);
+        let myPoint2 = turf.along(line2, d-10);
+        start = transform(myPoint2.geometry.coordinates,'EPSG:4326', 'EPSG:3857')
+        end = transform(myPoint1.geometry.coordinates,'EPSG:4326', 'EPSG:3857')
     }
-      }) 
-    let dis = closestPoint(coordinates, point)
-    let index = dis.index;
-    let end = [coordinates[index+1][0],coordinates[index+1][1]];
-    let start = [coordinates[index-1][0],coordinates[index-1][1]];
-   
     let cos = calculateCos(point,end)
     let tan = calculateTan( end, start)
-    let x = end[0] - start[0]
-    let y = end[1] - start[1]
+    let x   = end[0] - start[0]
+    let y   = end[1] - start[1]
     let orientation = true
     if(( x < 0 && y < 0) || (x < 0 && y > 0)){
-     orientation = false
+      orientation = false
     }
-
-    const windBarb = createWindBarb(vitesse,90,orientation)
-    let flecheVent = new Point(point)
-    let poigne = new Point(point)
-    let p = (Number(dblClickFeature.getGeometry().get('totalFleches')) + 1)
-    poigne.set('name','poigne')
-    flecheVent.set('name','flecheVent')
-    flecheVent.set('affichage',optionAffich)
-    flecheVent.set('vitesse',vitesse)
-    flecheVent.set('fl',flightLevel)
-    flecheVent.set('e-sup',epaisseurSup)
-    flecheVent.set('e-inf',epaisseurInf)
-    flecheVent.set('windBarb',windBarb)
-    flecheVent.set('priorite', p) 
-    flecheVent.set('colorText', textColor) 
-    dblClickFeature.getGeometry().set('totalFleches',p)
-
     let deg = 0
     if(tan > 0){
       deg = - Math.acos(cos) ;
@@ -113,82 +118,28 @@ function drawWindBarb(coordinates, point, vitesse, type){
     if(!orientation){
       deg = deg + Math.PI
     }
+    const windBarb = createWindBarb(vitesse,90,orientation)  
+    const style = new Style({
+			geometry: new Point(point),
+			text : new olText({
+			font: 'bold 16px/1 bold Arial',
+			text: 'FL / ' ,
+			rotation: deg,
+			offsetY  : 30,
+			fill: new Fill({
+				color: 'black' // change it after
+			}),
+			}),
+			image: new Icon (({
+			rotation:  deg+ (Math.PI/2),
+			anchor :  [0.48, 0.85] ,
+			src: 'data:image/svg+xml;charset=utf-8,' + escape(windBarb.outerHTML), 
+				}))
+			})
 
-    flecheVent.set('label', 'FL ' + flightLevel.toString() + '\n'+(((optionAffichEpaisseur != 'cache') && (epaisseurInf>0 || epaisseurSup>0)) ?  epaisseurInf+ '/'+ epaisseurSup : ''))
-    flecheVent.set('rotation',deg)
-    
-    if (i != -1 ){
-      if(type === 'cassure'){
-        let cassure = createCassure(point, deg)
-        styles[i] = cassure
-      }else{
-        if(vitesse == 0){
-          styles[i] = new Style({
-              geometry: poigne,
-              image: new Circle({
-                fill: fill,
-                stroke: stroke,
-                radius: 3,
-              })
-            })
-          
-        }else{
-        styles[i] = new Style({
-        geometry: flecheVent,
-        text : new olText({
-          font: 'bold '+ ((zoomMap != 0) ? ((zoomMap * '16') / 4) : '16') +'px/1 bold Arial',
-          text: 'FL ' + flightLevel.toString() + '\n'+ (((optionAffichEpaisseur != 'cache') && (epaisseurInf>0 || epaisseurSup>0)) ?  epaisseurInf+ '/'+ epaisseurSup : '') ,
-          rotation: deg ,
-          offsetY  :((zoomMap != 0) ? ((zoomMap * 30) / 4) : 30),
-          fill: new Fill({
-            color: textColor.hex
-          }),
-       }),
-        image: new Icon (({
-        rotation: deg+ (Math.PI/2) ,
-       anchor : (vitesse < 150) ? [0.48, 0.85] : [0.5,0.5],
-        src: 'data:image/svg+xml;charset=utf-8,' + escape(windBarb.outerHTML ), 
-        }))
-      
-      })
-    }
-       i =-1
-      }
-      
-    }else{
-      if(type === 'cassure'){
-        let cassure = createCassure(point, deg)
-        styles.push(cassure)
-      }else{
-        if(vitesse == 0){
-          styles.push(
-            new Style({
-              geometry: poigne,
-              image: new Circle({
-                fill: fill,
-                stroke: stroke,
-                radius: 3,
-              })
-            })
-          );
-        }else{
-          styles.push(new Style({
-            geometry: flecheVent,
-            text : new olText({
-              color: textColor.hex,
-              font: 'bold '+ ((zoomMap != 0) ? ((zoomMap * '16') / 4) : '16') +'px/1 bold Arial',
-              text: 'FL ' + flightLevel.toString() + '\n'+ (((optionAffichEpaisseur != 'cache') && (epaisseurInf>0 || epaisseurSup>0)) ?  epaisseurInf+ '/'+ epaisseurSup : '') ,
-              rotation: deg ,
-              offsetY  :((zoomMap != 0) ? ((zoomMap * 30) / 4) : 30),
-          }),
-            image: new Icon (({
-            rotation: deg + (Math.PI/2) ,
-            anchor : (vitesse < 150) ? [0.48, 0.85] : [0.5,0.5],
-            src: 'data:image/svg+xml;charset=utf-8,' + escape(windBarb.outerHTML )
-            }))
-          }))}
-  }
+    return style
 }
-    dblClickFeature.setStyle(styles)
-  
+export const deleteFlecheVent = () =>{
+    return
 }
+

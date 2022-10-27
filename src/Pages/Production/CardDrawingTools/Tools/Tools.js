@@ -46,6 +46,7 @@ function Tools() {
             dispatch(setOption(""));
           }else if(feature.getGeometry().getType() === "Point") {
             dispatch(setModal("fleche_vent"));
+            feature.get('features')[0].set('dblclickpoint',feature.getGeometry().getCoordinates())
           }
         },
         { hitTolerance: 10 }

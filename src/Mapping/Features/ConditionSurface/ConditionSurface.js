@@ -44,6 +44,7 @@ const selectType = (mapBrowserEvent) => {
 
 
 const selectStyleFunction = function (feature) {
+  
    const style2 =  new Style({
         image: new RegularShape({
            stroke: stroke2,
@@ -169,7 +170,7 @@ export const conditionVectorLayer = () => {
 	return new VectorLayer({
 		title: 'Condition en Surface',
 		source: new VectorSource(),
-        style :  (feature) => {
+       style :  (feature) => {
             if(feature.get('condition') === 'vent'){
                 return (
                       new Style({
@@ -288,14 +289,6 @@ export const drawCondition = (vectorSource) => {
 		type: 'Point',
 	});
 };
-
-// export const modifyJet = (select) => {
-// 	return new Modify({
-// 		features: select.getFeatures(),
-// 		insertVertexCondition: shiftKeyOnly,
-// 		removePoint: altKeyOnly,
-// 	});
-// };
 
 export const selectCondition = (vectorLayer) => {
 	return new Select({
