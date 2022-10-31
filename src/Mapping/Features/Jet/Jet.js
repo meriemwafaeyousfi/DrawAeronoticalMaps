@@ -4,8 +4,6 @@ import {
 	Style,
 	Fill,
 	RegularShape,
-	Icon,
-	Text as olText,
 } from 'ol/style';
 import { arc } from './JetGeometry';
 import VectorSource from 'ol/source/Vector';
@@ -13,14 +11,12 @@ import VectorLayer from 'ol/layer/Vector';
 import CircleStyle from 'ol/style/Circle';
 import { Point, MultiPoint, LineString } from 'ol/geom';
 import {
-	never,
 	altKeyOnly,
 	click,
 	shiftKeyOnly,
 	doubleClick,
 } from 'ol/events/condition';
 import { distance } from 'ol/coordinate';
-import { feature, point } from '@turf/turf';
 import { addFlecheVent } from "./FlecheVent"
 
 const fill = new Fill({ color: '#0000FF', opacity: 1 });
@@ -29,7 +25,6 @@ const stroke = new Stroke({
 	width: 4,
 });
 const styleFunction = function (feature) {
-	const geometry = feature.getGeometry();
 	let coords = feature.getGeometry().getCoordinates();
 	let end = coords[coords.length - 1];
 	let start = coords[coords.length - 2];
@@ -61,7 +56,7 @@ const styleFunction = function (feature) {
 	const styles4 = []
 	if(feature.get('fleches')){
 		feature.get('fleches').forEach((elt)=> { 
-			styles4.push(addFlecheVent(feature, feature.getGeometry().getCoordinates()[elt.index], elt.vitesse, 'fleche'))
+			styles4.push(addFlecheVent(feature, feature.getGeometry().getCoordinates()[elt.index], elt.vitesse, elt.flightLevel, elt.epSup, elt.epInf, elt.affich, elt.affichEp, 'fleche'))
 		})
 	}
 	return [styles2, styles].concat(styles4);
@@ -109,7 +104,7 @@ const selectStyleFunction = function (feature) {
 	//styles4 c'est le style des fleches de vent
 	const styles4 = []
 	feature.get('fleches').forEach((elt)=> { 
-		styles4.push(addFlecheVent(feature, feature.getGeometry().getCoordinates()[elt.index], elt.vitesse, 'fleche'))
+		styles4.push(addFlecheVent(feature, feature.getGeometry().getCoordinates()[elt.index], elt.vitesse, elt.flightLevel, elt.epSup, elt.epInf, elt.affich, elt.affichEp, 'fleche'))
     })
 
 	//styles3 c'est le styles des poingnés
@@ -198,7 +193,7 @@ export const addJetAHandle = (point, feature) => {
     if(fleches){
 		newCoordinates.forEach((elt, index)=>{
 			let i = fleches.findIndex(fleche => ((fleche.point[0] ===  elt[0] ) && (fleche.point[1] ===  elt[1])))
-			if(i != -1){
+			if(i !== -1){
 				fleches[i].index = index
 			}
 		})

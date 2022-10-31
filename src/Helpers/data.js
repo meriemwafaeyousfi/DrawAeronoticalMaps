@@ -138,6 +138,7 @@ export const directions2 = [
 	{ name: 360, code: '360' },
 ];
 
+
 export const forces = [
 	{
 		value: 'Modere',
@@ -170,3 +171,13 @@ export const forces = [
 let FI = [];
 forces.forEach((force) => (FI[force.value] = force.src));
 export const forcesImages = FI;
+
+
+export const styleBorder = [
+	{style:'dashed',image:'/Icons/ZoneTexte/dashed.PNG'},
+	{style:'dotted',image:'/Icons/ZoneTexte/dotted.PNG'},
+	{style:'double',image:'/Icons/ZoneTexte/double.PNG'},
+	{style:'solid',image:'/Icons/ZoneTexte/solid.PNG'},
+]
+
+export const sizeTextList = [8,10,12,14,16,18,20,22,24,26,28,38,48];

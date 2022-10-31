@@ -22,7 +22,7 @@ import { jetDrawingON } from "../../../../Mapping/Features/Jet/Jet";
 import { conditionDrawingON } from "../../../../Mapping/Features/ConditionSurface/ConditionSurface"
 import { centreActionDrawingON } from "../../../../Mapping/Features/CentreAction/CentreAction";
 import { CATDrawingON } from "Mapping/Features/CAT/CAT";
-import { selectedFeature } from "../redux/reducers";
+import { zoneTexteDrawingON } from "Mapping/Features/ZoneTexte/ZoneTexte"
 
 function Tools() {
   const map = useSelector((state) => state.map);
@@ -92,7 +92,7 @@ function Tools() {
           document.querySelector("#map-container").style.cursor = "grab";
           break;
         case "zone_texte":
-          console.log("not defined yet");
+          zoneTexteDrawingON(map);
           break;
         case "zone_nuageuse":
           cloudDrawingON(map);

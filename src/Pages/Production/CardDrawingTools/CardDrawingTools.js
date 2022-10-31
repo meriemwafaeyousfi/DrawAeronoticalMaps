@@ -15,6 +15,7 @@ import './CardDrawingTools.css';
 import { useParams } from 'react-router-dom';
 import CAT from '../Features/CAT/CAT';
 import ConditionSurface from '../Features/ConditionSurface/ConditionSurface';
+import ZoneTexte from '../Features/ZoneTexte/ZoneTexte';
 
 function CardDrawingTools() {
 	const dispatch = useDispatch();
@@ -48,6 +49,7 @@ function CardDrawingTools() {
 				<CentreAction />
 				<CAT />
 				<ConditionSurface/>
+				<ZoneTexte/>
 			</div>
 		</>
 	);

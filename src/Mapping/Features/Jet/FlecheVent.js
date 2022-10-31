@@ -1,21 +1,15 @@
 import * as turf from '@turf/turf';
-import { D3WindBarb, ConversionFactors } from "d3-wind-barbs";
+import { D3WindBarb} from "d3-wind-barbs";
 import { Point } from 'ol/geom';
-import { fromLonLat, transform , toLonLat} from 'ol/proj';
+import {transform} from 'ol/proj';
 import {
-	Stroke,
 	Style,
 	Fill,
-	RegularShape,
 	Icon,
 	Text as olText,
 } from 'ol/style';
 
-const fill = new Fill({ color: '#0000FF', opacity: 1 });
-const stroke = new Stroke({
-	color: '#0000FF',
-	width: 4,
-});
+
 
 function createWindBarb(speed , fl, orientation){
     const windBarb = new D3WindBarb(speed,fl,{
@@ -40,10 +34,8 @@ function createWindBarb(speed , fl, orientation){
     //let w = (zoomMap != 0) ? ((zoomMap * 50) / 4) : 50
     let w = 50
     windBarb.setAttribute('width', Math.round(w))
-    let x = windBarb.firstChild.getAttribute("transform")
     windBarb.firstChild.setAttribute("transform","scale(-1,1)translate(0, 0)rotate(90)")
-    if(speed != 0){
-        const line = windBarb.getElementsByClassName("wind-barb-root")[0]
+    if(speed !== 0){
         const old = (windBarb.firstChild).firstChild
         if(old){
           old.parentElement.removeChild(old)}
@@ -65,12 +57,14 @@ function calculateTan(point1, point2){
    return ((point1[1]-point2[1])/(point1[0]-point2[0]))
 }
 
-export const addFlecheVent = (feature, point, vitesse, type) =>{
+export const addFlecheVent = (feature, point, vitesse, flightLevel, epaisseurSup, epaisseurInf, affich, affichEp, type) =>{
   if(!feature) return
     let start, end = null
     let p1 = transform(feature.getGeometry().getCoordinates()[0],'EPSG:3857', 'EPSG:4326')
     let p2 = transform(point,'EPSG:3857', 'EPSG:4326')
     let newCoor = []
+    let c = feature.getGeometry().getCoordinates()
+        let i =  c.findIndex(elt => ((elt[0] ===  point[0] ) && (elt[1] ===  point[1])))
     feature.getGeometry().getCoordinates().forEach(point => {
       newCoor.push(transform(point,'EPSG:3857', 'EPSG:4326'))
     })
@@ -83,23 +77,32 @@ export const addFlecheVent = (feature, point, vitesse, type) =>{
         }
       }
     let line2 = turf.bezierSpline(line1);
+    console.log(line2)
     if(p1[0]===p2[0] && p1[1]===p2[1]){
         start = point
         let myPoint1 = turf.along(line2, 10);
         let myPoint2 = turf.along(line2, 20);
         point = transform(myPoint1.geometry.coordinates,'EPSG:4326', 'EPSG:3857')
         end = transform(myPoint2.geometry.coordinates,'EPSG:4326', 'EPSG:3857')
-    }else{
-        let d = turf.distance(p1, p2 );
-        let myPoint1 = turf.along(line2, d+10);
-        let myPoint2 = turf.along(line2, d-10);
-        start = transform(myPoint2.geometry.coordinates,'EPSG:4326', 'EPSG:3857')
+    }else{ 
+        let b2 = transform(c[c.length-1],'EPSG:3857', 'EPSG:4326')
+        let ll1 = {
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "LineString",
+            coordinates: [p2,b2]
+            }
+          }
+        let tt1 = turf.bezierSpline(ll1);
+        let myPoint1 = turf.along(tt1,100);
         end = transform(myPoint1.geometry.coordinates,'EPSG:4326', 'EPSG:3857')
+        
     }
     let cos = calculateCos(point,end)
-    let tan = calculateTan( end, start)
-    let x   = end[0] - start[0]
-    let y   = end[1] - start[1]
+    let tan = calculateTan( c[i+1] , c[i-1])
+    let x   = c[i+1][0] - c[i-1][0]
+    let y   = c[i+1][1] - c[i-1][1]
     let orientation = true
     if(( x < 0 && y < 0) || (x < 0 && y > 0)){
       orientation = false
@@ -108,7 +111,7 @@ export const addFlecheVent = (feature, point, vitesse, type) =>{
     if(tan > 0){
       deg = - Math.acos(cos) ;
     }else{
-      if(tan !=  0){
+      if(tan !==  0){
       deg =  Math.acos(cos) ;
     }else{
       deg = 0;
@@ -123,7 +126,7 @@ export const addFlecheVent = (feature, point, vitesse, type) =>{
 			geometry: new Point(point),
 			text : new olText({
 			font: 'bold 16px/1 bold Arial',
-			text: 'FL / ' ,
+			text: 'FL ' + flightLevel.toString() + '\n'+ (((affichEp !== 'cache') && (epaisseurInf>0 || epaisseurSup>0)) ?  epaisseurInf+ '/'+ epaisseurSup : '')  ,
 			rotation: deg,
 			offsetY  : 30,
 			fill: new Fill({

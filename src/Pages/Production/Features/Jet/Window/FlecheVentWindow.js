@@ -1,28 +1,18 @@
 import { useCallback, useState } from 'react';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import './Window.css';
-import { styled } from '@mui/material/styles';
-import { centresImages, directions2 } from 'Helpers/data';
 import { useDispatch, useSelector } from 'react-redux';
 import { InputNumber } from 'primereact/inputnumber';
-import { Dropdown } from 'primereact/dropdown';
-import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import {
-	setMapCoordinate,
 	setModal,
 	setOption,
 	setSelectedFeature,
 } from 'Pages/Production/CardDrawingTools/redux/actions';
-import { createCentreAction } from 'Mapping/Features/CentreAction/CentreAction';
 import { Dialog } from 'primereact/dialog';
-import { feature } from '@turf/turf';
 import { RadioButton } from 'primereact/radiobutton';
 
 function Window(props) {
 	const selectedFeature = useSelector((state) => state.selectedFeature);
-	const map = useSelector((state) => state.map);
-	const mapCoordinate = useSelector((state) => state.mapCoordinate);
 	const dispatch = useDispatch();
 
     const [vitesse, setVitesse] = useState(0)
@@ -44,6 +34,11 @@ function Window(props) {
                     selectedFeature.set('fleches', fleches.concat([({
                         point : selectedFeature.get('dblclickpoint'), 
                         vitesse : value,
+                        flightLevel : flightLevel,
+                        epSup : epaisseurSup,
+                        epInf : epaisseurInf,
+                        affichEp : affichEp,
+                        affich : affich,
                         index :  coords.findIndex(elt => ((elt[0] ===  selectedFeature.get('dblclickpoint')[0] ) && (elt[1] ===  selectedFeature.get('dblclickpoint')[1])))
                          })
                       ]
@@ -51,13 +46,12 @@ function Window(props) {
                 }else{
                     let i = fleches.indexOf(x)
                     x.vitesse = value
-                    //x.point = coords[x.index]
                     fleches[i] = x
                     selectedFeature.set('fleches', fleches.concat([]))
                 }
 			}
 		},
-		[props, selectedFeature]
+		[ selectedFeature, flightLevel, epaisseurInf, epaisseurSup, affich, affichEp]
 	);
 
     const handleChangeFlightLevel = useCallback(
@@ -65,10 +59,32 @@ function Window(props) {
 			if (selectedFeature) {
 				const { value } = event.target;
 				setFlightLevel(value);
-				selectedFeature.set('flightFleche', value);
+				let fleches = selectedFeature.get('fleches')
+                let x = fleches.find(elt => ((elt.point[0] ===  selectedFeature.get('dblclickpoint')[0] ) && (elt.point[1] ===  selectedFeature.get('dblclickpoint')[1])));
+                let coords = selectedFeature.getGeometry().getCoordinates()
+                if (!x){    
+                    selectedFeature.set('fleches', fleches.concat([({
+                        point : selectedFeature.get('dblclickpoint'), 
+                        vitesse : vitesse,
+                        flightLevel : value,
+                        epSup : epaisseurSup,
+                        epInf : epaisseurInf,
+                        affichEp : affichEp,
+                        affich : affich,
+                        index :  coords.findIndex(elt => ((elt[0] ===  selectedFeature.get('dblclickpoint')[0] ) && (elt[1] ===  selectedFeature.get('dblclickpoint')[1])))
+                         })
+                      ]
+                    ))
+                }else{
+                    let i = fleches.indexOf(x)
+                    x.flightLevel = value
+                    fleches[i] = x
+                    selectedFeature.set('fleches', fleches.concat([]))
+                }
+
 			}
 		},
-		[props, selectedFeature]
+		[ selectedFeature, vitesse, epaisseurInf, epaisseurSup, affich, affichEp]
 	);
 
     const handleChangeEpaisseurSup = useCallback(
@@ -76,10 +92,31 @@ function Window(props) {
 			if (selectedFeature) {
 				const { value } = event.target;
 				setEpaisseurSup(value);
-				//selectedFeature.set('flightFleche', value);
+                let fleches = selectedFeature.get('fleches')
+                let x = fleches.find(elt => ((elt.point[0] ===  selectedFeature.get('dblclickpoint')[0] ) && (elt.point[1] ===  selectedFeature.get('dblclickpoint')[1])));
+                let coords = selectedFeature.getGeometry().getCoordinates()
+                if (!x){    
+                    selectedFeature.set('fleches', fleches.concat([({
+                        point : selectedFeature.get('dblclickpoint'), 
+                        vitesse : vitesse,
+                        flightLevel : flightLevel,
+                        epSup : value,
+                        epInf : epaisseurInf,
+                        affichEp : affichEp,
+                        affich : affich,
+                        index :  coords.findIndex(elt => ((elt[0] ===  selectedFeature.get('dblclickpoint')[0] ) && (elt[1] ===  selectedFeature.get('dblclickpoint')[1])))
+                         })
+                      ]
+                    ))
+                }else{
+                    let i = fleches.indexOf(x)
+                    x.epSup = value
+                    fleches[i] = x
+                    selectedFeature.set('fleches', fleches.concat([]))
+                }
 			}
 		},
-		[props, selectedFeature]
+		[selectedFeature, vitesse, flightLevel, epaisseurInf, affich, affichEp]
 	);
 
     const handleChangeEpaisseurInf = useCallback(
@@ -87,37 +124,100 @@ function Window(props) {
 			if (selectedFeature) {
 				const { value } = event.target;
 				setEpaisseurInf(value);
-				//selectedFeature.set('flightFleche', value);
+                let fleches = selectedFeature.get('fleches')
+                let x = fleches.find(elt => ((elt.point[0] ===  selectedFeature.get('dblclickpoint')[0] ) && (elt.point[1] ===  selectedFeature.get('dblclickpoint')[1])));
+                let coords = selectedFeature.getGeometry().getCoordinates()
+                if (!x){    
+                    selectedFeature.set('fleches', fleches.concat([({
+                        point : selectedFeature.get('dblclickpoint'), 
+                        vitesse : vitesse,
+                        flightLevel : flightLevel,
+                        epSup : epaisseurSup,
+                        epInf : value,
+                        affichEp : affichEp,
+                        affich : affich,
+                        index :  coords.findIndex(elt => ((elt[0] ===  selectedFeature.get('dblclickpoint')[0] ) && (elt[1] ===  selectedFeature.get('dblclickpoint')[1])))
+                         })
+                      ]
+                    ))
+                }else{
+                    let i = fleches.indexOf(x)
+                    x.epInf = value
+                    fleches[i] = x
+                    selectedFeature.set('fleches', fleches.concat([]))
+                }
 			}
 		},
-		[props, selectedFeature]
+		[selectedFeature, vitesse, flightLevel, epaisseurSup, affich, affichEp]
 	);
 
     const handleChangeAffich = useCallback(
 		(event) => {
-            
 			if (selectedFeature) {
 				const { value } = event.target
 				setAffich(value)
+                let fleches = selectedFeature.get('fleches')
+                let x = fleches.find(elt => ((elt.point[0] ===  selectedFeature.get('dblclickpoint')[0] ) && (elt.point[1] ===  selectedFeature.get('dblclickpoint')[1])));
+                let coords = selectedFeature.getGeometry().getCoordinates()
+                if (!x){    
+                    selectedFeature.set('fleches', fleches.concat([({
+                        point : selectedFeature.get('dblclickpoint'), 
+                        vitesse : vitesse,
+                        flightLevel : flightLevel,
+                        epSup : epaisseurSup,
+                        epInf : epaisseurInf,
+                        affichEp : affichEp,
+                        affich : value,
+                        index :  coords.findIndex(elt => ((elt[0] ===  selectedFeature.get('dblclickpoint')[0] ) && (elt[1] ===  selectedFeature.get('dblclickpoint')[1])))
+                         })
+                      ]
+                    ))
+                }else{
+                    let i = fleches.indexOf(x)
+                    x.affich = value
+                    fleches[i] = x
+                    selectedFeature.set('fleches', fleches.concat([]))
+                }
 			} 
 		},
-		[props, selectedFeature]
+		[selectedFeature, vitesse, flightLevel, epaisseurInf, epaisseurSup, affichEp]
 	);
 
     const handleChangeAffichEp= useCallback(
 		(event) => {
-            
 			if (selectedFeature) {
 				const { value } = event.target
 				setAffichEp(value)
+                let fleches = selectedFeature.get('fleches')
+                let x = fleches.find(elt => ((elt.point[0] ===  selectedFeature.get('dblclickpoint')[0] ) && (elt.point[1] ===  selectedFeature.get('dblclickpoint')[1])));
+                let coords = selectedFeature.getGeometry().getCoordinates()
+                if (!x){    
+                    selectedFeature.set('fleches', fleches.concat([({
+                        point : selectedFeature.get('dblclickpoint'), 
+                        vitesse : vitesse,
+                        flightLevel : flightLevel,
+                        epSup : epaisseurSup,
+                        epInf : epaisseurInf,
+                        affichEp : value,
+                        affich : affich,
+                        index :  coords.findIndex(elt => ((elt[0] ===  selectedFeature.get('dblclickpoint')[0] ) && (elt[1] ===  selectedFeature.get('dblclickpoint')[1])))
+                         })
+                      ]
+                    ))
+                }else{
+                    let i = fleches.indexOf(x)
+                    x.affichEp = value
+                    fleches[i] = x
+                    selectedFeature.set('fleches', fleches.concat([]))
+                }
 			} 
 		},
-		[props, selectedFeature]
+		[selectedFeature, vitesse, flightLevel, epaisseurInf, epaisseurSup, affich]
 	);
  
 	const handleConfirm = useCallback(() => {
         dispatch(setModal(''));
-	}, [map, mapCoordinate, selectedFeature, props, dispatch]);
+	}, [ dispatch]);
 
 	const handleCancel = useCallback(() => {
 		dispatch(setOption(''));
