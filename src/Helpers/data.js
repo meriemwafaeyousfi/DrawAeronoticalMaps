@@ -181,3 +181,5 @@ export const styleBorder = [
 ]
 
 export const sizeTextList = [8,10,12,14,16,18,20,22,24,26,28,38,48];
+
+export const policesTextList = ['Arial', 'Time New Roman']

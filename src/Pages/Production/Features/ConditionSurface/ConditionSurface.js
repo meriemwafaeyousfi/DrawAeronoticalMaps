@@ -29,6 +29,7 @@ function ConditionSurface() {
 		scs.set('title', 'condition:select');
 		scs.setActive(false);
 		scs.on('select', ({ selected }) => {
+		  console.log('bug')
 			if (selected[0]) {
 				dispatch(setSelectedFeature(selected[0]));
 			} else {
@@ -46,7 +47,6 @@ function ConditionSurface() {
             feature.set('condition', 'etat');
             feature.set('valeur', 0);
 			dispatch(setOption(''));
-			dispatch(setOption('select'));
             dispatch(setModal('condition_surface'));
             dispatch(setSelectedFeature(feature));
 			endDrawing(map);

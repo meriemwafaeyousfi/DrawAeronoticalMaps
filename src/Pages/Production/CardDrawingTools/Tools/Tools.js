@@ -29,9 +29,7 @@ function Tools() {
   const modal = useSelector((state) => state.modal);
   const option = useSelector((state) => state.option);
   const mapCoordinate = useSelector((state) => state.mapCoordinate);
-
   const dispatch = useDispatch();
-
   const [undoRedo, setUndoRedo] = useState(null);
 
   const doubleClick = useCallback(
@@ -40,13 +38,15 @@ function Tools() {
       dispatch(setModal(""));
       map.forEachFeatureAtPixel(
         map.getEventPixel(event),
+       
         (feature) => {
-          if (feature.getGeometry().getType() !== "Point" && feature.get('feature_type') !== 'jet') {
+          if (feature.get('feature_type') !== 'jet' && (feature.getGeometry().getType() !== "Point" || feature.get('feature_type') )) {
             dispatch(setModal(feature.get("feature_type")));
             dispatch(setOption(""));
-          }else if(feature.getGeometry().getType() === "Point") {
+          }else if(feature.getGeometry().getType() === "Point" && !feature.get('feature_type') ) {
+            console.log(feature)
             dispatch(setModal("fleche_vent"));
-            feature.get('features')[0].set('dblclickpoint',feature.getGeometry().getCoordinates())
+            feature.get('features')[0].set('dblclickpoint',feature.getGeometry().getCoordinates());
           }
         },
         { hitTolerance: 10 }

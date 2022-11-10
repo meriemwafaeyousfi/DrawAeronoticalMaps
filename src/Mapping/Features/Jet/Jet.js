@@ -9,7 +9,7 @@ import { arc } from './JetGeometry';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import CircleStyle from 'ol/style/Circle';
-import { Point, MultiPoint, LineString } from 'ol/geom';
+import { Point, MultiPoint, LineString, SimpleGeometry } from 'ol/geom';
 import {
 	altKeyOnly,
 	click,
@@ -31,7 +31,6 @@ const styleFunction = function (feature) {
 	const dx = end[0] - start[0];
 	const dy = end[1] - start[1];
 	const rotation = -Math.atan2(dy, dx);
-   
 	const styles = new Style({
 		geometry: new Point(end),
 		image: new RegularShape({
@@ -70,70 +69,72 @@ const selectType = (mapBrowserEvent) => {
 	);
 };
 
-const selectStyleFunction = function (feature) {
-	let coords = feature.getGeometry().getCoordinates();
-	let end = coords[coords.length - 1];
-	let start = coords[coords.length - 2];
-	const dx = end[0] - start[0];
-	const dy = end[1] - start[1];
-	const rotation = -Math.atan2(dy, dx);
-    //styles1 c'est le style de fleche d'orientation
-	const styles1 = new Style({
-		geometry: new Point(end),
-		image: new RegularShape({
-			fill: fill,
-			stroke: stroke,
-			points: 3,
-			radius: 7,
-			rotation: rotation,
-			rotateWithView: true,
-			angle: 100,
-		}),
-	});
-	//styles2 c'est le style de JET
-	const styles2 = new Style({
-		stroke: new Stroke({
-			color: '#0000FF',
-			width: 4.5,
-		}),
-		geometry: (feature) => {
-			return arc(feature.getGeometry().getCoordinates())
-		},
-	});
+// const selectStyleFunction = function (feature) {
+// 	let coords = feature.getGeometry().getCoordinates();
+// 	let end = coords[coords.length - 1];
+// 	let start = coords[coords.length - 2];
+// 	const dx = end[0] - start[0];
+// 	const dy = end[1] - start[1];
+// 	const rotation = -Math.atan2(dy, dx);
+//     //styles1 c'est le style de fleche d'orientation
+// 	const styles1 = new Style({
+// 		geometry: new Point(end),
+// 		image: new RegularShape({
+// 			fill: fill,
+// 			stroke: stroke,
+// 			points: 3,
+// 			radius: 7,
+// 			rotation: rotation,
+// 			rotateWithView: true,
+// 			angle: 100,
+// 		}),
+// 	});
+// 	//styles2 c'est le style de JET
+// 	const styles2 = new Style({
+// 		stroke: new Stroke({
+// 			color: '#0000FF',
+// 			width: 4.5,
+// 		}),
+// 		geometry: (feature) => {
+// 			return arc(feature.getGeometry().getCoordinates())
+// 		},
+// 	});
 
-	//styles4 c'est le style des fleches de vent
-	const styles4 = []
-	feature.get('fleches').forEach((elt)=> { 
-		styles4.push(addFlecheVent(feature, feature.getGeometry().getCoordinates()[elt.index], elt.vitesse, elt.flightLevel, elt.epSup, elt.epInf, elt.affich, elt.affichEp, 'fleche'))
-    })
-
-	//styles3 c'est le styles des poingnés
-	const styles3 = new Style({
-		image: new CircleStyle({
-			radius: 5,
-			fill: new Fill({
-				color: '#0000FF',
-			}),
-		}), 
-		geometry: function (feature) {
-			// in the coordinates delete those which are fleches de vent
-			let coordinates = feature.getGeometry().getCoordinates()
-			let fleches = feature.get('fleches')
-			let flechesInd = []
-			fleches.forEach((elt)=>{
-				flechesInd.push(elt.index)
-
-			})
-			let newCoords = coordinates.filter((value, index) => {
-				return !flechesInd.includes(index)
-			})
-			newCoords.pop()
-			return new MultiPoint(newCoords)
-		},
-	})
+// 	//styles4 c'est le style des fleches de vent
+// 	const styles4 = []
 	
-	return [styles3, styles2, styles1].concat(styles4);
-};
+	
+// 	feature.get('fleches').forEach((elt)=> { 
+// 		styles4.push(addFlecheVent(map,feature, feature.getGeometry().getCoordinates()[elt.index] , elt.vitesse, elt.flightLevel, elt.epSup, elt.epInf, elt.affich, elt.affichEp, 'fleche'))
+//     })
+
+// 	//styles3 c'est le styles des poingnés
+// 	const styles3 = new Style({
+// 		image: new CircleStyle({
+// 			radius: 5,
+// 			fill: new Fill({
+// 				color: '#0000FF',
+// 			}),
+// 		}), 
+// 		geometry: function (feature) {
+// 			// in the coordinates delete those which are fleches de vent
+// 			let coordinates = feature.getGeometry().getCoordinates()
+// 			let fleches = feature.get('fleches')
+// 			let flechesInd = []
+// 			fleches.forEach((elt)=>{
+// 				flechesInd.push(elt.index)
+
+// 			})
+// 			let newCoords = coordinates.filter((value, index) => {
+// 				return !flechesInd.includes(index)
+// 			})
+// 			newCoords.pop()
+// 			return new MultiPoint(newCoords)
+// 		},
+// 	})
+	
+// 	return [styles3, styles2, styles1].concat(styles4);
+// };
 
 export const jetVectorLayer = () => {
 	return new VectorLayer({
@@ -159,11 +160,74 @@ export const modifyJet = (select) => {
 	});
 };
 
-export const selectJet = (vectorLayer) => {
+export const selectJet = (map,vectorLayer) => {
 	return new Select({
+		layers: [vectorLayer],
 		condition: selectType,
 		style: (feature) => {
-			return selectStyleFunction(feature);
+			let coords = feature.getGeometry().getCoordinates();
+			
+			let end = coords[coords.length - 1];
+			let start = coords[coords.length - 2];
+			const dx = end[0] - start[0];
+			const dy = end[1] - start[1];
+			const rotation = -Math.atan2(dy, dx);
+			//styles1 c'est le style de fleche d'orientation
+			const styles1 = new Style({
+				geometry: new Point(end),
+				image: new RegularShape({
+					fill: fill,
+					stroke: stroke,
+					points: 3,
+					radius: 7,
+					rotation: rotation,
+					rotateWithView: true,
+					angle: 100,
+				}),
+			});
+			//styles2 c'est le style de JET
+			const styles2 = new Style({
+				stroke: new Stroke({
+					color: '#0000FF',
+					width: 4.5,
+				}),
+				geometry: (feature) => {
+					return arc(feature.getGeometry().getCoordinates())
+				},
+			});
+		
+			//styles4 c'est le style des fleches de vent
+			const styles4 = []
+			feature.get('fleches').forEach((elt)=> { 
+				styles4.push(addFlecheVent(feature, feature.getGeometry().getCoordinates()[elt.index] , elt.vitesse, elt.flightLevel, elt.epSup, elt.epInf, elt.affich, elt.affichEp, 'fleche'))
+			})
+		
+			//styles3 c'est le styles des poingnés
+			const styles3 = new Style({
+				image: new CircleStyle({
+					radius: 5,
+					fill: new Fill({
+						color: '#0000FF',
+					}),
+				}), 
+				geometry: function (feature) {
+					// in the coordinates delete those which are fleches de vent
+					let coordinates = feature.getGeometry().getCoordinates()
+					let fleches = feature.get('fleches')
+					let flechesInd = []
+					fleches.forEach((elt)=>{
+						flechesInd.push(elt.index)
+		
+					})
+					let newCoords = coordinates.filter((value, index) => {
+						return !flechesInd.includes(index)
+					})
+					newCoords.pop()
+					return new MultiPoint(newCoords)
+				},
+			})
+			
+			return [styles3, styles2, styles1].concat(styles4);
 		},
 		filter: function (feature) {
 			return feature.get('feature_type') === 'jet';
@@ -186,10 +250,11 @@ export const addJetAHandle = (point, feature) => {
 			newCoordinates.push(end);
 		} else {
 			newCoordinates.push(end);
-		}
+		} 
 	});
 	//change the position of fleches-Vent
 	let fleches = feature.get('fleches')
+	console.log(fleches)
     if(fleches){
 		newCoordinates.forEach((elt, index)=>{
 			let i = fleches.findIndex(fleche => ((fleche.point[0] ===  elt[0] ) && (fleche.point[1] ===  elt[1])))

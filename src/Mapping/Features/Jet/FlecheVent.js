@@ -2,6 +2,7 @@ import * as turf from '@turf/turf';
 import { D3WindBarb} from "d3-wind-barbs";
 import { Point } from 'ol/geom';
 import {transform} from 'ol/proj';
+import { LineString} from 'ol/geom';
 import {
 	Style,
 	Fill,
@@ -57,62 +58,71 @@ function calculateTan(point1, point2){
    return ((point1[1]-point2[1])/(point1[0]-point2[0]))
 }
 
+
+//calculate the distance between two points
+function distance1(p1, p2) {
+  let a = p1[0] - p2[0];
+  let b = p1[1] - p2[1];
+  return Math.sqrt( Math.pow(a,2) + Math.pow(b,2));
+}
+
+
+//calculate distance between the point and the list of coordinates 
+/**and return the index of the closest coordinate to the point**/
+function closestPoint(coordinates, point){
+  let distances = [];
+  let distance = 0;
+  let min = 0;
+  for (let i = 0; i < coordinates.length; i++) {
+    if(coordinates[i] && ((coordinates[i][0] != point[0])&& (coordinates[i][1] != point[1]))){
+    distance = distance1(point, coordinates[i]);
+    distances.push(distance);
+    }else{
+      distances.push(Math.pow(10, 10));
+    }
+  }
+  min = Math.min.apply(null, distances);
+  return {'index' : distances.indexOf(min), 'distance' : min};
+}
+
 export const addFlecheVent = (feature, point, vitesse, flightLevel, epaisseurSup, epaisseurInf, affich, affichEp, type) =>{
   if(!feature) return
-    let start, end = null
-    let p1 = transform(feature.getGeometry().getCoordinates()[0],'EPSG:3857', 'EPSG:4326')
-    let p2 = transform(point,'EPSG:3857', 'EPSG:4326')
-    let newCoor = []
-    let c = feature.getGeometry().getCoordinates()
-        let i =  c.findIndex(elt => ((elt[0] ===  point[0] ) && (elt[1] ===  point[1])))
-    feature.getGeometry().getCoordinates().forEach(point => {
-      newCoor.push(transform(point,'EPSG:3857', 'EPSG:4326'))
-    })
-    let line1 = {
+     let line1 = {
       type: "Feature",
       properties: {},
       geometry: {
         type: "LineString",
-        coordinates: newCoor
+        coordinates: feature.getGeometry().getCoordinates()
         }
       }
     let line2 = turf.bezierSpline(line1);
-    console.log(line2)
-    if(p1[0]===p2[0] && p1[1]===p2[1]){
-        start = point
-        let myPoint1 = turf.along(line2, 10);
-        let myPoint2 = turf.along(line2, 20);
-        point = transform(myPoint1.geometry.coordinates,'EPSG:4326', 'EPSG:3857')
-        end = transform(myPoint2.geometry.coordinates,'EPSG:4326', 'EPSG:3857')
-    }else{ 
-        let b2 = transform(c[c.length-1],'EPSG:3857', 'EPSG:4326')
-        let ll1 = {
-          type: "Feature",
-          properties: {},
-          geometry: {
-            type: "LineString",
-            coordinates: [p2,b2]
-            }
-          }
-        let tt1 = turf.bezierSpline(ll1);
-        let myPoint1 = turf.along(tt1,100);
-        end = transform(myPoint1.geometry.coordinates,'EPSG:4326', 'EPSG:3857')
-        
-    }
+    let geom = new LineString([]);
+    geom.setCoordinates(line2["geometry"]["coordinates"]);
+    var from = turf.point(feature.getGeometry().getCoordinates()[0]);
+    var to = turf.point(feature.getGeometry().getCoordinates()[feature.getGeometry().getCoordinates().length-1]);
+    //change the tolerance 
+    let c2 = geom.simplify(100).getCoordinates()
+    let dis = closestPoint(c2, point)
+    let index = dis.index;
+    let end = [c2[index+1][0],c2[index+1][1]];
+    let start = [c2[index-1][0],c2[index-1][1]];
+
     let cos = calculateCos(point,end)
-    let tan = calculateTan( c[i+1] , c[i-1])
-    let x   = c[i+1][0] - c[i-1][0]
-    let y   = c[i+1][1] - c[i-1][1]
+    let tan = calculateTan( end, start)
+
+    let x = end[0] - start[0]
+    let y = end[1] - start[1]
     let orientation = true
     if(( x < 0 && y < 0) || (x < 0 && y > 0)){
-      orientation = false
+    orientation = false
     }
+
     let deg = 0
     if(tan > 0){
-      deg = - Math.acos(cos) ;
+      deg = - Math.acos(cos) 
     }else{
-      if(tan !==  0){
-      deg =  Math.acos(cos) ;
+      if(tan !=  0){
+      deg =  Math.acos(cos) 
     }else{
       deg = 0;
     }

@@ -15,23 +15,34 @@ import {
 import { Dialog } from 'primereact/dialog';
 import { RadioButton } from 'primereact/radiobutton';
 import { Checkbox } from 'primereact/checkbox';
-import {styleBorder, sizeTextList } from '../../../../../Helpers/data';
+import {styleBorder as styleBorderList, sizeTextList, policesTextList  } from '../../../../../Helpers/data';
 import { ColorPicker } from 'primereact/colorpicker';
+import {
+	resizeTextZone
+} from 'Mapping/Features/ZoneTexte/ZoneTexte';
 
 function Window(props) {
 	const selectedFeature = useSelector((state) => state.selectedFeature);
 	const map = useSelector((state) => state.map);
+    const option = useSelector((state)=> state.option)
 	const dispatch = useDispatch();
 
-    const [sizeText, setSizeText] = useState(0)
-    const [showBordure, setShowBordure] = useState(false)
-    const [epaisseur, setEpaisseur] = useState(0)
-    const [marge, setMarge] = useState(0)
-    const [textColor, setTextColor] = useState('1976D2')
-    const [borderColor, setBorderColor] = useState('1976D2')
-    const [showRemp, setShowRemp] = useState(false)
-    const [transparence, setTransparence] = useState(0)
-    const [policeText, setPoliceText] = useState('Arial')
+    const [sizeText, setSizeText] = useState(16);
+    const [showBordure, setShowBordure] = useState(false);
+    const [epaisseur, setEpaisseur] = useState(0);
+    const [marge, setMarge] = useState(0);
+    const [textColor, setTextColor] = useState('1976D2');
+    const [borderColor, setBorderColor] = useState('1976D2');
+    const [showRemp, setShowRemp] = useState(false);
+    const [transparence, setTransparence] = useState(100);
+    const [policeText, setPoliceText] = useState('Arial');
+    const [rempColor , setRempColor] = useState('1976D2');
+    const [boldText, setBoldText] = useState(false);
+    const [italicText, setItalicText] = useState(false);
+    const [underLineText, setUnderLineText] = useState(false);
+    const [alignText, setAlignText] = useState('start');
+    const [styleBorder, setStyleBorder] = useState('solid');
+
 
 	const handleChangeEpaisseur = useCallback(
 		(event) => {
@@ -41,7 +52,7 @@ function Window(props) {
 			    selectedFeature.set('epaisseur', value);
 			}
 		},
-		[props, selectedFeature]
+		[selectedFeature]
 	);
 
     const handleChangeTransparence = useCallback(
@@ -49,12 +60,11 @@ function Window(props) {
 			if (selectedFeature) {
 				const { value } = event.target;
 				setTransparence(value);
-			    selectedFeature.set('transparence', value);
+			    selectedFeature.set('transparence', (value === 0 )? 0 : value/100 );
 			}
 		},
-		[props, selectedFeature]
+		[selectedFeature]
 	);
-    
     
     const handleChangeSizeText = useCallback(
 		(event) => {
@@ -64,10 +74,9 @@ function Window(props) {
 			    selectedFeature.set('size', value);
 			}
 		},
-		[props, selectedFeature]
+		[selectedFeature]
 	);
-    
-    
+     
 	const handleChangeMarge = useCallback(
 		(event) => {
 			if (selectedFeature) {
@@ -76,7 +85,7 @@ function Window(props) {
 			    selectedFeature.set('marge', value);
 			}
 		},
-		[props, selectedFeature]
+		[selectedFeature]
 	);
 
     const handleChangeShowBordure = useCallback(
@@ -87,7 +96,7 @@ function Window(props) {
 			    selectedFeature.set('show-bordure', value);
 			}
 		},
-		[props, selectedFeature]
+		[selectedFeature]
 	);
 
     const handleChangeShowRemp = useCallback(
@@ -95,11 +104,107 @@ function Window(props) {
 			if (selectedFeature) {
 				const  value  = event.checked;
 				setShowRemp(value);
-			    selectedFeature.set('show-remplissage', value);
+			    selectedFeature.set('show-remp', value);
 			}
 		},
-		[props, selectedFeature]
+		[selectedFeature]
 	);
+
+    const handleChangeTextColor = useCallback(
+        (event)=>{
+            if (selectedFeature) {
+				const  value  = event.value;
+				setTextColor(value);
+			    selectedFeature.set('text-color', value);
+			}
+        },
+        [selectedFeature]
+    );
+
+    const handleChangeBorderColor = useCallback(
+        (event)=>{
+            if (selectedFeature) {
+				const  value  = event.value;
+				setBorderColor(value);
+			    selectedFeature.set('border-color', value);
+			}
+        },
+        [selectedFeature]
+    );
+
+    const handleChangeRempColor = useCallback(
+        (event)=>{
+            if (selectedFeature) {
+				const  value  = event.value;
+				setRempColor(value);
+			    selectedFeature.set('remp-color', value);
+			}
+        },
+        [selectedFeature]
+    );
+
+    const handleChangeBoldText = useCallback(
+		(event) => {
+			if (selectedFeature) {
+				setBoldText(!boldText);
+                console.log(!boldText)
+			    selectedFeature.set('bold', !boldText);
+			}
+		},
+		[selectedFeature,boldText]
+	);
+
+    const handleChangeItalicText = useCallback(
+		(event) => {
+			if (selectedFeature) {
+				setItalicText(!italicText);
+			    selectedFeature.set('italic', !italicText);
+			}
+		},
+		[selectedFeature,italicText]
+	);
+
+    const handleChangeUnderLineText = useCallback(
+		(event) => {
+			if (selectedFeature) {
+				setUnderLineText(!underLineText);
+			    selectedFeature.set('underline', !underLineText);
+			}
+		},
+		[selectedFeature,underLineText]
+	);
+
+    const handleChangeAlign = useCallback(
+        (event , value) => {
+            if(selectedFeature){
+                setAlignText(value)
+                selectedFeature.set('align', value)
+            }
+        },
+		[selectedFeature]
+    )
+
+    const handleChangeStyleBorder = useCallback(
+        (event) => {
+            if(selectedFeature){
+                const {value} = event.target
+                setStyleBorder(value)
+                selectedFeature.set('style-border', value.style)
+            }
+        },
+		[selectedFeature]
+    )
+
+    const handleChangePoliceText = useCallback(
+        (event) => {
+            if(selectedFeature){
+                const {value} = event.target
+                setPoliceText(value)
+                selectedFeature.set('police', value)
+            }
+        },
+		[selectedFeature]
+    )
 
 
 	const handleConfirm = useCallback(() => {
@@ -107,11 +212,13 @@ function Window(props) {
         editorOverlay.getElement().contentEditable = "false";
         editorOverlay.getElement().style.resize= "none";
         editorOverlay.getElement().style.outline = 'none';
+        
+        console.log(selectedFeature)
 		dispatch(setSelectedFeature(null));
 		dispatch(setOption(''));
 		dispatch(setModal(''));
         dispatch(setOption("select"));
-	}, [map, selectedFeature, props, dispatch]);
+	}, [map, selectedFeature, dispatch]);
 
 	const handleCancel = useCallback(() => {
 		dispatch(setOption(''));
@@ -121,9 +228,23 @@ function Window(props) {
 
     useEffect(() => {
         if (selectedFeature) {
-          
+            setSizeText(selectedFeature.get("size"));
+            setShowBordure(selectedFeature.get("show-bordure"));
+            setEpaisseur(selectedFeature.get("epaisseur"));
+            setMarge(selectedFeature.get("marge"));
+            setTextColor(selectedFeature.get("text-color"));
+            setBorderColor(selectedFeature.get("border-color"));
+            setShowRemp(selectedFeature.get("show-remp"));
+            setTransparence(selectedFeature.get("transparence"));
+            setPoliceText(selectedFeature.get("police"));
+            setRempColor(selectedFeature.get("remp-color"));
+            setBoldText(selectedFeature.get("bold"));
+            setItalicText(selectedFeature.get("italic"));
+            setUnderLineText(selectedFeature.get("underline"));
+            setAlignText(selectedFeature.get("align"));
+            setStyleBorder(selectedFeature.get("style-border"));
         }
-      }, [selectedFeature]);
+      }, [map,selectedFeature]);
     
     const groupedItemTemplate = (option) => {
         return (
@@ -135,7 +256,7 @@ function Window(props) {
 
 return (
     <Dialog
-        header="Conditions surface"
+        header="Editeur de texte"
         position="bottom-left"
         modal={false}
         visible={true}
@@ -145,25 +266,23 @@ return (
         style={{ width: '300px' }}
         closable={false}>
 
-
             <div className="my-2">
                 <label htmlFor="color" className="p-checkbox-label">Couleur</label>
-                <ColorPicker inputId="color" value={textColor} onChange={(e) => setTextColor(e.value)} />
+                <ColorPicker inputId="color" value={textColor} onChange={handleChangeTextColor} />
             </div>
 
             <div className="grid p-fluid col-12 ">
                     <div className="grid p-fluid col-12">
-                        <div className="col_6">
+                        <div className="col_6 p-1 ">
                             <Dropdown
-                                //value={dir2}
-                                options={styleBorder}
-                                //onChange={handleChangeDirection}
-                                optionLabel="style"
+                                value={policeText}
+                                options={policesTextList}
+                                onChange={handleChangePoliceText}
                                 placeholder="Polices"
                             />
                         </div>
 
-                    <div className="col_6">
+                    <div className="col_6 p-1 ">
 						<Dropdown
 							value={sizeText}
 							options={sizeTextList}
@@ -177,19 +296,19 @@ return (
 
        
         <div className="grid p-fluid col-12">
-                 <div className="col_6">
+                 <div className="col_6 p-1">
                     <span className="p-buttonset">
-                        <Button  icon="pi pi-align-right" />
-                        <Button  icon="pi pi-align-left" />
-                        <Button  icon="pi pi-align-center" />
+                        <Button id='left'   icon="pi pi-align-left"    onClick={(e) => handleChangeAlign(e,'left')}/>
+                        <Button id='center' icon="pi pi-align-center"  onClick={(e) => handleChangeAlign(e,'center')}/>
+                        <Button id='right'  icon="pi pi-align-right"   onClick={(e) => handleChangeAlign(e,'right')}/>
                     </span>
                 </div>
 
-                <div className="col_6">
+                <div className="col_6 p-1">
                     <span className="p-buttonset">
-                        <Button label='B' />
-                        <Button  label='I'/>
-                        <Button  label='U' />
+                        <Button  label='B' onClick={handleChangeBoldText} />
+                        <Button  label='I' onClick={handleChangeItalicText}/>
+                        <Button  label='U' onClick={handleChangeUnderLineText}/>
                     </span>
                 </div>
 
@@ -201,16 +320,16 @@ return (
             </div>
 
             <div className="grid p-fluid col-12">
-                <div className="col_6">
+                <div className="col_6 p-1">
                         <label htmlFor="color2">Couleur</label>
-                        <ColorPicker inputId="color2" value={textColor} onChange={(e) => setTextColor(e.value)} />
+                        <ColorPicker  inputId="color2" value={borderColor} onChange={handleChangeBorderColor} />
                         
                 </div>
-                <div className="col_6">
+                <div className="col_6 p-1">
                     <Dropdown
-							   //value={dir2}
-							    options={styleBorder}
-                                //onChange={handleChangeDirection}
+							    value={styleBorder}
+							    options={styleBorderList}
+                                onChange={handleChangeStyleBorder}
                                 optionLabel="style"
 							   placeholder="Style"
                               itemTemplate={groupedItemTemplate}
@@ -220,16 +339,17 @@ return (
 
             <div className="grid p-fluid col-12 ">
                 
-            <div className="col_6">
-                    <label htmlFor="stacked">Epaisseur</label>
+            <div className="col_6 p-1">
+                    <label htmlFor="i1">Epaisseur</label>
                     <InputNumber
-                        inputId="stacked"
+                        inputId="i1"
                         value={epaisseur}
                         onValueChange={handleChangeEpaisseur}
                         showButtons
+                        placeholder="Polices"
                     />
                 </div>
-                <div className="col_6">
+                <div className="col_6 p-1">
                     <label htmlFor="stacked">Marge</label>
                     <InputNumber
                         inputId="stacked"
@@ -250,8 +370,8 @@ return (
 
         <div className="grid p-fluid col-12">
                 <div className="col_6">
-                        <label htmlFor="color2">Couleur</label>
-                        <ColorPicker inputId="color2" value={borderColor} onChange={(e) => setBorderColor(e.value)} />
+                        <label htmlFor="color3">Couleur</label>
+                        <ColorPicker inputId="color3" value={rempColor} onChange={handleChangeRempColor} />
                         
                 </div>
 

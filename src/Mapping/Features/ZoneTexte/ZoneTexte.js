@@ -21,26 +21,75 @@ import {
 	shiftKeyOnly,
 	doubleClick,
 } from 'ol/events/condition';
-import Overlay from 'ol/Overlay';   
+import Overlay from 'ol/Overlay'; 
 
-export const zoneTexteVectorLayer = () => {
+const stroke = new Stroke({ 
+    color: 'transparent',
+    width: 2
+})
+
+const stroke2= new Stroke({ 
+    color: '#000',
+    width: 2
+})
+
+const fill = new Fill({
+    color: 'transparent',
+    width: 2
+})  
+
+const selectType = (mapBrowserEvent) => {
+    return (
+            click(mapBrowserEvent) ||
+            doubleClick(mapBrowserEvent) ||
+            mapBrowserEvent.type === 'contextmenu'
+        );
+    };
+
+export const zoneTexteVectorLayer = (map) => {
 	return new VectorLayer({
 		title: 'Zone de Texte',
 		source: new VectorSource(),
-        // style :  (feature) => {
-        //     return (
-        //         new Style({
-        //                   text: new olText({
-        //                     font: 'bold 16px/1 bold Arial',
-        //                     text: feature.get('size').toString(),
-        //                     offsetY  : 0,
-        //                     fill: new Fill({
-        //                       color: 'black'
-        //                     }),
-        //                  })
-        //     })
-        //     )
-        // }
+       style :  (feature) => {
+            const editor = map.getOverlayById(feature.ol_uid)
+            let computedStyle = getComputedStyle(editor.getElement()); //use it to modify the width of 
+            const editorWidth = computedStyle.width;
+            const _opacity = Math.round(Math.min(Math.max(feature.get('transparence') || 1, 0), 1) * 255);
+            const color=  feature.get('remp-color') + _opacity.toString(16).toUpperCase();
+            editor.getElement().style.borderWidth = feature.get('show-bordure') ? feature.get('epaisseur') + "px": 0;
+            editor.getElement().style.borderColor = feature.get('show-bordure') ? '#'+feature.get('border-color').toString() : 'transparent';
+            editor.getElement().style.borderStyle = feature.get('show-bordure') ?  feature.get('style-border') : 'none';
+            editor.getElement().style.backgroundColor = feature.get('show-remp') ?  '#'+color.toString() : 'transparent';
+            editor.getElement().style.padding =feature.get('show-bordure') ? feature.get('marge') +"px" : 0;
+            editor.getElement().style.color = '#'+feature.get('text-color').toString() ;
+            editor.getElement().style.fontSize = feature.get('size')+ 'px';
+            editor.getElement().style.fontFamily = feature.get('police');
+            editor.getElement().style.textAlign = feature.get('align');
+            if(feature.get('bold')){
+                editor.getElement().style.fontWeight= 'bold';
+            }
+            if(feature.get('italic')){
+                editor.getElement().style.fontStyle = "italic";
+            }
+            if(feature.get('underline')){
+                editor.getElement().style.textDecoration = "underline";
+            }
+           
+          
+          return (
+            new Style({
+                image: new RegularShape({
+                    fill: fill,
+                    stroke: stroke,
+                    points: 4,
+                    radius: 40,
+                    rotateWithView: true,
+                    angle: 40,
+                  }),
+                
+            })
+          )
+        }
   
 	});
 };
@@ -52,8 +101,61 @@ export const drawZoneTexte = (vectorSource) => {
 	});
 };
 
-export const selectZoneTexte = (vectorLayer) => {
-	return new Select();
+export const selectZoneTexte = (map,vectorLayer) => {
+	return new Select({
+        layers: [vectorLayer],
+        condition: selectType,
+        style: (feature) => {
+            if (feature.get('feature_type') === 'zone_texte') {
+            const editor = map.getOverlayById(feature.ol_uid)
+            let computedStyle = getComputedStyle(editor.getElement()); //use it to modify the width of 
+            const editorWidth = computedStyle.width;
+            editor.getElement().style.resize= "vertical";
+            editor.getElement().style.outline = '0.2px dashed #000000';
+            const _opacity = Math.round(Math.min(Math.max(feature.get('transparence') || 1, 0), 1) * 255);
+            const color=  feature.get('remp-color') + _opacity.toString(16).toUpperCase();
+            editor.getElement().style.borderWidth = feature.get('show-bordure') ? feature.get('epaisseur') + "px": 0;
+            editor.getElement().style.borderColor = feature.get('show-bordure') ? '#'+feature.get('border-color').toString() : 'transparent';
+            editor.getElement().style.borderStyle = feature.get('show-bordure') ?  feature.get('style-border') : 'none';
+            editor.getElement().style.backgroundColor = feature.get('show-remp') ?  '#'+color.toString() : 'transparent';
+            //editor.getElement().style.opacity = feature.get('show-remp') ?  feature.get('transparence')/100 : 'transparent';
+            editor.getElement().style.padding =feature.get('show-bordure') ? feature.get('marge') +"px" : 0;
+            editor.getElement().style.color = '#'+feature.get('text-color').toString() ;
+            editor.getElement().style.fontSize = feature.get('size')+ 'px';
+            editor.getElement().style.fontFamily = feature.get('police');
+            editor.getElement().style.textAlign = feature.get('align');
+            if(feature.get('bold')){
+                editor.getElement().style.fontWeight= 'bold';
+            }else{
+                
+                editor.getElement().style.fontWeight= 'normal';
+            }
+            if(feature.get('italic')){
+                editor.getElement().style.fontStyle = "italic";
+            }else{
+                editor.getElement().style.fontStyle = "normal";
+            }
+            if(feature.get('underline')){
+                editor.getElement().style.textDecoration = "underline";
+            }else{
+                editor.getElement().style.textDecoration = "none";
+            }
+            
+           return (new Style({
+                image: new RegularShape({
+                    fill: fill,
+                    stroke: stroke2,
+                    points: 4,
+                    radius: 40,
+                    rotateWithView: true,
+                    angle: 40,
+                  }),
+                
+            }))
+            
+        }
+    }
+    });
 };
 
 export const translateZoneTexte = (vectorLayer) => {
@@ -81,9 +183,11 @@ export const createEditorText = (map, feature) =>{
                   position: feature.getGeometry().getCoordinates(),
                   element: div,
                   stopEvent: false,
-                  dragging: false
+                  dragging: false,
+                  positioning: 'center-center',
                 });
-    map.addOverlay(editorOverlay);
+                
+    map.addOverlay(editorOverlay);  		
     }
 
 
@@ -94,3 +198,5 @@ export const zoneTexteDrawingON = (map) => {
 		}
 	});
 };
+
+

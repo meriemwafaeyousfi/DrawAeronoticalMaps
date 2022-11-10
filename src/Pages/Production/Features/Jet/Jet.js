@@ -24,12 +24,12 @@ function Jet() {
 		const jvl = jetVectorLayer();
 		map.addLayer(jvl);
 
-		const sj = selectJet(jvl);
+		const sj = selectJet(map,jvl);
 		sj.set('title', 'jet:select');
 		sj.setActive(false);
-		sj.on('select', ({ selected }) => {
-			if (selected[0]) {
-				dispatch(setSelectedFeature(selected[0]));
+		sj.on('select', (e) => {
+			if (e.selected[0]) {
+				dispatch(setSelectedFeature(e.selected[0]));
 			} else {
 				dispatch(setSelectedFeature(null));
 			}
@@ -45,6 +45,7 @@ function Jet() {
 			feature.set('fleches', [])
 			dispatch(setOption(''));
 			dispatch(setOption('select'));
+			
 			endDrawing(map);
 		});
 		map.addInteraction(dj);

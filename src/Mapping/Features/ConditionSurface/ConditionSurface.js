@@ -292,6 +292,7 @@ export const drawCondition = (vectorSource) => {
 
 export const selectCondition = (vectorLayer) => {
 	return new Select({
+    layers: [vectorLayer],
 		condition: selectType,
 		style: (feature) => {
 			return selectStyleFunction(feature);

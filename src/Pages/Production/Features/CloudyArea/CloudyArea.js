@@ -46,6 +46,7 @@ function CloudyArea({ clouds, cardid }) {
 		sc.set('title', 'zone_nuageuse:select');
 		sc.setActive(false);
 		sc.on('select', ({ selected }) => {
+			console.log('bug2')
 			if (selected[0]) {
 				dispatch(setSelectedFeature(selected[0]));
 			} else {
