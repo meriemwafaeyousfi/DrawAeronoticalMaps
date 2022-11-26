@@ -21,7 +21,7 @@ function Jet() {
 	const dispatch = useDispatch();
 
 	const init = useCallback(() => {
-		const jvl = jetVectorLayer();
+		const jvl = jetVectorLayer(map);
 		map.addLayer(jvl);
 
 		const sj = selectJet(map,jvl);
@@ -45,7 +45,6 @@ function Jet() {
 			feature.set('fleches', [])
 			dispatch(setOption(''));
 			dispatch(setOption('select'));
-			
 			endDrawing(map);
 		});
 		map.addInteraction(dj);

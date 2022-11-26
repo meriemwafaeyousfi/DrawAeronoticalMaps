@@ -23,6 +23,8 @@ import { feature } from '@turf/turf';
 import Overlay from 'ol/Overlay';
 import { setSelectedFeature , setModal, setMapCoordinate} from '../../../Pages/Production/CardDrawingTools/redux/actions'
 
+
+
 export const centreActionVectorLayer = () => {
 	return new VectorLayer({
 		title: 'Centre Action',

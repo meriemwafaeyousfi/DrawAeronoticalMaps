@@ -17,7 +17,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedFeature } from '../redux/actions';
 import { addAHandleCat, deleteAHandleCat } from 'Mapping/Features/CAT/CAT';
-import {addJetAHandle} from 'Mapping/Features/Jet/Jet'
+import {addJetAHandle, deleteJetAHandle} from 'Mapping/Features/Jet/Jet'
 
 function MapContextMenu() {
 	const map = useSelector((state) => state.map);
@@ -84,8 +84,7 @@ function MapContextMenu() {
 			visible:
 				!!rightClickedFeature &&
 				(rightClickedFeature.get('feature_type') === 'zone_nuageuse' ||
-					rightClickedFeature.get('feature_type') === 'courant_front'||
-					rightClickedFeature.get('feature_type') === 'jet') &&
+					rightClickedFeature.get('feature_type') === 'courant_front')&&
 				vertex &&
 				rightClickedFeature === selectedFeature,
 			command: () => {
@@ -102,6 +101,18 @@ function MapContextMenu() {
 				rightClickedFeature === selectedFeature,
 			command: () => {
 				deleteAHandle(eventCoordiantes, rightClickedFeature);
+			},
+		},
+		{
+			label: 'Supprimer le poignée',
+			icon: 'supprimer-poingee',
+			visible:
+				!!rightClickedFeature &&
+				rightClickedFeature.get('feature_type') === 'jet' &&
+				vertex &&
+				rightClickedFeature === selectedFeature,
+			command: () => {
+				deleteJetAHandle(eventCoordiantes, rightClickedFeature);
 			},
 		},
 		{
